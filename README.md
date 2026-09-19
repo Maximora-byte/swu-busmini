@@ -6,9 +6,9 @@ SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航�
 
 ## 当前状态
 
-项目已完成 **Phase 3.5：第一条校车线路静态数据闭环**。当前版本可以获取并显示用户位置、读取 1 路正反向数据、展示站点顺序，并为坐标校准后的校车站生成地图 marker。
+项目已完成 **Phase 4 的代码闭环：1 路坐标验证与地图 marker 管线**。当前版本可以获取并显示用户位置；点击“1路”可查看正反方向和纵向站序；Repository 只允许 `verified: true` 的 GCJ-02 坐标进入地图 marker。
 
-当前只录入 1 路：一号门、图书馆、八教、田家炳、五号门。路线图只用于确认站序，不能提供可验证的 GPS 坐标，因此五个站点坐标均保留为 `null` 并标记 TODO；在完成现场 GCJ-02 坐标校准前，页面会展示站序和待校准提示，不会在错误位置绘制 marker。
+当前只录入 1 路：一号门、图书馆、八教、田家炳、五号门。路线图只用于确认站序，不能提供可验证的 GPS 坐标，因此五个站点坐标均保留为 `null`，并标记 `TODO: waiting for field verification`。现场校准尚未完成，所以正式数据中暂时没有校车站 marker；填入经现场验证的坐标后会自动显示。
 
 定位功能仍能识别权限拒绝、超时、无效结果和系统定位失败。水平误差超过 100 米时保留定位结果，并显示低精度提示。
 
@@ -18,7 +18,7 @@ SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航�
 2. 克隆仓库，并在开发者工具中导入仓库根目录。
 3. 没有小程序 AppID 时使用游客模式；正式调试时在开发者工具的项目设置中换成自己的 AppID。
 4. 执行 `npm install` 安装开发依赖。
-5. 执行 `npm run typecheck` 进行 TypeScript 静态检查，执行 `npm test` 运行定位服务单元测试。
+5. 执行 `npm run typecheck` 进行 TypeScript 静态检查，执行 `npm test` 运行定位、Repository 和 Route Catalog 测试。
 
 真机测试定位前，还需要在微信公众平台完成《小程序用户隐私保护指引》中的位置信息用途声明。开发者工具可模拟位置，但其结果不能替代真机的 GPS 与权限拒绝场景测试。
 
@@ -49,13 +49,15 @@ miniprogram/
 模型定义位于 `miniprogram/models/index.ts`：
 
 - `BusStop`：站点名称、别名和坐标；
+- `BusStopCoordinate`：带 `verified` 状态的 GCJ-02 站点坐标；
+- `VerifiedBusStop`：Repository 已验证、可以交给地图的站点类型；
 - `BusDirection`：一个方向及其有序站点 ID；
 - `BusRoute`：包含一个或多个方向的校车线路；
 - `CampusPOI`：可搜索校园地点及分类；
 - `Coordinate` 与 `Location`：统一的 GCJ-02 坐标及带精度的定位结果；
 - `VehicleLocationProvider`：未来接入经授权实时车辆数据的可插拔边界。
 
-正反方向分别建模，可以明确站点顺序并避免环线或单向站点产生歧义。`BusStop.coordinate` 在未校准时为 `null`，已填写的坐标必须标记为 `verified`。所有坐标统一使用微信地图采用的 GCJ-02 坐标系。
+正反方向分别建模，可以明确站点顺序并避免环线或单向站点产生歧义。`BusStop.coordinate` 在未采集时为 `null`；已填写但尚未确认的坐标使用 `verified: false`，只有 `verified: true` 才能进入地图。所有坐标统一使用微信地图采用的 GCJ-02 坐标系。
 
 ## MVP 开发顺序
 
@@ -64,7 +66,7 @@ miniprogram/
 1. 显示校园地图（已完成）；
 2. 获取并显示用户位置（已完成）；
 3. 建立 1 路静态站点和正反向线路数据（已完成，坐标待校准）；
-4. 现场采集并校准 1 路站点坐标，验证地图 marker（下一步）；
+4. 完成坐标验证、marker 管线和线路详情 UI（代码已完成；现场坐标采集待完成）；
 5. 建立带别名的校园 POI 搜索；
 6. 实现单线路直达推荐；
 7. 接入上车前、下车后的步行路线；
@@ -81,7 +83,8 @@ miniprogram/
 - `miniprogram/data/stops.json` 保存去重后的站点记录；
 - `miniprogram/data/routes.json` 只用站点 ID 表达各方向的有序站点；
 - Repository 负责读取和验证静态 JSON，禁止页面直接导入数据文件；
-- Route Catalog Service 负责连接线路与站点，并只把已校准坐标的站点交给地图；
+- `getVerifiedStops()` 只返回坐标完整且明确标记 `verified: true` 的站点；
+- Route Catalog Service 负责连接线路与站点，检查所有方向中的重复 stopId 和未定义站点，并只把已验证站点交给地图；
 - 以后切换到 CloudBase 时可以替换 Repository，而不改变页面和领域模型。
 
 当前仅完成 1 路验证。2–9 路会在线路模型和坐标采集流程稳定后逐条加入，不接入未经授权的实时公交接口。

@@ -33,7 +33,7 @@ interface BusStopMarker {
 interface RouteStopView {
   id: string
   name: string
-  hasCoordinate: boolean
+  hasVerifiedCoordinate: boolean
   isLast: boolean
 }
 
@@ -74,6 +74,8 @@ Page({
     routeDirections: [] as RouteDirectionView[],
     routeStops: [] as RouteStopView[],
     routeCoordinateStatusText: '',
+    routeDetailsExpanded: false,
+    routeDataErrorText: '',
   },
 
   onLoad() {
@@ -82,46 +84,62 @@ Page({
   },
 
   loadRoute(directionName?: string) {
-    const details = routeCatalogService.getRouteDetails(
-      'route_1',
-      directionName,
-    )
+    try {
+      const details = routeCatalogService.getRouteDetails(
+        'route_1',
+        directionName,
+      )
+      const verifiedStopIds = new Set(
+        details.mappableStops.map((stop) => stop.id),
+      )
 
-    this.setData({
-      routeName: details.route.name,
-      routeDirectionName: details.direction.name,
-      routeDirections: details.route.directions.map((direction) => ({
-        name: direction.name,
-        selected: direction.name === details.direction.name,
-      })),
-      routeStops: details.stops.map((stop, index) => ({
-        id: stop.id,
-        name: stop.name,
-        hasCoordinate: stop.coordinate !== null,
-        isLast: index === details.stops.length - 1,
-      })),
-      busStopMarkers: details.mappableStops.map((stop, index) => ({
-        id: 1000 + index,
-        latitude: stop.coordinate.latitude,
-        longitude: stop.coordinate.longitude,
-        title: stop.name,
-        iconPath: '/assets/icons/bus-stop-marker.svg',
-        width: 30,
-        height: 36,
-        label: {
-          content: stop.name,
-          color: '#126b47',
-          fontSize: 12,
-          borderRadius: 4,
-          bgColor: '#ffffff',
-          padding: 4,
-        },
-      })),
-      routeCoordinateStatusText:
-        details.pendingCoordinateCount > 0
-          ? `${details.pendingCoordinateCount} 个站点坐标待现场校准，暂不显示 marker`
-          : '全部站点坐标已校准',
-    })
+      this.setData({
+        routeName: details.route.name,
+        routeDirectionName: details.direction.name,
+        routeDirections: details.route.directions.map((direction) => ({
+          name: direction.name,
+          selected: direction.name === details.direction.name,
+        })),
+        routeStops: details.stops.map((stop, index) => ({
+          id: stop.id,
+          name: stop.name,
+          hasVerifiedCoordinate: verifiedStopIds.has(stop.id),
+          isLast: index === details.stops.length - 1,
+        })),
+        busStopMarkers: details.mappableStops.map((stop, index) => ({
+          id: 1000 + index,
+          latitude: stop.coordinate.latitude,
+          longitude: stop.coordinate.longitude,
+          title: stop.name,
+          iconPath: '/assets/icons/bus-stop-marker.svg',
+          width: 30,
+          height: 36,
+          label: {
+            content: `📍${stop.name}站`,
+            color: '#126b47',
+            fontSize: 12,
+            borderRadius: 4,
+            bgColor: '#ffffff',
+            padding: 4,
+          },
+        })),
+        routeCoordinateStatusText:
+          details.pendingCoordinateCount > 0
+            ? `${details.pendingCoordinateCount} 个站点坐标待现场校准，暂不显示 marker`
+            : '全部站点坐标已校准',
+        routeDataErrorText: '',
+      })
+    } catch (error: unknown) {
+      this.setData({
+        routeName: '1路',
+        routeDirections: [],
+        routeStops: [],
+        busStopMarkers: [],
+        routeCoordinateStatusText: '',
+        routeDataErrorText:
+          error instanceof Error ? error.message : '线路数据加载失败',
+      })
+    }
   },
 
   async locateUser() {
@@ -166,6 +184,12 @@ Page({
     if (typeof directionName === 'string') {
       this.loadRoute(directionName)
     }
+  },
+
+  toggleRouteDetails() {
+    this.setData({
+      routeDetailsExpanded: !this.data.routeDetailsExpanded,
+    })
   },
 
   handleOpenSetting(event: WechatMiniprogram.ButtonOpenSetting) {

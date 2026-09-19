@@ -63,7 +63,53 @@ test('route catalog rejects a route that references an unknown stop', () => {
 
   assert.throws(
     () => service.getRouteDetails('invalid_route'),
-    /线路引用了不存在的站点/,
+    /方向 正向 引用了未定义站点: missing_stop/,
+  )
+})
+
+test('route catalog validates every direction before returning details', () => {
+  const invalidRoutes = createStaticRouteRepository([
+    {
+      id: 'partially_invalid_route',
+      name: '部分无效线路',
+      directions: [
+        {
+          name: '正向',
+          stopIds: ['gate_1', 'library'],
+        },
+        {
+          name: '反向',
+          stopIds: ['library', 'missing_reverse_stop'],
+        },
+      ],
+    },
+  ])
+  const service = createRouteCatalogService(invalidRoutes, busStopRepository)
+
+  assert.throws(
+    () => service.getRouteDetails('partially_invalid_route', '正向'),
+    /方向 反向 引用了未定义站点: missing_reverse_stop/,
+  )
+})
+
+test('route catalog rejects duplicate stopIds within one direction', () => {
+  const duplicateRoutes = createStaticRouteRepository([
+    {
+      id: 'duplicate_route',
+      name: '重复站点线路',
+      directions: [
+        {
+          name: '正向',
+          stopIds: ['gate_1', 'library', 'gate_1'],
+        },
+      ],
+    },
+  ])
+  const service = createRouteCatalogService(duplicateRoutes, busStopRepository)
+
+  assert.throws(
+    () => service.getRouteDetails('duplicate_route'),
+    /方向 正向 存在重复 stopId: gate_1/,
   )
 })
 
@@ -73,18 +119,18 @@ test('route catalog exposes only verified coordinates to the map layer', () => {
       id: 'verified_stop',
       name: '已校准站点',
       aliases: [],
-      latitude: 29.8,
-      longitude: 106.4,
-      coordinateStatus: 'verified',
+      coordinate: {
+        latitude: 29.8,
+        longitude: 106.4,
+        verified: true,
+      },
     },
     {
       id: 'pending_stop',
       name: '待校准站点',
       aliases: [],
-      latitude: null,
-      longitude: null,
-      coordinateStatus: 'pending',
-      coordinateTodo: 'TODO: 现场校准',
+      coordinate: null,
+      coordinateTodo: 'TODO: waiting for field verification',
     },
   ])
   const routes = createStaticRouteRepository([

@@ -13,13 +13,21 @@ export interface Location {
 }
 
 /** 校园校车站点。坐标统一使用 GCJ-02。 */
+export interface BusStopCoordinate extends Coordinate {
+  verified: boolean
+}
+
 export interface BusStop {
   id: string
   name: string
   aliases?: string[]
-  coordinate: Coordinate | null
-  coordinateStatus: 'verified' | 'pending'
+  coordinate: BusStopCoordinate | null
   coordinateTodo?: string
+}
+
+/** Repository 已确认坐标可用于正式地图展示的站点。 */
+export type VerifiedBusStop = BusStop & {
+  coordinate: BusStopCoordinate & { verified: true }
 }
 
 /** 一条线路的一个行驶方向，stopIds 的顺序就是行驶顺序。 */

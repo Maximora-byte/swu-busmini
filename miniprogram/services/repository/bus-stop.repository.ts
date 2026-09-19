@@ -1,20 +1,21 @@
 import stopsData from '../../data/stops.json'
-import type { BusStop, Coordinate } from '../../models/index'
-
-type CoordinateStatus = BusStop['coordinateStatus']
+import type {
+  BusStop,
+  BusStopCoordinate,
+  VerifiedBusStop,
+} from '../../models/index'
 
 interface StaticBusStopRecord {
   id: string
   name: string
   aliases: string[]
-  latitude: number | null
-  longitude: number | null
-  coordinateStatus: CoordinateStatus
+  coordinate: BusStopCoordinate | null
   coordinateTodo?: string
 }
 
 export interface BusStopRepository {
   getAll(): readonly BusStop[]
+  getVerifiedStops(): readonly VerifiedBusStop[]
   findById(id: string): BusStop | undefined
   getByIds(ids: readonly string[]): readonly BusStop[]
 }
@@ -27,39 +28,39 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string')
 }
 
-function isNullableNumber(value: unknown): value is number | null {
-  return value === null || (typeof value === 'number' && Number.isFinite(value))
-}
-
-function parseCoordinate(record: StaticBusStopRecord): Coordinate | null {
-  if (record.latitude === null && record.longitude === null) {
-    if (record.coordinateStatus !== 'pending') {
-      throw new Error(`站点 ${record.id} 缺少坐标，但未标记为 pending`)
-    }
+function parseCoordinate(
+  value: unknown,
+  stopId: string,
+): BusStopCoordinate | null {
+  if (value === null) {
     return null
   }
 
-  if (record.latitude === null || record.longitude === null) {
-    throw new Error(`站点 ${record.id} 的经纬度必须同时填写或同时为空`)
+  if (!isRecord(value)) {
+    throw new Error(`站点 ${stopId} 的 coordinate 必须是对象或 null`)
+  }
+
+  const { latitude, longitude, verified } = value
+  if (
+    typeof latitude !== 'number' ||
+    !Number.isFinite(latitude) ||
+    typeof longitude !== 'number' ||
+    !Number.isFinite(longitude) ||
+    typeof verified !== 'boolean'
+  ) {
+    throw new Error(`站点 ${stopId} 的坐标结构无效`)
   }
 
   if (
-    record.latitude < -90 ||
-    record.latitude > 90 ||
-    record.longitude < -180 ||
-    record.longitude > 180
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
   ) {
-    throw new Error(`站点 ${record.id} 的经纬度超出有效范围`)
+    throw new Error(`站点 ${stopId} 的经纬度超出有效范围`)
   }
 
-  if (record.coordinateStatus !== 'verified') {
-    throw new Error(`站点 ${record.id} 已填写坐标，但尚未标记为 verified`)
-  }
-
-  return {
-    latitude: record.latitude,
-    longitude: record.longitude,
-  }
+  return { latitude, longitude, verified }
 }
 
 function parseRecord(value: unknown, index: number): StaticBusStopRecord {
@@ -67,16 +68,13 @@ function parseRecord(value: unknown, index: number): StaticBusStopRecord {
     throw new Error(`stops.json 第 ${index + 1} 项不是对象`)
   }
 
-  const { id, name, aliases, latitude, longitude, coordinateStatus } = value
+  const { id, name, aliases, coordinate } = value
   const coordinateTodo = value.coordinateTodo
 
   if (
     typeof id !== 'string' ||
     typeof name !== 'string' ||
     !isStringArray(aliases) ||
-    !isNullableNumber(latitude) ||
-    !isNullableNumber(longitude) ||
-    (coordinateStatus !== 'verified' && coordinateStatus !== 'pending') ||
     (coordinateTodo !== undefined && typeof coordinateTodo !== 'string')
   ) {
     throw new Error(`stops.json 第 ${index + 1} 项结构无效`)
@@ -86,9 +84,7 @@ function parseRecord(value: unknown, index: number): StaticBusStopRecord {
     id,
     name,
     aliases,
-    latitude,
-    longitude,
-    coordinateStatus,
+    coordinate: parseCoordinate(coordinate, id),
     coordinateTodo,
   }
 }
@@ -110,8 +106,7 @@ function parseStops(value: unknown): readonly BusStop[] {
       id: record.id,
       name: record.name,
       aliases: [...record.aliases],
-      coordinate: parseCoordinate(record),
-      coordinateStatus: record.coordinateStatus,
+      coordinate: record.coordinate,
       coordinateTodo: record.coordinateTodo,
     }
   })
@@ -122,9 +117,13 @@ export function createStaticBusStopRepository(
 ): BusStopRepository {
   const stops = parseStops(data)
   const stopsById = new Map(stops.map((stop) => [stop.id, stop]))
+  const verifiedStops = stops.filter(
+    (stop): stop is VerifiedBusStop => stop.coordinate?.verified === true,
+  )
 
   return {
     getAll: () => stops,
+    getVerifiedStops: () => verifiedStops,
     findById: (id) => stopsById.get(id),
     getByIds: (ids) =>
       ids.map((id) => {

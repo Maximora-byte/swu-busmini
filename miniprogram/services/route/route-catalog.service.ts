@@ -2,7 +2,7 @@ import type {
   BusDirection,
   BusRoute,
   BusStop,
-  Coordinate,
+  VerifiedBusStop,
 } from '../../models/index'
 import {
   busStopRepository,
@@ -13,13 +13,11 @@ import {
   type RouteRepository,
 } from '../repository/route.repository'
 
-export type MappableBusStop = BusStop & { coordinate: Coordinate }
-
 export interface RouteDetails {
   route: BusRoute
   direction: BusDirection
   stops: readonly BusStop[]
-  mappableStops: readonly MappableBusStop[]
+  mappableStops: readonly VerifiedBusStop[]
   pendingCoordinateCount: number
 }
 
@@ -31,12 +29,48 @@ export function createRouteCatalogService(
   routes: RouteRepository,
   stops: BusStopRepository,
 ): RouteCatalogService {
+  function validateRoute(route: BusRoute): void {
+    for (const direction of route.directions) {
+      const seenStopIds = new Set<string>()
+      const duplicateStopIds = new Set<string>()
+      const missingStopIds = new Set<string>()
+
+      for (const stopId of direction.stopIds) {
+        if (seenStopIds.has(stopId)) {
+          duplicateStopIds.add(stopId)
+        }
+        seenStopIds.add(stopId)
+
+        if (!stops.findById(stopId)) {
+          missingStopIds.add(stopId)
+        }
+      }
+
+      if (duplicateStopIds.size > 0) {
+        throw new Error(
+          `线路 ${route.id} 方向 ${direction.name} 存在重复 stopId: ${[
+            ...duplicateStopIds,
+          ].join(', ')}`,
+        )
+      }
+
+      if (missingStopIds.size > 0) {
+        throw new Error(
+          `线路 ${route.id} 方向 ${direction.name} 引用了未定义站点: ${[
+            ...missingStopIds,
+          ].join(', ')}`,
+        )
+      }
+    }
+  }
+
   return {
     getRouteDetails(routeId, directionName) {
       const route = routes.findById(routeId)
       if (!route) {
         throw new Error(`未找到线路: ${routeId}`)
       }
+      validateRoute(route)
 
       const direction = directionName
         ? route.directions.find(({ name }) => name === directionName)
@@ -46,9 +80,13 @@ export function createRouteCatalogService(
       }
 
       const routeStops = stops.getByIds(direction.stopIds)
-      const mappableStops = routeStops.filter(
-        (stop): stop is MappableBusStop => stop.coordinate !== null,
+      const verifiedStopsById = new Map(
+        stops.getVerifiedStops().map((stop) => [stop.id, stop]),
       )
+      const mappableStops = direction.stopIds.flatMap((stopId) => {
+        const stop = verifiedStopsById.get(stopId)
+        return stop ? [stop] : []
+      })
 
       return {
         route,

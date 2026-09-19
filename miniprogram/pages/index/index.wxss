@@ -65,38 +65,91 @@
 
 .campus-map {
   width: 100%;
-  height: calc(100% - 536rpx);
+  height: calc(100% - 296rpx);
+}
+
+.page--route-expanded .campus-map {
+  height: calc(100% - 656rpx);
 }
 
 .route-panel {
   width: 100%;
-  height: 360rpx;
-  padding: 24rpx 28rpx 18rpx;
+  height: 120rpx;
+  padding: 0 28rpx;
   box-sizing: border-box;
   background: #ffffff;
   border-top: 1rpx solid #e3eae6;
 }
 
-.route-panel__header {
+.route-panel--expanded {
+  height: 480rpx;
+}
+
+.route-summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  height: 120rpx;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  line-height: normal;
+  text-align: left;
+  background: transparent;
 }
 
-.route-panel__eyebrow {
-  display: block;
+.route-summary::after {
+  border: 0;
+}
+
+.route-summary__identity {
+  display: flex;
+  align-items: baseline;
+}
+
+.route-summary__label,
+.route-details__label {
   color: #718078;
-  font-size: 22rpx;
-  line-height: 1.2;
+  font-size: 24rpx;
 }
 
-.route-panel__title {
-  display: block;
-  margin-top: 4rpx;
+.route-summary__name {
+  margin-left: 18rpx;
   color: #126b47;
   font-size: 40rpx;
   font-weight: 700;
-  line-height: 1.2;
+}
+
+.route-summary__action {
+  color: #126b47;
+  font-size: 26rpx;
+}
+
+.route-details {
+  height: 360rpx;
+}
+
+.route-details__error {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  color: #a93830;
+  font-size: 26rpx;
+  line-height: 1.5;
+  background: #fff2f0;
+  border-radius: 12rpx;
+}
+
+.route-details__direction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72rpx;
+}
+
+.route-details__stops-label {
+  display: block;
+  margin-top: 4rpx;
 }
 
 .direction-switch {
@@ -119,24 +172,27 @@
 
 .route-stops {
   width: 100%;
-  margin-top: 22rpx;
-  white-space: nowrap;
+  height: 190rpx;
+  margin-top: 8rpx;
 }
 
 .route-stops__track {
-  display: inline-flex;
-  align-items: flex-start;
-  min-width: 100%;
-  padding: 0 10rpx;
+  width: 100%;
   box-sizing: border-box;
 }
 
 .route-stop {
-  display: inline-flex;
+  display: flex;
+  align-items: flex-start;
+  min-height: 58rpx;
+}
+
+.route-stop__rail {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  flex: none;
-  width: 108rpx;
+  width: 34rpx;
+  min-height: 58rpx;
 }
 
 .route-stop__dot {
@@ -154,23 +210,21 @@
 }
 
 .route-stop__name {
-  margin-top: 10rpx;
+  margin-left: 16rpx;
   color: #26372f;
-  font-size: 24rpx;
+  font-size: 28rpx;
   line-height: 1.2;
 }
 
 .route-stop__line {
-  flex: 1 0 36rpx;
-  min-width: 36rpx;
-  height: 4rpx;
-  margin-top: 9rpx;
+  width: 4rpx;
+  height: 36rpx;
   background: #b8dfce;
 }
 
 .route-panel__note {
   display: block;
-  margin-top: 16rpx;
+  margin-top: 2rpx;
   color: #9a6813;
   font-size: 22rpx;
   line-height: 1.35;

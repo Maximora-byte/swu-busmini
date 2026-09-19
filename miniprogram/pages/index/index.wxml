@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page {{routeDetailsExpanded ? 'page--route-expanded' : ''}}">
   <view class="location-panel location-panel--{{locationStatusKind}}">
     <view class="location-panel__content">
       <view class="location-panel__dot"></view>
@@ -29,34 +29,48 @@
     show-location="{{hasLocation}}"
     show-scale
   ></map>
-  <view class="route-panel">
-    <view class="route-panel__header">
-      <view>
-        <text class="route-panel__eyebrow">当前线路</text>
-        <text class="route-panel__title">{{routeName}}</text>
+  <view class="route-panel {{routeDetailsExpanded ? 'route-panel--expanded' : ''}}">
+    <button class="route-summary" bindtap="toggleRouteDetails">
+      <view class="route-summary__identity">
+        <text class="route-summary__label">线路</text>
+        <text class="route-summary__name">{{routeName}}</text>
       </view>
-      <view class="direction-switch">
-        <button
-          wx:for="{{routeDirections}}"
-          wx:key="name"
-          class="direction-switch__button {{item.selected ? 'direction-switch__button--active' : ''}}"
-          size="mini"
-          data-direction-name="{{item.name}}"
-          bindtap="handleDirectionChange"
-        >{{item.name}}</button>
+      <text class="route-summary__action">{{routeDetailsExpanded ? '收起' : '查看线路'}}</text>
+    </button>
+    <view wx:if="{{routeDetailsExpanded}}" class="route-details">
+      <view wx:if="{{routeDataErrorText}}" class="route-details__error">
+        <text>{{routeDataErrorText}}</text>
       </view>
+      <block wx:else>
+      <view class="route-details__direction">
+        <text class="route-details__label">方向</text>
+        <view class="direction-switch">
+          <button
+            wx:for="{{routeDirections}}"
+            wx:key="name"
+            class="direction-switch__button {{item.selected ? 'direction-switch__button--active' : ''}}"
+            size="mini"
+            data-direction-name="{{item.name}}"
+            bindtap="handleDirectionChange"
+          >{{item.name}}</button>
+        </view>
+      </view>
+      <text class="route-details__label route-details__stops-label">站点</text>
+      <scroll-view class="route-stops" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="route-stops__track">
+          <block wx:for="{{routeStops}}" wx:key="id">
+            <view class="route-stop">
+              <view class="route-stop__rail">
+                <view class="route-stop__dot {{item.hasVerifiedCoordinate ? '' : 'route-stop__dot--pending'}}"></view>
+                <view wx:if="{{!item.isLast}}" class="route-stop__line"></view>
+              </view>
+              <text class="route-stop__name">{{item.name}}</text>
+            </view>
+          </block>
+        </view>
+      </scroll-view>
+      <text class="route-panel__note">{{routeCoordinateStatusText}}</text>
+      </block>
     </view>
-    <scroll-view class="route-stops" scroll-x enhanced show-scrollbar="{{false}}">
-      <view class="route-stops__track">
-        <block wx:for="{{routeStops}}" wx:key="id">
-          <view class="route-stop">
-            <view class="route-stop__dot {{item.hasCoordinate ? '' : 'route-stop__dot--pending'}}"></view>
-            <text class="route-stop__name">{{item.name}}</text>
-          </view>
-          <view wx:if="{{!item.isLast}}" class="route-stop__line"></view>
-        </block>
-      </view>
-    </scroll-view>
-    <text class="route-panel__note">{{routeCoordinateStatusText}}</text>
   </view>
 </view>

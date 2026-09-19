@@ -3,45 +3,35 @@
     "id": "gate_1",
     "name": "一号门",
     "aliases": ["1号门"],
-    "latitude": null,
-    "longitude": null,
-    "coordinateStatus": "pending",
-    "coordinateTodo": "TODO: 现场采集并校验站点的 GCJ-02 坐标"
+    "coordinate": null,
+    "coordinateTodo": "TODO: waiting for field verification"
   },
   {
     "id": "library",
     "name": "图书馆",
     "aliases": [],
-    "latitude": null,
-    "longitude": null,
-    "coordinateStatus": "pending",
-    "coordinateTodo": "TODO: 现场采集并校验站点的 GCJ-02 坐标"
+    "coordinate": null,
+    "coordinateTodo": "TODO: waiting for field verification"
   },
   {
     "id": "building_8",
     "name": "八教",
     "aliases": ["第八教学楼", "8教"],
-    "latitude": null,
-    "longitude": null,
-    "coordinateStatus": "pending",
-    "coordinateTodo": "TODO: 现场采集并校验站点的 GCJ-02 坐标"
+    "coordinate": null,
+    "coordinateTodo": "TODO: waiting for field verification"
   },
   {
     "id": "tjb",
     "name": "田家炳",
     "aliases": ["田家炳教育书院"],
-    "latitude": null,
-    "longitude": null,
-    "coordinateStatus": "pending",
-    "coordinateTodo": "TODO: 现场采集并校验站点的 GCJ-02 坐标"
+    "coordinate": null,
+    "coordinateTodo": "TODO: waiting for field verification"
   },
   {
     "id": "gate_5",
     "name": "五号门",
     "aliases": ["5号门"],
-    "latitude": null,
-    "longitude": null,
-    "coordinateStatus": "pending",
-    "coordinateTodo": "TODO: 现场采集并校验站点的 GCJ-02 坐标"
+    "coordinate": null,
+    "coordinateTodo": "TODO: waiting for field verification"
   }
 ]
