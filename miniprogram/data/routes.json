@@ -1,0 +1,28 @@
+[
+  {
+    "id": "route_1",
+    "name": "1路",
+    "directions": [
+      {
+        "name": "正向",
+        "stopIds": [
+          "gate_1",
+          "library",
+          "building_8",
+          "tjb",
+          "gate_5"
+        ]
+      },
+      {
+        "name": "反向",
+        "stopIds": [
+          "gate_5",
+          "tjb",
+          "building_8",
+          "library",
+          "gate_1"
+        ]
+      }
+    ]
+  }
+]

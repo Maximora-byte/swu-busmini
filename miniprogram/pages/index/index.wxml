@@ -25,7 +25,38 @@
     latitude="{{latitude}}"
     longitude="{{longitude}}"
     scale="{{scale}}"
+    markers="{{busStopMarkers}}"
     show-location="{{hasLocation}}"
     show-scale
   ></map>
+  <view class="route-panel">
+    <view class="route-panel__header">
+      <view>
+        <text class="route-panel__eyebrow">当前线路</text>
+        <text class="route-panel__title">{{routeName}}</text>
+      </view>
+      <view class="direction-switch">
+        <button
+          wx:for="{{routeDirections}}"
+          wx:key="name"
+          class="direction-switch__button {{item.selected ? 'direction-switch__button--active' : ''}}"
+          size="mini"
+          data-direction-name="{{item.name}}"
+          bindtap="handleDirectionChange"
+        >{{item.name}}</button>
+      </view>
+    </view>
+    <scroll-view class="route-stops" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="route-stops__track">
+        <block wx:for="{{routeStops}}" wx:key="id">
+          <view class="route-stop">
+            <view class="route-stop__dot {{item.hasCoordinate ? '' : 'route-stop__dot--pending'}}"></view>
+            <text class="route-stop__name">{{item.name}}</text>
+          </view>
+          <view wx:if="{{!item.isLast}}" class="route-stop__line"></view>
+        </block>
+      </view>
+    </scroll-view>
+    <text class="route-panel__note">{{routeCoordinateStatusText}}</text>
+  </view>
 </view>

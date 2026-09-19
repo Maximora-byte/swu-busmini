@@ -17,15 +17,22 @@ export interface BusStop {
   id: string
   name: string
   aliases?: string[]
-  coordinate: Coordinate
+  coordinate: Coordinate | null
+  coordinateStatus: 'verified' | 'pending'
+  coordinateTodo?: string
 }
 
-/** 一条线路的一个行驶方向；返程方向应保存为独立记录。 */
+/** 一条线路的一个行驶方向，stopIds 的顺序就是行驶顺序。 */
+export interface BusDirection {
+  name: string
+  stopIds: string[]
+}
+
+/** 校车线路。正反方向分别建模，允许未来表达不同的单向站点。 */
 export interface BusRoute {
   id: string
   name: string
-  direction: string
-  stopIds: string[]
+  directions: BusDirection[]
 }
 
 export type CampusPOICategory =
