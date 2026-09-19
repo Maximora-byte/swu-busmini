@@ -1,0 +1,21 @@
+# Dependencies and build output
+node_modules/
+miniprogram_npm/
+dist/
+
+# WeChat DevTools local settings
+project.private.config.json
+
+# Local secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+miniprogram/config/config.local.ts
+secrets.json
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+

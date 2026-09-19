@@ -1,0 +1,9 @@
+<view class="page">
+  <map
+    class="campus-map"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    scale="{{scale}}"
+    show-scale
+  ></map>
+</view>
