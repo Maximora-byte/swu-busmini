@@ -1,9 +1,31 @@
 <view class="page">
+  <view class="location-panel location-panel--{{locationStatusKind}}">
+    <view class="location-panel__content">
+      <view class="location-panel__dot"></view>
+      <text class="location-panel__text">{{locationStatusText}}</text>
+    </view>
+    <view class="location-panel__actions">
+      <button
+        wx:if="{{canOpenSettings}}"
+        class="location-panel__button"
+        size="mini"
+        open-type="openSetting"
+        bindopensetting="handleOpenSetting"
+      >去设置</button>
+      <button
+        wx:elif="{{locationStatusKind === 'error'}}"
+        class="location-panel__button"
+        size="mini"
+        bindtap="handleRetry"
+      >重试</button>
+    </view>
+  </view>
   <map
     class="campus-map"
     latitude="{{latitude}}"
     longitude="{{longitude}}"
     scale="{{scale}}"
+    show-location="{{hasLocation}}"
     show-scale
   ></map>
 </view>

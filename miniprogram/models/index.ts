@@ -1,10 +1,23 @@
+/** 微信地图使用的 GCJ-02 坐标。 */
+export interface Coordinate {
+  latitude: number
+  longitude: number
+}
+
+/** 一次用户定位结果。accuracy 表示水平误差半径，单位为米。 */
+export interface Location {
+  coordinate: Coordinate
+  accuracy: number
+  isApproximate: boolean
+  timestamp: number
+}
+
 /** 校园校车站点。坐标统一使用 GCJ-02。 */
 export interface BusStop {
   id: string
   name: string
   aliases?: string[]
-  latitude: number
-  longitude: number
+  coordinate: Coordinate
 }
 
 /** 一条线路的一个行驶方向；返程方向应保存为独立记录。 */
@@ -31,20 +44,17 @@ export interface CampusPOI {
   name: string
   aliases?: string[]
   category: CampusPOICategory
-  latitude: number
-  longitude: number
+  coordinate: Coordinate
 }
 
 /** 实时车辆能力的稳定边界；MVP 可使用返回空数组的实现。 */
 export interface Vehicle {
   id: string
   routeId: string
-  latitude: number
-  longitude: number
+  coordinate: Coordinate
   updatedAt: number
 }
 
 export interface VehicleLocationProvider {
   getVehicles(): Promise<Vehicle[]>
 }
-

@@ -9,6 +9,13 @@
     "backgroundColor": "#f4f7f5",
     "backgroundTextStyle": "light"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于推荐附近校车站并规划校园出行路线"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
   "sitemapLocation": "sitemap.json"
 }
-

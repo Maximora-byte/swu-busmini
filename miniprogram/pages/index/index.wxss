@@ -1,6 +1,69 @@
-.page,
-.campus-map {
+.page {
   width: 100%;
   height: 100%;
 }
 
+.location-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 176rpx;
+  padding: 24rpx 28rpx;
+  box-sizing: border-box;
+  background: #ffffff;
+  border-bottom: 1rpx solid #e3eae6;
+}
+
+.location-panel__content {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.location-panel__dot {
+  flex: none;
+  width: 18rpx;
+  height: 18rpx;
+  margin-right: 18rpx;
+  border-radius: 50%;
+  background: #718078;
+}
+
+.location-panel__text {
+  color: #26372f;
+  font-size: 28rpx;
+  line-height: 1.45;
+}
+
+.location-panel--loading .location-panel__dot {
+  background: #2775ca;
+}
+
+.location-panel--success .location-panel__dot {
+  background: #168557;
+}
+
+.location-panel--warning .location-panel__dot {
+  background: #d18b13;
+}
+
+.location-panel--error .location-panel__dot {
+  background: #c6453a;
+}
+
+.location-panel__actions {
+  flex: none;
+  margin-left: 20rpx;
+}
+
+.location-panel__button {
+  color: #126b47;
+  border-color: #126b47;
+  background: #ffffff;
+}
+
+.campus-map {
+  width: 100%;
+  height: calc(100% - 176rpx);
+}

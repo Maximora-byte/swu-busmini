@@ -4,11 +4,13 @@
   "private": true,
   "description": "SWU Go - 西南大学北碚校区非官方校园校车导航微信小程序",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/**/*.test.ts"
   },
   "devDependencies": {
+    "@types/node": "^24.5.2",
     "miniprogram-api-typings": "^4.0.1",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }
 }
-

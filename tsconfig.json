@@ -5,10 +5,9 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "lib": ["ES2020"],
-    "types": ["miniprogram-api-typings"],
+    "types": ["miniprogram-api-typings", "node"],
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["miniprogram/**/*.ts"]
+  "include": ["miniprogram/**/*.ts", "tests/**/*.ts"]
 }
-
