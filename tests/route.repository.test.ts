@@ -21,6 +21,81 @@ const ROUTE_1_FORWARD_STOP_IDS = [
   'gate_5',
 ]
 
+const MAP_FORWARD_STOP_IDS: Readonly<Record<string, readonly string[]>> = {
+  route_1: ROUTE_1_FORWARD_STOP_IDS,
+  route_2: [
+    'jingguanyuan',
+    'gate_6',
+    'gate_2',
+    'building_8',
+    'tianjiabing',
+    'xishijie',
+    'gate_5',
+  ],
+  route_3: [
+    'zhuyuan',
+    'gate_2',
+    'building_5',
+    'meiyuan',
+    'juyuan',
+    'gate_5',
+  ],
+  route_4: [
+    'gate_2',
+    'canteen_2',
+    'geosciences',
+    'foreign_languages',
+    'building_26',
+    'meiyuan',
+    'juyuan',
+  ],
+  route_5: ['gate_2', 'building_8', 'tianjiabing', 'yuanding', 'gate_5'],
+  route_6: [
+    'zhuyuan',
+    'gate_2',
+    'meiyuan',
+    'juyuan',
+    'tianjiabing',
+    'building_8',
+    'gate_2',
+    'zhuyuan',
+  ],
+  route_7: [
+    'gate_2',
+    'geosciences',
+    'building_5',
+    'building_26',
+    'meiyuan',
+    'juyuan',
+    'tianjiabing',
+    'liyuan',
+    'auditorium',
+    'gate_2',
+  ],
+  route_8: [
+    'music_school',
+    'building_8',
+    'tianjiabing',
+    'juyuan',
+    'meiyuan',
+    'foreign_languages',
+    'music_school',
+  ],
+  route_9: [
+    'zhuyuan',
+    'gate_2',
+    'building_8',
+    'tianjiabing',
+    'yuanding',
+    'gate_5',
+    'juyuan',
+    'meiyuan',
+    'zhongtu',
+    'gate_2',
+    'zhuyuan',
+  ],
+}
+
 test('loads route 1 through route 9 with unique ids', () => {
   const routes = routeRepository.getAll()
 
@@ -48,6 +123,38 @@ test('corrects route 1 to the 2025 map sequence', () => {
       allowedRepeatedStopIds: undefined,
     },
   ])
+})
+
+test('uses 二食堂 as route 4 second stop from the 2025 map', () => {
+  const route = routeRepository.findById('route_4')
+  assert.ok(route)
+
+  assert.deepEqual(route.directions[0]?.stopIds, [
+    'gate_2',
+    'canteen_2',
+    'geosciences',
+    'foreign_languages',
+    'building_26',
+    'meiyuan',
+    'juyuan',
+  ])
+  assert.equal(busStopRepository.findById('canteen_2')?.name, '二食堂')
+  assert.equal(busStopRepository.findById('canteen_3'), undefined)
+})
+
+test('matches every route sequence visible in the 2025 map table', () => {
+  for (const [routeId, expectedForwardStopIds] of Object.entries(
+    MAP_FORWARD_STOP_IDS,
+  )) {
+    const route = routeRepository.findById(routeId)
+    assert.ok(route, routeId)
+    assert.deepEqual(route.directions[0]?.stopIds, expectedForwardStopIds, routeId)
+    assert.deepEqual(
+      route.directions[1]?.stopIds,
+      [...expectedForwardStopIds].reverse(),
+      `${routeId} reverse`,
+    )
+  }
 })
 
 test('resolves every route and every direction against the stop repository', () => {

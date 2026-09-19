@@ -12,8 +12,8 @@
     {"name":"图示反向","isLoop":false,"stopIds":["gate_5","juyuan","meiyuan","building_5","gate_2","zhuyuan"]}
   ]},
   {"id":"route_4","name":"4路","directions":[
-    {"name":"图示正向","isLoop":false,"stopIds":["gate_2","canteen_3","geosciences","foreign_languages","building_26","meiyuan","juyuan"]},
-    {"name":"图示反向","isLoop":false,"stopIds":["juyuan","meiyuan","building_26","foreign_languages","geosciences","canteen_3","gate_2"]}
+    {"name":"图示正向","isLoop":false,"stopIds":["gate_2","canteen_2","geosciences","foreign_languages","building_26","meiyuan","juyuan"]},
+    {"name":"图示反向","isLoop":false,"stopIds":["juyuan","meiyuan","building_26","foreign_languages","geosciences","canteen_2","gate_2"]}
   ]},
   {"id":"route_5","name":"5路","directions":[
     {"name":"图示正向","isLoop":false,"stopIds":["gate_2","building_8","tianjiabing","yuanding","gate_5"]},

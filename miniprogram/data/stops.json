@@ -11,7 +11,7 @@
   {"id":"building_5","name":"五教","aliases":["第五教学楼","5教"],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
   {"id":"meiyuan","name":"梅园","aliases":[],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
   {"id":"juyuan","name":"橘园","aliases":[],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
-  {"id":"canteen_3","name":"三食堂","aliases":["第三食堂","3食堂"],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
+  {"id":"canteen_2","name":"二食堂","aliases":["第二食堂","2食堂"],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
   {"id":"geosciences","name":"地科院","aliases":[],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
   {"id":"foreign_languages","name":"外语学院","aliases":["外国语学院"],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
   {"id":"building_26","name":"二十六教","aliases":["26教","第二十六教学楼"],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
