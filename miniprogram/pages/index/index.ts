@@ -31,6 +31,7 @@ interface BusStopMarker {
 }
 
 interface RouteStopView {
+  key: string
   id: string
   name: string
   hasVerifiedCoordinate: boolean
@@ -38,6 +39,12 @@ interface RouteStopView {
 }
 
 interface RouteDirectionView {
+  name: string
+  selected: boolean
+}
+
+interface RouteOptionView {
+  id: string
   name: string
   selected: boolean
 }
@@ -76,17 +83,27 @@ Page({
     routeCoordinateStatusText: '',
     routeDetailsExpanded: false,
     routeDataErrorText: '',
+    selectedRouteId: 'route_1',
+    routeOptions: [] as RouteOptionView[],
   },
 
   onLoad() {
-    this.loadRoute()
+    const routes = routeCatalogService.getRoutes()
+    this.setData({
+      routeOptions: routes.map((route) => ({
+        id: route.id,
+        name: route.name,
+        selected: route.id === 'route_1',
+      })),
+    })
+    this.loadRoute('route_1')
     void this.locateUser()
   },
 
-  loadRoute(directionName?: string) {
+  loadRoute(routeId: string, directionName?: string) {
     try {
       const details = routeCatalogService.getRouteDetails(
-        'route_1',
+        routeId,
         directionName,
       )
       const verifiedStopIds = new Set(
@@ -95,12 +112,18 @@ Page({
 
       this.setData({
         routeName: details.route.name,
+        selectedRouteId: details.route.id,
+        routeOptions: this.data.routeOptions.map((route) => ({
+          ...route,
+          selected: route.id === details.route.id,
+        })),
         routeDirectionName: details.direction.name,
         routeDirections: details.route.directions.map((direction) => ({
           name: direction.name,
           selected: direction.name === details.direction.name,
         })),
         routeStops: details.stops.map((stop, index) => ({
+          key: `${stop.id}-${index}`,
           id: stop.id,
           name: stop.name,
           hasVerifiedCoordinate: verifiedStopIds.has(stop.id),
@@ -131,7 +154,9 @@ Page({
       })
     } catch (error: unknown) {
       this.setData({
-        routeName: '1路',
+        routeName:
+          this.data.routeOptions.find((route) => route.id === routeId)?.name ??
+          routeId,
         routeDirections: [],
         routeStops: [],
         busStopMarkers: [],
@@ -182,7 +207,14 @@ Page({
   handleDirectionChange(event: WechatMiniprogram.TouchEvent) {
     const directionName = event.currentTarget.dataset.directionName
     if (typeof directionName === 'string') {
-      this.loadRoute(directionName)
+      this.loadRoute(this.data.selectedRouteId, directionName)
+    }
+  },
+
+  handleRouteChange(event: WechatMiniprogram.TouchEvent) {
+    const routeId = event.currentTarget.dataset.routeId
+    if (typeof routeId === 'string') {
+      this.loadRoute(routeId)
     }
   },
 

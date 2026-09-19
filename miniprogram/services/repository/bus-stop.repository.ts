@@ -11,6 +11,7 @@ interface StaticBusStopRecord {
   aliases: string[]
   coordinate: BusStopCoordinate | null
   coordinateTodo?: string
+  dataTodo?: string
 }
 
 export interface BusStopRepository {
@@ -70,12 +71,14 @@ function parseRecord(value: unknown, index: number): StaticBusStopRecord {
 
   const { id, name, aliases, coordinate } = value
   const coordinateTodo = value.coordinateTodo
+  const dataTodo = value.dataTodo
 
   if (
     typeof id !== 'string' ||
     typeof name !== 'string' ||
     !isStringArray(aliases) ||
-    (coordinateTodo !== undefined && typeof coordinateTodo !== 'string')
+    (coordinateTodo !== undefined && typeof coordinateTodo !== 'string') ||
+    (dataTodo !== undefined && typeof dataTodo !== 'string')
   ) {
     throw new Error(`stops.json 第 ${index + 1} 项结构无效`)
   }
@@ -86,6 +89,7 @@ function parseRecord(value: unknown, index: number): StaticBusStopRecord {
     aliases,
     coordinate: parseCoordinate(coordinate, id),
     coordinateTodo,
+    dataTodo,
   }
 }
 
@@ -108,6 +112,7 @@ function parseStops(value: unknown): readonly BusStop[] {
       aliases: [...record.aliases],
       coordinate: record.coordinate,
       coordinateTodo: record.coordinateTodo,
+      dataTodo: record.dataTodo,
     }
   })
 }

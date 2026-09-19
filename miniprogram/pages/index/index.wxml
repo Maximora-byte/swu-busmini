@@ -42,6 +42,18 @@
         <text>{{routeDataErrorText}}</text>
       </view>
       <block wx:else>
+      <scroll-view class="route-selector" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="route-selector__track">
+          <button
+            wx:for="{{routeOptions}}"
+            wx:key="id"
+            class="route-selector__button {{item.selected ? 'route-selector__button--active' : ''}}"
+            size="mini"
+            data-route-id="{{item.id}}"
+            bindtap="handleRouteChange"
+          >{{item.name}}</button>
+        </view>
+      </scroll-view>
       <view class="route-details__direction">
         <text class="route-details__label">方向</text>
         <view class="direction-switch">
@@ -58,7 +70,7 @@
       <text class="route-details__label route-details__stops-label">站点</text>
       <scroll-view class="route-stops" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="route-stops__track">
-          <block wx:for="{{routeStops}}" wx:key="id">
+          <block wx:for="{{routeStops}}" wx:key="key">
             <view class="route-stop">
               <view class="route-stop__rail">
                 <view class="route-stop__dot {{item.hasVerifiedCoordinate ? '' : 'route-stop__dot--pending'}}"></view>

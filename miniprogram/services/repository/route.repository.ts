@@ -19,12 +19,34 @@ function parseDirection(value: unknown, routeId: string): BusDirection {
     throw new Error(`线路 ${routeId} 包含无效方向`)
   }
 
-  const { name, stopIds } = value
-  if (typeof name !== 'string' || !isStringArray(stopIds) || stopIds.length < 2) {
+  const { name, isLoop, stopIds } = value
+  const allowedRepeatedStopIds = value.allowedRepeatedStopIds
+  if (
+    typeof name !== 'string' ||
+    typeof isLoop !== 'boolean' ||
+    !isStringArray(stopIds) ||
+    stopIds.length < 2 ||
+    (allowedRepeatedStopIds !== undefined &&
+      !isStringArray(allowedRepeatedStopIds))
+  ) {
     throw new Error(`线路 ${routeId} 的方向结构无效`)
   }
 
-  return { name, stopIds: [...stopIds] }
+  if (
+    allowedRepeatedStopIds &&
+    new Set(allowedRepeatedStopIds).size !== allowedRepeatedStopIds.length
+  ) {
+    throw new Error(`线路 ${routeId} 方向 ${name} 的重复站点白名单包含重复项`)
+  }
+
+  return {
+    name,
+    isLoop,
+    stopIds: [...stopIds],
+    allowedRepeatedStopIds: allowedRepeatedStopIds
+      ? [...allowedRepeatedStopIds]
+      : undefined,
+  }
 }
 
 function parseRoutes(value: unknown): readonly BusRoute[] {

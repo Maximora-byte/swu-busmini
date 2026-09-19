@@ -23,6 +23,7 @@ export interface BusStop {
   aliases?: string[]
   coordinate: BusStopCoordinate | null
   coordinateTodo?: string
+  dataTodo?: string
 }
 
 /** Repository 已确认坐标可用于正式地图展示的站点。 */
@@ -33,7 +34,10 @@ export type VerifiedBusStop = BusStop & {
 /** 一条线路的一个行驶方向，stopIds 的顺序就是行驶顺序。 */
 export interface BusDirection {
   name: string
+  isLoop: boolean
   stopIds: string[]
+  /** 图示明确重复经过、且不是环线首尾闭合的站点。 */
+  allowedRepeatedStopIds?: string[]
 }
 
 /** 校车线路。正反方向分别建模，允许未来表达不同的单向站点。 */

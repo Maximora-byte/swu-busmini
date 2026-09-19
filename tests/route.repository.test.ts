@@ -11,119 +11,201 @@ import {
 } from '../miniprogram/services/repository/route.repository'
 import { createRouteCatalogService } from '../miniprogram/services/route/route-catalog.service'
 
-const FORWARD_STOP_IDS = [
-  'gate_1',
-  'library',
+const ROUTE_1_FORWARD_STOP_IDS = [
+  'jingguanyuan',
+  'gate_6',
+  'gate_2',
   'building_8',
-  'tjb',
+  'tianjiabing',
+  'yuanding',
   'gate_5',
 ]
 
-test('loads only route 1 with independent forward and reverse directions', () => {
+test('loads route 1 through route 9 with unique ids', () => {
   const routes = routeRepository.getAll()
 
-  assert.equal(routes.length, 1)
-  assert.equal(routes[0]?.id, 'route_1')
-  assert.deepEqual(routes[0]?.directions, [
-    { name: '正向', stopIds: FORWARD_STOP_IDS },
-    { name: '反向', stopIds: [...FORWARD_STOP_IDS].reverse() },
+  assert.deepEqual(
+    routes.map(({ id }) => id),
+    Array.from({ length: 9 }, (_, index) => `route_${index + 1}`),
+  )
+  assert.equal(new Set(routes.map(({ id }) => id)).size, 9)
+})
+
+test('corrects route 1 to the 2025 map sequence', () => {
+  const route = routeRepository.findById('route_1')
+
+  assert.deepEqual(route?.directions, [
+    {
+      name: '图示正向',
+      isLoop: false,
+      stopIds: ROUTE_1_FORWARD_STOP_IDS,
+      allowedRepeatedStopIds: undefined,
+    },
+    {
+      name: '图示反向',
+      isLoop: false,
+      stopIds: [...ROUTE_1_FORWARD_STOP_IDS].reverse(),
+      allowedRepeatedStopIds: undefined,
+    },
   ])
 })
 
-test('route catalog resolves stop details and reports pending markers', () => {
-  const service = createRouteCatalogService(
-    routeRepository,
-    busStopRepository,
-  )
+test('resolves every route and every direction against the stop repository', () => {
+  const catalog = createRouteCatalogService(routeRepository, busStopRepository)
 
-  const details = service.getRouteDetails('route_1', '正向')
-
-  assert.deepEqual(
-    details.stops.map(({ name }) => name),
-    ['一号门', '图书馆', '八教', '田家炳', '五号门'],
-  )
-  assert.equal(details.mappableStops.length, 0)
-  assert.equal(details.pendingCoordinateCount, 5)
+  for (const route of catalog.getRoutes()) {
+    for (const direction of route.directions) {
+      const details = catalog.getRouteDetails(route.id, direction.name)
+      assert.equal(details.stops.length, direction.stopIds.length)
+    }
+  }
 })
 
-test('route catalog rejects a route that references an unknown stop', () => {
+test('the nine sourced routes reference 20 unique stops', () => {
+  const referencedStopIds = new Set(
+    routeRepository
+      .getAll()
+      .flatMap((route) => route.directions)
+      .flatMap((direction) => direction.stopIds),
+  )
+
+  assert.equal(referencedStopIds.size, 20)
+  assert.equal(referencedStopIds.has('gate_1'), false)
+  assert.equal(referencedStopIds.has('library'), false)
+})
+
+test('reports all formal route stops as pending map markers', () => {
+  const catalog = createRouteCatalogService(routeRepository, busStopRepository)
+
+  for (const route of catalog.getRoutes()) {
+    const details = catalog.getRouteDetails(route.id)
+    assert.equal(details.mappableStops.length, 0, route.id)
+    assert.equal(
+      details.pendingCoordinateCount,
+      new Set(details.direction.stopIds).size,
+      route.id,
+    )
+  }
+})
+
+test('rejects duplicate route ids', () => {
+  const duplicatedRoute = {
+    id: 'duplicate_route',
+    name: '重复线路',
+    directions: [
+      {
+        name: '图示正向',
+        isLoop: false,
+        stopIds: ['gate_1', 'library'],
+      },
+    ],
+  }
+
+  assert.throws(
+    () => createStaticRouteRepository([duplicatedRoute, duplicatedRoute]),
+    /重复线路 id: duplicate_route/,
+  )
+})
+
+test('rejects a route that references an undefined stop', () => {
   const invalidRoutes = createStaticRouteRepository([
     {
       id: 'invalid_route',
       name: '无效线路',
       directions: [
         {
-          name: '正向',
+          name: '图示正向',
+          isLoop: false,
           stopIds: ['gate_1', 'missing_stop'],
         },
       ],
     },
   ])
-  const service = createRouteCatalogService(invalidRoutes, busStopRepository)
+  const catalog = createRouteCatalogService(invalidRoutes, busStopRepository)
 
   assert.throws(
-    () => service.getRouteDetails('invalid_route'),
-    /方向 正向 引用了未定义站点: missing_stop/,
+    () => catalog.getRouteDetails('invalid_route'),
+    /引用了未定义站点: missing_stop/,
   )
 })
 
-test('route catalog validates every direction before returning details', () => {
-  const invalidRoutes = createStaticRouteRepository([
-    {
-      id: 'partially_invalid_route',
-      name: '部分无效线路',
-      directions: [
-        {
-          name: '正向',
-          stopIds: ['gate_1', 'library'],
-        },
-        {
-          name: '反向',
-          stopIds: ['library', 'missing_reverse_stop'],
-        },
-      ],
-    },
-  ])
-  const service = createRouteCatalogService(invalidRoutes, busStopRepository)
-
-  assert.throws(
-    () => service.getRouteDetails('partially_invalid_route', '正向'),
-    /方向 反向 引用了未定义站点: missing_reverse_stop/,
-  )
-})
-
-test('route catalog rejects duplicate stopIds within one direction', () => {
+test('rejects an undeclared duplicate stop within a direction', () => {
   const duplicateRoutes = createStaticRouteRepository([
     {
       id: 'duplicate_route',
       name: '重复站点线路',
       directions: [
         {
-          name: '正向',
+          name: '图示正向',
+          isLoop: false,
           stopIds: ['gate_1', 'library', 'gate_1'],
         },
       ],
     },
   ])
-  const service = createRouteCatalogService(duplicateRoutes, busStopRepository)
+  const catalog = createRouteCatalogService(duplicateRoutes, busStopRepository)
 
   assert.throws(
-    () => service.getRouteDetails('duplicate_route'),
-    /方向 正向 存在重复 stopId: gate_1/,
+    () => catalog.getRouteDetails('duplicate_route'),
+    /首尾站点相同，但未标记为环线/,
   )
 })
 
-test('route catalog exposes only verified coordinates to the map layer', () => {
+test('allows only the first and last duplicate for a simple loop', () => {
+  const loopRoutes = createStaticRouteRepository([
+    {
+      id: 'simple_loop',
+      name: '简单环线',
+      directions: [
+        {
+          name: '图示顺序',
+          isLoop: true,
+          stopIds: ['gate_1', 'library', 'gate_1'],
+        },
+      ],
+    },
+  ])
+  const catalog = createRouteCatalogService(loopRoutes, busStopRepository)
+
+  assert.doesNotThrow(() => catalog.getRouteDetails('simple_loop'))
+})
+
+test('allows explicitly declared repeated stops in a sourced loop', () => {
+  const catalog = createRouteCatalogService(routeRepository, busStopRepository)
+
+  assert.doesNotThrow(() => catalog.getRouteDetails('route_6'))
+  assert.doesNotThrow(() => catalog.getRouteDetails('route_9'))
+})
+
+test('rejects an unclosed direction marked as a loop', () => {
+  const invalidLoop = createStaticRouteRepository([
+    {
+      id: 'open_loop',
+      name: '未闭合环线',
+      directions: [
+        {
+          name: '图示顺序',
+          isLoop: true,
+          stopIds: ['gate_1', 'library'],
+        },
+      ],
+    },
+  ])
+  const catalog = createRouteCatalogService(invalidLoop, busStopRepository)
+
+  assert.throws(
+    () => catalog.getRouteDetails('open_loop'),
+    /标记为环线，但首尾站点不同/,
+  )
+})
+
+test('exposes only verified unique stops to the map layer', () => {
   const stops = createStaticBusStopRepository([
     {
       id: 'verified_stop',
       name: '已校准站点',
       aliases: [],
-      coordinate: {
-        latitude: 29.8,
-        longitude: 106.4,
-        verified: true,
-      },
+      coordinate: { latitude: 29.8, longitude: 106.4, verified: true },
     },
     {
       id: 'pending_stop',
@@ -135,19 +217,20 @@ test('route catalog exposes only verified coordinates to the map layer', () => {
   ])
   const routes = createStaticRouteRepository([
     {
-      id: 'calibration_test',
-      name: '校准测试',
+      id: 'calibration_loop',
+      name: '校准测试环线',
       directions: [
         {
-          name: '正向',
-          stopIds: ['verified_stop', 'pending_stop'],
+          name: '图示顺序',
+          isLoop: true,
+          stopIds: ['verified_stop', 'pending_stop', 'verified_stop'],
         },
       ],
     },
   ])
-  const service = createRouteCatalogService(routes, stops)
+  const catalog = createRouteCatalogService(routes, stops)
 
-  const details = service.getRouteDetails('calibration_test')
+  const details = catalog.getRouteDetails('calibration_loop')
 
   assert.deepEqual(
     details.mappableStops.map(({ id }) => id),
