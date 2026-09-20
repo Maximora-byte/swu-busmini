@@ -192,6 +192,60 @@ test('reports duplicate stop ids', () => {
   )
 })
 
+test('reports an incomplete verified stop coordinate', () => {
+  const incompleteStop = {
+    id: 'verified_incomplete',
+    name: '坐标不完整站点',
+    aliases: [],
+    coordinate: { verified: true },
+  } as unknown as BusStop
+  const result = validateRouteData(
+    [routeWith(['a', 'b'])],
+    [...stops, incompleteStop],
+    sources,
+    [sourceAssignment],
+  )
+
+  assert.equal(
+    result.issues.find(
+      ({ code }) => code === 'verified_coordinate_incomplete',
+    )?.stopId,
+    'verified_incomplete',
+  )
+})
+
+test('reports latitude or longitude outside valid ranges', () => {
+  for (const invalidStop of [
+    {
+      id: 'invalid_latitude',
+      name: '纬度越界站点',
+      aliases: [],
+      coordinate: { latitude: 91, longitude: 106.4, verified: false },
+    },
+    {
+      id: 'invalid_longitude',
+      name: '经度越界站点',
+      aliases: [],
+      coordinate: { latitude: 29.8, longitude: 181, verified: true },
+    },
+  ]) {
+    const result = validateRouteData(
+      [routeWith(['a', 'b'])],
+      [...stops, invalidStop],
+      sources,
+      [sourceAssignment],
+    )
+
+    assert.equal(
+      result.issues.some(
+        ({ code, stopId }) =>
+          code === 'invalid_coordinate' && stopId === invalidStop.id,
+      ),
+      true,
+    )
+  }
+})
+
 test('reports duplicate source ids', () => {
   const result = validateRouteData(
     [routeWith(['a', 'b'])],

@@ -31,6 +31,14 @@ export type VerifiedBusStop = BusStop & {
   coordinate: BusStopCoordinate & { verified: true }
 }
 
+/** 用户坐标到一个已验证校车站的空间查询结果。 */
+export interface NearestStopResult {
+  stopId: string
+  stopName: string
+  distanceMeters: number
+  coordinate: Coordinate
+}
+
 /** 一条线路的一个行驶方向，stopIds 的顺序就是行驶顺序。 */
 export interface BusDirection {
   name: string

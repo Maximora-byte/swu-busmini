@@ -24,6 +24,8 @@ export type RouteDataValidationIssueCode =
   | 'missing_source'
   | 'duplicate_route_id'
   | 'duplicate_stop_id'
+  | 'invalid_coordinate'
+  | 'verified_coordinate_incomplete'
   | 'duplicate_source_id'
   | 'unknown_source'
   | 'unknown_route_source_assignment'
@@ -73,6 +75,68 @@ function globalIssue(
   > = {},
 ): RouteDataValidationIssue {
   return { code, scope, message, ...details }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function validateStopCoordinate(
+  stop: BusStop,
+): readonly RouteDataValidationIssue[] {
+  const coordinate: unknown = stop.coordinate
+  if (coordinate === null) {
+    return []
+  }
+
+  if (!isRecord(coordinate)) {
+    return [
+      globalIssue(
+        'stops',
+        'invalid_coordinate',
+        `Stop ${stop.id} coordinate must be an object or null`,
+        { stopId: stop.id },
+      ),
+    ]
+  }
+
+  const { latitude, longitude, verified } = coordinate
+  if (
+    verified === true &&
+    (typeof latitude !== 'number' || typeof longitude !== 'number')
+  ) {
+    return [
+      globalIssue(
+        'stops',
+        'verified_coordinate_incomplete',
+        `Verified stop ${stop.id} must have a complete coordinate`,
+        { stopId: stop.id },
+      ),
+    ]
+  }
+
+  if (
+    typeof latitude !== 'number' ||
+    !Number.isFinite(latitude) ||
+    typeof longitude !== 'number' ||
+    !Number.isFinite(longitude) ||
+    typeof verified !== 'boolean' ||
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
+    return [
+      globalIssue(
+        'stops',
+        'invalid_coordinate',
+        `Stop ${stop.id} has an invalid coordinate`,
+        { stopId: stop.id },
+      ),
+    ]
+  }
+
+  return []
 }
 
 export function validateRoute(
@@ -262,6 +326,7 @@ export function validateRouteData(
   }
 
   for (const stop of stops) {
+    issues.push(...validateStopCoordinate(stop))
     if (stopIds.has(stop.id)) {
       issues.push(
         globalIssue(
