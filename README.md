@@ -6,7 +6,7 @@ SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航�
 
 ## 当前状态
 
-项目已完成 **Phase 5.1：CI 自动质量门禁与 Validator 加固**。当前版本可以获取并显示用户位置，在 1～9 路之间切换并查看图示方向和纵向站序；独立验证器与 CLI 会检查线路引用、唯一 ID、重复站点、环线结构、方向名称和来源元数据，GitHub Actions 会在 push 和 pull request 时自动执行完整检查。Repository 只允许 `verified: true` 的 GCJ-02 坐标进入地图 marker。
+项目已完成 **Phase 5 扩展：校园灵活停靠模型**。当前版本可以获取并显示用户位置，在 1～9 路之间切换并查看图示方向和纵向站序；线路模型可区分固定站点与允许沿途停靠的校园车，并记录数据可信状态。独立验证器与 CLI 会检查线路引用、服务方式、唯一 ID、重复站点、环线结构、方向名称和来源元数据，GitHub Actions 会在 push 和 pull request 时自动执行完整检查。Repository 只允许 `verified: true` 的 GCJ-02 坐标进入地图 marker。
 
 线路数据第一版来源为《西南大学北碚校区校园地图（2025）》左上角线路表，仅用于确认线路编号、图示站名、站序和环线结构。2026 年实际运营方向、站牌名称和停靠情况仍需结合官方通知、现场站牌与实际乘车复核。
 
@@ -55,12 +55,14 @@ miniprogram/
 - `BusStopCoordinate`：带 `verified` 状态的 GCJ-02 站点坐标；
 - `VerifiedBusStop`：Repository 已验证、可以交给地图的站点类型；
 - `BusDirection`：一个方向及其有序站点 ID；
-- `BusRoute`：包含一个或多个方向的校车线路；
+- `BusRoute`：包含一个或多个方向、服务类型、沿途停靠策略和数据可信状态的校车线路；
 - `CampusPOI`：可搜索校园地点及分类；
 - `Coordinate` 与 `Location`：统一的 GCJ-02 坐标及带精度的定位结果；
 - `VehicleLocationProvider`：未来接入经授权实时车辆数据的可插拔边界。
 
 `BusDirection.isLoop` 显式区分环线；普通重复 stopId 会被拒绝，环线首尾同站允许出现一次。图中 6 路和 9 路还明确重复经过二号门，因此使用 `allowedRepeatedStopIds` 单独声明。`BusStop.coordinate` 在未采集时为 `null`；已填写但尚未确认的坐标使用 `verified: false`，只有 `verified: true` 才能进入地图。所有坐标统一使用微信地图采用的 GCJ-02 坐标系。
+
+校园车不完全等同于标准城市公交。`BusRoute.serviceType` 支持 `fixed_stop` 和 `flexible_campus_bus`；`allowIntermediateStop` 明确是否允许沿途停靠；`dataStatus` 使用 `needs_review` 或 `verified` 表示服务方式、方向和站序是否已经人工复核。`stopIds` 始终表示当前已知站点：固定站点线路的每个方向必须至少有一个已知站点，灵活校园车可以暂时使用空数组表达“完整站点集合尚未采集”，但已填写的站点仍必须存在于 `stops.json`。
 
 ## MVP 开发顺序
 
@@ -96,6 +98,21 @@ miniprogram/
 - 以后切换到 CloudBase 时可以替换 Repository，而不改变页面和领域模型。
 
 当前已录入 1～9 路第一版，但不将其声明为 2026 年官方实时线路。图片中的“中图”完整名称、它与既有“图书馆”站的关系，以及图示双向箭头对应的实际运营方向仍需人工确认。项目不接入未经授权的实时公交接口。
+
+线路记录的服务策略格式如下：
+
+```json
+{
+  "id": "route_1",
+  "name": "1路",
+  "serviceType": "flexible_campus_bus",
+  "allowIntermediateStop": true,
+  "dataStatus": "needs_review",
+  "directions": []
+}
+```
+
+当前 1～9 路保留原有已知站序，并根据校园车允许沿途停靠的业务特征标记为 `flexible_campus_bus`。该策略仍处于 `needs_review`，不代表已经完成 2026 年现场运营核验。
 
 ## 数据维护与校验
 

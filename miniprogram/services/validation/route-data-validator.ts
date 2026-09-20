@@ -103,14 +103,38 @@ export function validateRoute(
     }
 
     if (direction.stopIds.length === 0) {
-      issues.push(
-        issue(
-          route,
-          'empty_direction',
-          `Route ${route.name} direction ${directionLabel} has no stops`,
-          direction,
-        ),
-      )
+      if (route.serviceType === 'fixed_stop') {
+        issues.push(
+          issue(
+            route,
+            'empty_direction',
+            `Route ${route.name} direction ${directionLabel} has no stops`,
+            direction,
+          ),
+        )
+      }
+      const declaredRepeatedStopIds = direction.allowedRepeatedStopIds ?? []
+      if (!direction.isLoop && declaredRepeatedStopIds.length > 0) {
+        issues.push(
+          issue(
+            route,
+            'invalid_repeat_declaration',
+            `Route ${route.name} direction ${directionLabel} declares repeated stops but is not a loop`,
+            direction,
+          ),
+        )
+      }
+      for (const stopId of declaredRepeatedStopIds) {
+        issues.push(
+          issue(
+            route,
+            'invalid_repeat_declaration',
+            `Route ${route.name} direction ${directionLabel} allows stop ${stopId}, but it is not repeated`,
+            direction,
+            stopId,
+          ),
+        )
+      }
       continue
     }
 
@@ -142,7 +166,11 @@ export function validateRoute(
         ),
       )
     }
-    if (!direction.isLoop && firstStopId === lastStopId) {
+    if (
+      !direction.isLoop &&
+      direction.stopIds.length > 1 &&
+      firstStopId === lastStopId
+    ) {
       issues.push(
         issue(
           route,

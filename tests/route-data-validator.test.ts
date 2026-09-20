@@ -27,10 +27,14 @@ function routeWith(
   stopIds: string[],
   isLoop = false,
   name = '正向',
+  serviceType: BusRoute['serviceType'] = 'fixed_stop',
 ): BusRoute {
   return {
     id: 'route_test',
     name: '测试线路',
+    serviceType,
+    allowIntermediateStop: serviceType === 'flexible_campus_bus',
+    dataStatus: 'needs_review',
     directions: [{ name, isLoop, stopIds }],
   }
 }
@@ -62,6 +66,9 @@ test('reports a route with no directions', () => {
   const emptyRoute: BusRoute = {
     id: 'route_empty',
     name: '空线路',
+    serviceType: 'fixed_stop',
+    allowIntermediateStop: false,
+    dataStatus: 'needs_review',
     directions: [],
   }
 
@@ -88,6 +95,45 @@ test('reports an empty direction stop list', () => {
     ['empty_direction'],
   )
   assert.match(issues[0]?.message ?? '', /direction 正向 has no stops/)
+})
+
+test('allows a flexible campus bus direction without a complete stop set', () => {
+  const issues = validateRoute(
+    routeWith([], false, '待采集方向', 'flexible_campus_bus'),
+    stops,
+  )
+
+  assert.deepEqual(issues, [])
+})
+
+test('allows a flexible campus bus direction with one known stop', () => {
+  const issues = validateRoute(
+    routeWith(['a'], false, '部分已知站点', 'flexible_campus_bus'),
+    stops,
+  )
+
+  assert.deepEqual(issues, [])
+})
+
+test('still validates known stop ids on a flexible campus bus route', () => {
+  const issues = validateRoute(
+    routeWith(['a', 'unknown'], false, '已知站点', 'flexible_campus_bus'),
+    stops,
+  )
+
+  assert.equal(issues.some(({ code }) => code === 'unknown_stop'), true)
+})
+
+test('still rejects a repeat declaration without repeated known stops', () => {
+  const route = routeWith([], true, '待采集环线', 'flexible_campus_bus')
+  route.directions[0]!.allowedRepeatedStopIds = ['a']
+
+  const issues = validateRoute(route, stops)
+
+  assert.equal(
+    issues.some(({ code }) => code === 'invalid_repeat_declaration'),
+    true,
+  )
 })
 
 test('reports missing route source metadata', () => {

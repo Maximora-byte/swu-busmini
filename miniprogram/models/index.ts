@@ -41,9 +41,18 @@ export interface BusDirection {
 }
 
 /** 校车线路。正反方向分别建模，允许未来表达不同的单向站点。 */
+export type RouteServiceType = 'fixed_stop' | 'flexible_campus_bus'
+
+export type RouteDataStatus = 'needs_review' | 'verified'
+
 export interface BusRoute {
   id: string
   name: string
+  /** 固定站点线路，或允许站点集合不完整的校园灵活停靠线路。 */
+  serviceType: RouteServiceType
+  allowIntermediateStop: boolean
+  /** 线路服务方式、方向和站序的人工复核状态。 */
+  dataStatus: RouteDataStatus
   directions: BusDirection[]
 }
 

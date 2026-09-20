@@ -21,6 +21,12 @@ const ROUTE_1_FORWARD_STOP_IDS = [
   'gate_5',
 ]
 
+const FIXED_ROUTE_METADATA = {
+  serviceType: 'fixed_stop',
+  allowIntermediateStop: false,
+  dataStatus: 'needs_review',
+} as const
+
 const MAP_FORWARD_STOP_IDS: Readonly<Record<string, readonly string[]>> = {
   route_1: ROUTE_1_FORWARD_STOP_IDS,
   route_2: [
@@ -104,6 +110,14 @@ test('loads route 1 through route 9 with unique ids', () => {
     Array.from({ length: 9 }, (_, index) => `route_${index + 1}`),
   )
   assert.equal(new Set(routes.map(({ id }) => id)).size, 9)
+})
+
+test('loads flexible campus bus policy and review status for current routes', () => {
+  for (const route of routeRepository.getAll()) {
+    assert.equal(route.serviceType, 'flexible_campus_bus', route.id)
+    assert.equal(route.allowIntermediateStop, true, route.id)
+    assert.equal(route.dataStatus, 'needs_review', route.id)
+  }
 })
 
 test('corrects route 1 to the 2025 map sequence', () => {
@@ -199,6 +213,7 @@ test('rejects duplicate route ids', () => {
   const duplicatedRoute = {
     id: 'duplicate_route',
     name: '重复线路',
+    ...FIXED_ROUTE_METADATA,
     directions: [
       {
         name: '图示正向',
@@ -219,6 +234,7 @@ test('rejects a route that references an undefined stop', () => {
     {
       id: 'invalid_route',
       name: '无效线路',
+      ...FIXED_ROUTE_METADATA,
       directions: [
         {
           name: '图示正向',
@@ -241,6 +257,7 @@ test('rejects an undeclared duplicate stop within a direction', () => {
     {
       id: 'duplicate_route',
       name: '重复站点线路',
+      ...FIXED_ROUTE_METADATA,
       directions: [
         {
           name: '图示正向',
@@ -263,6 +280,7 @@ test('allows only the first and last duplicate for a simple loop', () => {
     {
       id: 'simple_loop',
       name: '简单环线',
+      ...FIXED_ROUTE_METADATA,
       directions: [
         {
           name: '图示顺序',
@@ -289,6 +307,7 @@ test('rejects an unclosed direction marked as a loop', () => {
     {
       id: 'open_loop',
       name: '未闭合环线',
+      ...FIXED_ROUTE_METADATA,
       directions: [
         {
           name: '图示顺序',
@@ -326,6 +345,7 @@ test('exposes only verified unique stops to the map layer', () => {
     {
       id: 'calibration_loop',
       name: '校准测试环线',
+      ...FIXED_ROUTE_METADATA,
       directions: [
         {
           name: '图示顺序',

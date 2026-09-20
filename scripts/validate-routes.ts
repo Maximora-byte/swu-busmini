@@ -1,13 +1,14 @@
 import routesData from '../miniprogram/data/routes.json'
 import sourcesData from '../miniprogram/data/sources.json'
 import stopsData from '../miniprogram/data/stops.json'
-import type { BusRoute, BusStop } from '../miniprogram/models/index'
+import type { BusStop } from '../miniprogram/models/index'
+import { parseRouteData } from '../miniprogram/services/repository/route-data.parser'
 import {
   type RouteDataValidationIssue,
   validateRouteData,
 } from '../miniprogram/services/validation/route-data-validator'
 
-const routes: readonly BusRoute[] = routesData
+const routes = parseRouteData(routesData)
 const stops: readonly BusStop[] = stopsData
 
 function formatIssue(issue: RouteDataValidationIssue): string {
