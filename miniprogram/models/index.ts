@@ -43,7 +43,9 @@ export interface BusDirection {
 /** 校车线路。正反方向分别建模，允许未来表达不同的单向站点。 */
 export type RouteServiceType = 'fixed_stop' | 'flexible_campus_bus'
 
-export type RouteDataStatus = 'needs_review' | 'verified'
+export type DataStatus = 'needs_review' | 'verified'
+
+export type RouteDataStatus = DataStatus
 
 export interface BusRoute {
   id: string
@@ -57,22 +59,21 @@ export interface BusRoute {
 }
 
 export type CampusPOICategory =
-  | 'academic'
+  | 'library'
   | 'dormitory'
   | 'canteen'
-  | 'library'
-  | 'sports'
+  | 'building'
   | 'gate'
-  | 'delivery'
   | 'other'
 
-/** 可被搜索和导航的校园地点。 */
+/** 可搜索、可关联校车站点的校园地点；本阶段不包含推测坐标。 */
 export interface CampusPOI {
   id: string
   name: string
-  aliases?: string[]
+  aliases: string[]
   category: CampusPOICategory
-  coordinate: Coordinate
+  relatedStopIds: string[]
+  dataStatus: DataStatus
 }
 
 /** 实时车辆能力的稳定边界；MVP 可使用返回空数组的实现。 */

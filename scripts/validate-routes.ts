@@ -1,8 +1,13 @@
+import poisData from '../miniprogram/data/pois.json'
 import routesData from '../miniprogram/data/routes.json'
 import sourcesData from '../miniprogram/data/sources.json'
 import stopsData from '../miniprogram/data/stops.json'
 import type { BusStop } from '../miniprogram/models/index'
 import { parseRouteData } from '../miniprogram/services/repository/route-data.parser'
+import {
+  type PoiDataValidationIssue,
+  validatePoiData,
+} from '../miniprogram/services/validation/poi-data-validator'
 import {
   type RouteDataValidationIssue,
   validateRouteData,
@@ -43,6 +48,19 @@ function formatIssue(issue: RouteDataValidationIssue): string {
   return issue.message
 }
 
+function formatPoiIssue(issue: PoiDataValidationIssue): string {
+  if (issue.code === 'unknown_stop') {
+    return `unknown stop: ${issue.stopId ?? '(missing)'}`
+  }
+  if (issue.code === 'duplicate_poi_id') {
+    return `duplicate POI id: ${issue.poiId ?? '(missing)'}`
+  }
+  if (issue.code === 'empty_alias') {
+    return `empty alias: ${issue.poiId ?? '(missing)'}`
+  }
+  return issue.message
+}
+
 function main(): void {
   const result = validateRouteData(
     routes,
@@ -50,6 +68,7 @@ function main(): void {
     sourcesData.sources,
     sourcesData.routeSources,
   )
+  const poiResult = validatePoiData(poisData, stops)
 
   for (const scope of ['data', 'stops', 'sources'] as const) {
     const scopedIssues = result.issues.filter((issue) => issue.scope === scope)
@@ -77,7 +96,16 @@ function main(): void {
     }
   }
 
-  if (!result.valid) {
+  if (poiResult.valid) {
+    console.log('✓ pois')
+  } else {
+    console.error('✗ pois')
+    for (const validationIssue of poiResult.issues) {
+      console.error(`  ${formatPoiIssue(validationIssue)}`)
+    }
+  }
+
+  if (!result.valid || !poiResult.valid) {
     process.exitCode = 1
   }
 }
@@ -86,7 +114,7 @@ try {
   main()
 } catch (error: unknown) {
   const message = error instanceof Error ? error.message : 'unknown error'
-  console.error('✗ route data')
+  console.error('✗ static data')
   console.error(`  ${message}`)
   process.exitCode = 1
 }
