@@ -4,6 +4,7 @@ import { test } from 'node:test'
 import type {
   CandidateCoordinate,
   Coordinate,
+  DrivingRouteResult,
   WalkingRouteResult,
 } from '../miniprogram/models/index'
 import { createGeocodingService } from '../miniprogram/services/map/geocoding.service'
@@ -37,6 +38,17 @@ class MockMapProvider implements MapProvider {
     return {
       distanceMeters: 100,
       durationSeconds: 80,
+      polyline: [origin, destination],
+    }
+  }
+
+  async drivingRoute(
+    origin: Coordinate,
+    destination: Coordinate,
+  ): Promise<DrivingRouteResult> {
+    return {
+      distanceMeters: 120,
+      durationSeconds: 60,
       polyline: [origin, destination],
     }
   }
@@ -279,4 +291,39 @@ test('Tencent provider normalizes walking route units and polyline', async () =>
   assert.ok(
     Math.abs((result.polyline[1]?.longitude ?? 0) - 106.402) < 1e-9,
   )
+})
+
+test('Tencent provider supports driving route generation', async () => {
+  const requestClient: TencentRequestClient = {
+    async get(url, parameters) {
+      assert.equal(url, 'https://apis.map.qq.com/ws/direction/v1/driving/')
+      assert.deepEqual(parameters, {
+        key: 'test-key',
+        from: '29.8,106.4',
+        to: '29.81,106.41',
+      })
+      return {
+        status: 0,
+        result: {
+          routes: [
+            {
+              distance: 300,
+              duration: 2,
+              polyline: [29.8, 106.4, 1000, 2000],
+            },
+          ],
+        },
+      }
+    },
+  }
+  const provider = new TencentMapProvider({ key: 'test-key', requestClient })
+
+  const result = await provider.drivingRoute(
+    { latitude: 29.8, longitude: 106.4 },
+    { latitude: 29.81, longitude: 106.41 },
+  )
+
+  assert.equal(result.distanceMeters, 300)
+  assert.equal(result.durationSeconds, 120)
+  assert.equal(result.polyline.length, 2)
 })

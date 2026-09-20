@@ -3,6 +3,10 @@ import {
   routeCatalogService,
   type RouteCatalogService,
 } from '../route/route-catalog.service'
+import {
+  routeGeometryRepository,
+  type RouteGeometryRepository,
+} from '../repository/route-geometry.repository'
 
 export const FLEXIBLE_ROUTE_NAVIGATION_NOTE =
   '该线路支持沿途停靠，请结合现场情况选择安全位置候车'
@@ -13,6 +17,7 @@ export interface RouteNavigationService {
 
 export function createRouteNavigationService(
   catalog: RouteCatalogService,
+  geometries: RouteGeometryRepository = routeGeometryRepository,
 ): RouteNavigationService {
   return {
     getRouteNavigation(routeId) {
@@ -35,13 +40,10 @@ export function createRouteNavigationService(
             isLoop: direction.isLoop,
             stopIds: [...direction.stopIds],
             knownStops: [...details.stops],
-            geometry: direction.geometry
-              ? {
-                  routeId: route.id,
-                  directionId: direction.name,
-                  points: direction.geometry.map((point) => ({ ...point })),
-                }
-              : undefined,
+            geometry: geometries.getVerifiedGeometry(
+              route.id,
+              direction.name,
+            ),
           }
         }),
         note:
@@ -55,4 +57,5 @@ export function createRouteNavigationService(
 
 export const routeNavigationService = createRouteNavigationService(
   routeCatalogService,
+  routeGeometryRepository,
 )

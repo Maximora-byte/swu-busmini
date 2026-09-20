@@ -8,6 +8,7 @@ import {
   FLEXIBLE_ROUTE_NAVIGATION_NOTE,
 } from '../miniprogram/services/navigation/route-navigation.service'
 import { createStaticBusStopRepository } from '../miniprogram/services/repository/bus-stop.repository'
+import { createStaticRouteGeometryRepository } from '../miniprogram/services/repository/route-geometry.repository'
 import { createStaticRouteRepository } from '../miniprogram/services/repository/route.repository'
 import { createRouteCatalogService } from '../miniprogram/services/route/route-catalog.service'
 
@@ -30,10 +31,6 @@ function createNavigationService() {
           name: '正向',
           isLoop: false,
           stopIds: ['stop_a', 'stop_b'],
-          geometry: [
-            { latitude: 29.8, longitude: 106.4 },
-            { latitude: 29.81, longitude: 106.41 },
-          ],
         },
       ],
     },
@@ -52,8 +49,24 @@ function createNavigationService() {
       ],
     },
   ])
+  const geometryRepository = createStaticRouteGeometryRepository(
+    [
+      {
+        routeId: 'route_with_geometry',
+        directionId: '正向',
+        source: 'field_survey',
+        dataStatus: 'verified',
+        points: [
+          { latitude: 29.8, longitude: 106.4 },
+          { latitude: 29.81, longitude: 106.41 },
+        ],
+      },
+    ],
+    routeRepository,
+  )
   return createRouteNavigationService(
     createRouteCatalogService(routeRepository, stopRepository),
+    geometryRepository,
   )
 }
 
@@ -65,6 +78,8 @@ test('loads verified geometry for a route direction', () => {
   assert.deepEqual(navigation.directions[0]?.geometry, {
     routeId: 'route_with_geometry',
     directionId: '正向',
+    source: 'field_survey',
+    dataStatus: 'verified',
     points: [
       { latitude: 29.8, longitude: 106.4 },
       { latitude: 29.81, longitude: 106.41 },

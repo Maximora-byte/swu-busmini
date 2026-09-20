@@ -6,7 +6,7 @@ SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航�
 
 ## 当前状态
 
-项目已完成 **Phase 12：线路导航基础能力**。当前版本可以获取并显示用户位置，在 1～9 路之间切换并查看方向、已知站序和人工采集的线路轨迹；没有轨迹时仍能查看站序。校园地点知识层支持单地点线路推荐与起点-终点直达线路匹配。地图 Provider 提供可替换的地理能力，外部坐标必须经过独立审核记录确认后，才能进入地图和空间计算管线。独立验证器、CLI 与 GitHub Actions 会持续检查数据质量。
+项目已完成 **Phase 13：离线线路轨迹生成 Pipeline**。当前版本可以获取并显示用户位置，在 1～9 路之间切换并查看方向、已知站序和人工确认的线路轨迹；没有轨迹时仍能查看站序。开发者可以用已验证站点坐标分段调用地图 Provider，离线生成待审核轨迹并缓存 API 结果。用户运行时只读取本地已验证轨迹，不调用腾讯路线 API。
 
 线路数据第一版来源为《西南大学北碚校区校园地图（2025）》左上角线路表，仅用于确认线路编号、图示站名、站序和环线结构。2026 年实际运营方向、站牌名称和停靠情况仍需结合官方通知、现场站牌与实际乘车复核。
 
@@ -57,6 +57,7 @@ miniprogram/
 - `BusDirection`：一个方向、已知有序站点 ID，以及可选的人工确认 GCJ-02 线路轨迹；
 - `BusRoute`：包含一个或多个方向、服务类型、沿途停靠策略和数据可信状态的校车线路；
 - `RouteGeometry`：以线路 ID、方向 ID 和 GCJ-02 点列表示的厂商无关线路轨迹；
+- `RouteGeometryCacheEntry`：以出行模式、起终点和返回点列保存的开发阶段 API 缓存；
 - `RouteNavigation`：线路方向、已知参考站点、轨迹、服务类型和候车提示；
 - `CampusPOI`：可搜索校园地点、分类、关联站点及数据状态，不包含推测坐标；
 - `RouteRecommendation`：由地点关联关系推导出的候选线路、匹配站点、可用方向、服务类型和数据状态；
@@ -90,11 +91,12 @@ miniprogram/
 12. 建立地图 Provider 抽象、腾讯位置服务适配与候选坐标流程（已完成）；
 13. 建立候选坐标的人工审核、过滤和运行时应用流程（已完成）；
 14. 建立以线路方向、已知站点和可选轨迹为核心的线路导航（已完成）；
-15. 结合 2026 年站牌、通知和实际乘车复核线路、POI 关系、站点坐标及线路轨迹；
-16. 在页面接入上车前、下车后的步行路线；
-17. 增加路线排序、时刻表和多方案；
-18. 稳定后迁移可变数据到 CloudBase；
-19. 仅在获得正式授权接口后接入实时车辆。
+15. 建立基于已验证站点和路线 API 缓存的离线轨迹生成 Pipeline（已完成）；
+16. 结合 2026 年站牌、通知和实际乘车复核线路、POI 关系、站点坐标及线路轨迹；
+17. 在页面接入上车前、下车后的步行路线；
+18. 增加路线排序、时刻表和多方案；
+19. 稳定后迁移可变数据到 CloudBase；
+20. 仅在获得正式授权接口后接入实时车辆。
 
 ## 定位服务设计
 
@@ -106,6 +108,8 @@ miniprogram/
 - `miniprogram/data/routes.json` 只用站点 ID 表达各方向的有序站点；
 - `miniprogram/data/sources.json` 记录数据来源、允许用途和待复核状态；
 - `miniprogram/data/coordinate-reviews.json` 独立保存候选坐标及人工审核状态，不覆盖正式站点数据；
+- `miniprogram/data/route-geometries.json` 独立保存生成或人工确认的方向轨迹，不改写线路站序；
+- `miniprogram/data/geometry-cache.json` 缓存开发阶段分段路线结果，减少重复 API 消耗；
 - Repository 负责读取和验证静态 JSON，禁止页面直接导入数据文件；
 - `getVerifiedStops()` 只返回坐标完整且明确标记 `verified: true` 的站点；
 - Route Catalog Service 负责连接线路与站点，检查所有方向中的重复 stopId 和未定义站点，并只把已验证站点交给地图；
@@ -188,7 +192,7 @@ miniprogram/
 
 ## 地图服务适配层
 
-`MapProvider` 是与厂商无关的地图能力边界，包含地理编码、逆地理编码和步行路线。`geocode()` 返回候选坐标数组：成功时可以包含一个或多个候选，查询无结果时返回空数组。`GeocodingService` 与 `WalkingRouteService` 只依赖该接口，因此未来可以替换腾讯、高德或测试实现，不影响校园 POI、校车线路推荐和 OD 匹配逻辑。
+`MapProvider` 是与厂商无关的地图能力边界，包含地理编码、逆地理编码、步行路线和驾车路线。`geocode()` 返回候选坐标数组：成功时可以包含一个或多个候选，查询无结果时返回空数组。业务与离线生成服务只依赖该接口，因此未来可以替换腾讯、高德或测试实现，不影响校园 POI、校车线路推荐和 OD 匹配逻辑。
 
 ```text
 GeocodingService / WalkingRouteService
@@ -202,6 +206,7 @@ GeocodingService / WalkingRouteService
 
 - `/ws/geocoder/v1/`：地址解析与逆地址解析；
 - `/ws/direction/v1/walking/`：步行路线。
+- `/ws/direction/v1/driving/`：仅供开发脚本离线生成候选线路轨迹。
 
 腾讯地理编码结果只会形成 `CandidateCoordinate`，其 `verified` 固定为 `false`。候选坐标需要人工确认后，才能通过单独的数据维护流程转成正式 `BusStop.coordinate`；服务不会写入 Repository，也不会自动修改 `stops.json`。腾讯位置服务只提供地理能力，不参与决定校车线路、站点关系或推荐结果。
 
@@ -253,6 +258,38 @@ RouteRepository / Route Catalog
 
 当前线路导航不计算最近上车点、步行距离或实时车辆，也不承诺图示线路与当日实际运营完全一致。
 
+## 离线线路轨迹生成
+
+`RouteGeometryGeneratorService` 根据一个方向的 `stopIds` 从 `BusStopRepository.getVerifiedStops()` 读取已验证 GCJ-02 坐标，并逐段调用 `MapProvider.drivingRoute()`。各段折线按站序合并，相邻重复点会被删除；任何站点缺少已验证坐标时立即停止，不会用候选坐标或图片位置补齐。
+
+```text
+BusDirection.stopIds
+        ↓
+VerifiedBusStop 坐标
+        ↓
+geometry-cache.json（优先命中）
+        ↓ 未命中
+MapProvider.drivingRoute()
+        ↓
+合并分段、去除相邻重复点
+        ↓
+route-geometries.json（needs_review）
+        ↓ 人工核对
+verified → RouteNavigation → 地图 polyline
+```
+
+开发阶段运行：
+
+```bash
+npm run generate:geometry route_1
+```
+
+脚本通过 `TencentMapProvider` 调用 `/ws/direction/v1/driving/`，读取本地且被 Git 忽略的腾讯 Key。它只写入独立的 `route-geometries.json` 和 `geometry-cache.json`，不会修改 `routes.json` 或 `stops.json`。生成结果固定为 `needs_review`；必须人工核对来源、方向和轨迹后才能改为 `verified`。
+
+缓存键由出行模式、起点经纬度和终点经纬度组成，方向不同会使用不同缓存项。即使一次生成在后续分段失败，已经成功获得的分段仍会写入缓存，避免再次消耗额度。
+
+`RouteGeometryRepository` 同时提供普通查询和已验证查询；运行时 `RouteNavigationService` 只调用 `getVerifiedGeometry()`。小程序页面不会构造 `TencentMapProvider`，用户查看、切换或查询线路时不会实时请求腾讯路线 API。当前正式站点坐标不足，因此仓库中的轨迹文件保持为空，不会为了演示生成假轨迹。
+
 ## 数据维护与校验
 
 新增或修改线路、站点、方向或来源信息后，必须执行：
@@ -261,7 +298,7 @@ RouteRepository / Route Catalog
 npm run validate:data
 ```
 
-命令会逐条输出线路、POI 与坐标审核检查结果，并以退出码 `0` 表示全部通过、退出码 `1` 表示存在数据错误，可直接用于 CI。除既有线路、站点和来源规则外，POI ID 必须唯一，别名不能为空，分类与数据状态必须合法，所有 `relatedStopIds` 必须引用已存在站点。站点坐标存在时必须包含有效的有限数值，经纬度范围分别为 `-90～90` 和 `-180～180`；已验证坐标不得缺少经纬度，`CandidateCoordinate` 包装对象不能进入正式站点数据。审核记录必须引用已存在站点，并遵守状态与审核时间约束。
+命令会逐条输出线路、POI、坐标审核与线路轨迹检查结果，并以退出码 `0` 表示全部通过、退出码 `1` 表示存在数据错误，可直接用于 CI。除既有规则外，每条线路轨迹必须引用存在的线路和方向、包含至少两个合法坐标点；已验证轨迹必须注明来源。站点坐标和线路轨迹经纬度范围分别为 `-90～90` 和 `-180～180`。
 
 线路数据录入时先在 `sources.json` 登记来源及复核状态，再按原始资料录入站名和顺序。图片资料只用于其能够清晰支持的信息，不用于推算坐标；状态保持 `needs_review`，直到结合当年官方通知、现场站牌和实际乘车完成人工复核。提交前应依次运行 `npm run validate:data`、`npm run typecheck` 和 `npm test`。
 

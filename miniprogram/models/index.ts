@@ -33,6 +33,13 @@ export interface WalkingRouteResult {
   polyline: Coordinate[]
 }
 
+/** 地图 Provider 返回的驾车路线；字段单位与步行路线一致。 */
+export interface DrivingRouteResult {
+  distanceMeters: number
+  durationSeconds: number
+  polyline: Coordinate[]
+}
+
 /** 一次用户定位结果。accuracy 表示水平误差半径，单位为米。 */
 export interface Location {
   coordinate: Coordinate
@@ -83,6 +90,20 @@ export interface BusDirection {
 export interface RouteGeometry {
   routeId: string
   directionId: string
+  source: string
+  dataStatus: RouteGeometryDataStatus
+  points: Coordinate[]
+}
+
+export type RouteGeometryDataStatus = 'needs_review' | 'verified'
+
+export type RouteGeometryMode = 'walking' | 'driving'
+
+/** 开发阶段路线 API 的分段结果缓存。 */
+export interface RouteGeometryCacheEntry {
+  mode: RouteGeometryMode
+  origin: Coordinate
+  destination: Coordinate
   points: Coordinate[]
 }
 

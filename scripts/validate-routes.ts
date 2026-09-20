@@ -2,6 +2,7 @@ import poisData from '../miniprogram/data/pois.json'
 import routesData from '../miniprogram/data/routes.json'
 import sourcesData from '../miniprogram/data/sources.json'
 import stopsData from '../miniprogram/data/stops.json'
+import routeGeometriesData from '../miniprogram/data/route-geometries.json'
 import type { BusStop } from '../miniprogram/models/index'
 import { createCoordinateVerificationService } from '../miniprogram/services/location/coordinate-verification.service'
 import { createStaticBusStopRepository } from '../miniprogram/services/repository/bus-stop.repository'
@@ -17,6 +18,7 @@ import {
   type RouteDataValidationIssue,
   validateRouteData,
 } from '../miniprogram/services/validation/route-data-validator'
+import { validateRouteGeometryData } from '../miniprogram/services/validation/route-geometry-validator'
 
 const routes = parseRouteData(routesData)
 const stops: readonly BusStop[] = stopsData
@@ -81,6 +83,7 @@ function main(): void {
     sourcesData.routeSources,
   )
   const poiResult = validatePoiData(poisData, stops)
+  const geometryResult = validateRouteGeometryData(routeGeometriesData, routes)
 
   for (const scope of ['data', 'stops', 'sources'] as const) {
     const scopedIssues = result.issues.filter((issue) => issue.scope === scope)
@@ -119,7 +122,16 @@ function main(): void {
 
   console.log('✓ coordinate reviews')
 
-  if (!result.valid || !poiResult.valid) {
+  if (geometryResult.valid) {
+    console.log('✓ route geometries')
+  } else {
+    console.error('✗ route geometries')
+    for (const validationIssue of geometryResult.issues) {
+      console.error(`  ${validationIssue.message}`)
+    }
+  }
+
+  if (!result.valid || !poiResult.valid || !geometryResult.valid) {
     process.exitCode = 1
   }
 }

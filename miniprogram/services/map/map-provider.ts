@@ -1,6 +1,7 @@
 import type {
   CandidateCoordinate,
   Coordinate,
+  DrivingRouteResult,
   WalkingRouteResult,
 } from '../../models/index'
 
@@ -12,4 +13,8 @@ export interface MapProvider {
     origin: Coordinate,
     destination: Coordinate,
   ): Promise<WalkingRouteResult>
+  drivingRoute(
+    origin: Coordinate,
+    destination: Coordinate,
+  ): Promise<DrivingRouteResult>
 }

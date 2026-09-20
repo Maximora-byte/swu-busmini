@@ -1,6 +1,7 @@
 import type {
   CandidateCoordinate,
   Coordinate,
+  DrivingRouteResult,
   WalkingRouteResult,
 } from '../../../models/index'
 import type { MapProvider } from '../map-provider'
@@ -153,7 +154,7 @@ function decodePolyline(value: unknown): Coordinate[] {
   ) {
     throw new TencentMapProviderError(
       'INVALID_RESPONSE',
-      '腾讯位置服务步行路线折线无效',
+      '腾讯位置服务路线折线无效',
     )
   }
 
@@ -169,6 +170,27 @@ function decodePolyline(value: unknown): Coordinate[] {
     )
   }
   return coordinates
+}
+
+function readRouteResult(
+  result: Record<string, unknown>,
+  routeType: string,
+): DrivingRouteResult {
+  if (!Array.isArray(result.routes) || result.routes.length === 0) {
+    throw new TencentMapProviderError(
+      'INVALID_RESPONSE',
+      `腾讯位置服务未返回${routeType}路线`,
+    )
+  }
+  const route = readRecord(result.routes[0], `${routeType}路线`)
+  const distanceMeters = readFiniteNumber(route.distance, `${routeType}距离`)
+  const durationMinutes = readFiniteNumber(route.duration, `${routeType}时长`)
+
+  return {
+    distanceMeters,
+    durationSeconds: Math.round(durationMinutes * 60),
+    polyline: decodePolyline(route.polyline),
+  }
 }
 
 export function createWechatTencentRequestClient(): TencentRequestClient {
@@ -295,20 +317,21 @@ export class TencentMapProvider implements MapProvider {
       },
     )
     const result = readSuccessfulResult(response)
-    if (!Array.isArray(result.routes) || result.routes.length === 0) {
-      throw new TencentMapProviderError(
-        'INVALID_RESPONSE',
-        '腾讯位置服务未返回步行路线',
-      )
-    }
-    const route = readRecord(result.routes[0], '步行路线')
-    const distanceMeters = readFiniteNumber(route.distance, '步行距离')
-    const durationMinutes = readFiniteNumber(route.duration, '步行时长')
+    return readRouteResult(result, '步行')
+  }
 
-    return {
-      distanceMeters,
-      durationSeconds: Math.round(durationMinutes * 60),
-      polyline: decodePolyline(route.polyline),
-    }
+  async drivingRoute(
+    origin: Coordinate,
+    destination: Coordinate,
+  ): Promise<DrivingRouteResult> {
+    const response = await this.request(
+      '/ws/direction/v1/driving/',
+      {
+        key: this.key,
+        from: formatCoordinate(origin),
+        to: formatCoordinate(destination),
+      },
+    )
+    return readRouteResult(readSuccessfulResult(response), '驾车')
   }
 }
