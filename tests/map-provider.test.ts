@@ -10,6 +10,7 @@ import { createGeocodingService } from '../miniprogram/services/map/geocoding.se
 import type { MapProvider } from '../miniprogram/services/map/map-provider'
 import {
   TencentMapProvider,
+  TencentMapProviderError,
   type TencentRequestClient,
 } from '../miniprogram/services/map/tencent/tencent-map.provider'
 import { createWalkingRouteService } from '../miniprogram/services/map/walking-route.service'
@@ -155,7 +156,51 @@ test('Tencent provider reports API errors clearly', async () => {
 
   await assert.rejects(
     () => provider.geocode('西南大学'),
-    /腾讯位置服务请求失败 \(120\): QPS limit exceeded/,
+    (error: unknown) => {
+      assert.ok(error instanceof TencentMapProviderError)
+      assert.equal(error.code, 'API_ERROR')
+      assert.equal(error.status, 120)
+      assert.match(error.message, /QPS limit exceeded/)
+      return true
+    },
+  )
+})
+
+test('Tencent provider classifies an invalid key', async () => {
+  const requestClient: TencentRequestClient = {
+    async get() {
+      return { status: 190, message: 'invalid key' }
+    },
+  }
+  const provider = new TencentMapProvider({ key: 'test-key', requestClient })
+
+  await assert.rejects(
+    () => provider.geocode('西南大学'),
+    (error: unknown) => {
+      assert.ok(error instanceof TencentMapProviderError)
+      assert.equal(error.code, 'INVALID_KEY')
+      assert.equal(error.status, 190)
+      return true
+    },
+  )
+})
+
+test('Tencent provider normalizes network failures', async () => {
+  const requestClient: TencentRequestClient = {
+    async get() {
+      throw new Error('socket details must not leak')
+    },
+  }
+  const provider = new TencentMapProvider({ key: 'test-key', requestClient })
+
+  await assert.rejects(
+    () => provider.geocode('西南大学'),
+    (error: unknown) => {
+      assert.ok(error instanceof TencentMapProviderError)
+      assert.equal(error.code, 'NETWORK_ERROR')
+      assert.doesNotMatch(error.message, /socket details/)
+      return true
+    },
   )
 })
 

@@ -20,8 +20,18 @@ export interface TencentMapProviderOptions {
   region?: string
 }
 
+export type TencentMapProviderErrorCode =
+  | 'INVALID_KEY'
+  | 'API_ERROR'
+  | 'NETWORK_ERROR'
+  | 'INVALID_RESPONSE'
+
 export class TencentMapProviderError extends Error {
-  constructor(message: string) {
+  constructor(
+    public readonly code: TencentMapProviderErrorCode,
+    message: string,
+    public readonly status?: number,
+  ) {
     super(message)
     this.name = 'TencentMapProviderError'
   }
@@ -36,21 +46,30 @@ function readRecord(
   description: string,
 ): Record<string, unknown> {
   if (!isRecord(value)) {
-    throw new TencentMapProviderError(`腾讯位置服务${description}无效`)
+    throw new TencentMapProviderError(
+      'INVALID_RESPONSE',
+      `腾讯位置服务${description}无效`,
+    )
   }
   return value
 }
 
 function readFiniteNumber(value: unknown, description: string): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
-    throw new TencentMapProviderError(`腾讯位置服务${description}无效`)
+    throw new TencentMapProviderError(
+      'INVALID_RESPONSE',
+      `腾讯位置服务${description}无效`,
+    )
   }
   return value
 }
 
 function readString(value: unknown, description: string): string {
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new TencentMapProviderError(`腾讯位置服务${description}无效`)
+    throw new TencentMapProviderError(
+      'INVALID_RESPONSE',
+      `腾讯位置服务${description}无效`,
+    )
   }
   return value
 }
@@ -74,8 +93,13 @@ function throwRequestError(
     typeof root.message === 'string' && root.message.trim().length > 0
       ? root.message
       : '请求失败'
+  const code: TencentMapProviderErrorCode = [190, 199, 311].includes(status)
+    ? 'INVALID_KEY'
+    : 'API_ERROR'
   throw new TencentMapProviderError(
+    code,
     `腾讯位置服务请求失败 (${status}): ${message}`,
+    status,
   )
 }
 
@@ -97,7 +121,10 @@ function readCoordinate(value: unknown): Coordinate {
     longitude < -180 ||
     longitude > 180
   ) {
-    throw new TencentMapProviderError('腾讯位置服务坐标超出有效范围')
+    throw new TencentMapProviderError(
+      'INVALID_RESPONSE',
+      '腾讯位置服务坐标超出有效范围',
+    )
   }
   return { latitude, longitude }
 }
@@ -124,7 +151,10 @@ function decodePolyline(value: unknown): Coordinate[] {
     value.length % 2 !== 0 ||
     !value.every((item) => typeof item === 'number' && Number.isFinite(item))
   ) {
-    throw new TencentMapProviderError('腾讯位置服务步行路线折线无效')
+    throw new TencentMapProviderError(
+      'INVALID_RESPONSE',
+      '腾讯位置服务步行路线折线无效',
+    )
   }
 
   const decoded = [...value] as number[]
@@ -165,7 +195,10 @@ export class TencentMapProvider implements MapProvider {
   constructor(options: TencentMapProviderOptions) {
     const key = options.key.trim()
     if (key.length === 0) {
-      throw new Error('腾讯位置服务 Key 不能为空')
+      throw new TencentMapProviderError(
+        'INVALID_KEY',
+        '腾讯位置服务 Key 不能为空',
+      )
     }
     this.key = key
     this.requestClient =
@@ -173,6 +206,26 @@ export class TencentMapProvider implements MapProvider {
     this.baseUrl = (options.baseUrl ?? TENCENT_MAP_BASE_URL).replace(/\/$/, '')
     const region = options.region?.trim()
     this.region = region && region.length > 0 ? region : undefined
+  }
+
+  private async request(
+    path: string,
+    parameters: TencentRequestParameters,
+  ): Promise<unknown> {
+    try {
+      return await this.requestClient.get(
+        `${this.baseUrl}${path}`,
+        parameters,
+      )
+    } catch (error: unknown) {
+      if (error instanceof TencentMapProviderError) {
+        throw error
+      }
+      throw new TencentMapProviderError(
+        'NETWORK_ERROR',
+        '腾讯位置服务网络请求失败，请检查网络后重试',
+      )
+    }
   }
 
   async geocode(keyword: string): Promise<readonly CandidateCoordinate[]> {
@@ -188,10 +241,7 @@ export class TencentMapProvider implements MapProvider {
     if (this.region) {
       parameters.region = this.region
     }
-    const response = await this.requestClient.get(
-      `${this.baseUrl}/ws/geocoder/v1/`,
-      parameters,
-    )
+    const response = await this.request('/ws/geocoder/v1/', parameters)
     const { root, status } = readResponse(response)
     if (status === 347) {
       return []
@@ -220,8 +270,8 @@ export class TencentMapProvider implements MapProvider {
   }
 
   async reverseGeocode(coordinate: Coordinate): Promise<string> {
-    const response = await this.requestClient.get(
-      `${this.baseUrl}/ws/geocoder/v1/`,
+    const response = await this.request(
+      '/ws/geocoder/v1/',
       {
         key: this.key,
         location: formatCoordinate(coordinate),
@@ -236,8 +286,8 @@ export class TencentMapProvider implements MapProvider {
     origin: Coordinate,
     destination: Coordinate,
   ): Promise<WalkingRouteResult> {
-    const response = await this.requestClient.get(
-      `${this.baseUrl}/ws/direction/v1/walking/`,
+    const response = await this.request(
+      '/ws/direction/v1/walking/',
       {
         key: this.key,
         from: formatCoordinate(origin),
@@ -246,7 +296,10 @@ export class TencentMapProvider implements MapProvider {
     )
     const result = readSuccessfulResult(response)
     if (!Array.isArray(result.routes) || result.routes.length === 0) {
-      throw new TencentMapProviderError('腾讯位置服务未返回步行路线')
+      throw new TencentMapProviderError(
+        'INVALID_RESPONSE',
+        '腾讯位置服务未返回步行路线',
+      )
     }
     const route = readRecord(result.routes[0], '步行路线')
     const distanceMeters = readFiniteNumber(route.distance, '步行距离')

@@ -56,7 +56,7 @@ function createNodeRequestClient(): TencentRequestClient {
 async function main(): Promise<void> {
   const keyword = process.argv.slice(2).join(' ').trim()
   if (keyword.length === 0) {
-    throw new Error('用法: npm run geocode -- "地址关键词"')
+    throw new Error('用法: npm run geocode "地址关键词"')
   }
 
   const config = await loadLocalConfig()

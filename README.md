@@ -202,7 +202,7 @@ GeocodingService / WalkingRouteService
 开发阶段可以执行一次单地址查询：
 
 ```bash
-npm run geocode -- "西南大学北碚校区图书馆"
+npm run geocode "西南大学北碚校区图书馆"
 ```
 
 脚本在运行时读取被 Git 忽略的 `miniprogram/config/config.local.ts`，通过 `TencentMapProvider` 发起真实请求，并只向终端输出未验证候选数组。脚本不会写入任何 JSON，不会覆盖现有坐标，也不会把候选自动标记为已验证。腾讯 API 返回错误时命令以非零退出码结束；查询无结果时正常输出空数组。
