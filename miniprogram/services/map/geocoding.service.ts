@@ -2,7 +2,7 @@ import type { CandidateCoordinate } from '../../models/index'
 import type { MapProvider } from './map-provider'
 
 export interface GeocodingService {
-  getCandidate(keyword: string): Promise<CandidateCoordinate>
+  getCandidates(keyword: string): Promise<readonly CandidateCoordinate[]>
 }
 
 function isValidCandidate(candidate: CandidateCoordinate): boolean {
@@ -26,23 +26,25 @@ export function createGeocodingService(
   provider: MapProvider,
 ): GeocodingService {
   return {
-    async getCandidate(keyword) {
+    async getCandidates(keyword) {
       const normalizedKeyword = keyword.trim()
       if (normalizedKeyword.length === 0) {
         throw new Error('地理编码关键词不能为空')
       }
 
-      const candidate = await provider.geocode(normalizedKeyword)
-      if (!isValidCandidate(candidate)) {
-        throw new Error('地图服务返回了无效的候选坐标')
-      }
+      const candidates = await provider.geocode(normalizedKeyword)
+      return candidates.map((candidate) => {
+        if (!isValidCandidate(candidate)) {
+          throw new Error('地图服务返回了无效的候选坐标')
+        }
 
-      return {
-        coordinate: { ...candidate.coordinate },
-        source: candidate.source,
-        confidence: candidate.confidence,
-        verified: false,
-      }
+        return {
+          coordinate: { ...candidate.coordinate },
+          source: candidate.source,
+          confidence: candidate.confidence,
+          verified: false,
+        }
+      })
     },
   }
 }

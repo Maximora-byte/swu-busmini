@@ -17,10 +17,12 @@ import { routeRecommendationService } from '../miniprogram/services/navigation/r
 import { createStaticBusStopRepository } from '../miniprogram/services/repository/bus-stop.repository'
 
 class MockMapProvider implements MapProvider {
-  constructor(private readonly candidate: CandidateCoordinate) {}
+  constructor(
+    private readonly candidates: readonly CandidateCoordinate[],
+  ) {}
 
-  async geocode(): Promise<CandidateCoordinate> {
-    return this.candidate
+  async geocode(): Promise<readonly CandidateCoordinate[]> {
+    return this.candidates
   }
 
   async reverseGeocode(): Promise<string> {
@@ -47,12 +49,12 @@ const candidate: CandidateCoordinate = {
 }
 
 test('geocoding business service depends only on MapProvider', async () => {
-  const service = createGeocodingService(new MockMapProvider(candidate))
+  const service = createGeocodingService(new MockMapProvider([candidate]))
 
-  const result = await service.getCandidate(' 西南大学 ')
+  const result = await service.getCandidates(' 西南大学 ')
 
-  assert.deepEqual(result, candidate)
-  assert.equal(result.verified, false)
+  assert.deepEqual(result, [candidate])
+  assert.equal(result[0]?.verified, false)
 })
 
 test('geocoding returns a candidate without modifying formal stop data', async () => {
@@ -64,9 +66,9 @@ test('geocoding returns a candidate without modifying formal stop data', async (
       coordinate: null,
     },
   ])
-  const service = createGeocodingService(new MockMapProvider(candidate))
+  const service = createGeocodingService(new MockMapProvider([candidate]))
 
-  await service.getCandidate('待确认站点')
+  await service.getCandidates('待确认站点')
 
   assert.equal(repository.findById('pending_stop')?.coordinate, null)
   assert.deepEqual(repository.getVerifiedStops(), [])
@@ -74,20 +76,22 @@ test('geocoding returns a candidate without modifying formal stop data', async (
 
 test('replacing MapProvider does not affect campus route recommendations', async () => {
   const before = routeRecommendationService.recommendRoutesForPoi('canteen_2')
-  const replacement = new MockMapProvider({
-    ...candidate,
-    coordinate: { latitude: 30, longitude: 106.5 },
-    source: 'replacement',
-  })
+  const replacement = new MockMapProvider([
+    {
+      ...candidate,
+      coordinate: { latitude: 30, longitude: 106.5 },
+      source: 'replacement',
+    },
+  ])
 
-  await createGeocodingService(replacement).getCandidate('任意地点')
+  await createGeocodingService(replacement).getCandidates('任意地点')
   const after = routeRecommendationService.recommendRoutesForPoi('canteen_2')
 
   assert.deepEqual(after, before)
 })
 
 test('walking route service delegates through the provider boundary', async () => {
-  const provider = new MockMapProvider(candidate)
+  const provider = new MockMapProvider([candidate])
   const origin = { latitude: 29.8, longitude: 106.4 }
   const destination = { latitude: 29.81, longitude: 106.41 }
 
@@ -117,21 +121,53 @@ test('Tencent provider maps geocoding response to an unverified candidate', asyn
       }
     },
   }
-  const provider = new TencentMapProvider({ key: 'test-key', requestClient })
+  const provider = new TencentMapProvider({
+    key: 'test-key',
+    requestClient,
+    region: '重庆市',
+  })
 
   const result = await provider.geocode('西南大学')
 
-  assert.deepEqual(result, {
-    coordinate: { latitude: 29.8, longitude: 106.4 },
-    source: 'tencent',
-    confidence: 0.92,
-    verified: false,
-  })
+  assert.deepEqual(result, [
+    {
+      coordinate: { latitude: 29.8, longitude: 106.4 },
+      source: 'tencent',
+      confidence: 0.92,
+      verified: false,
+    },
+  ])
   assert.equal(requests[0]?.url, 'https://apis.map.qq.com/ws/geocoder/v1/')
   assert.deepEqual(requests[0]?.parameters, {
     key: 'test-key',
     address: '西南大学',
+    region: '重庆市',
   })
+})
+
+test('Tencent provider reports API errors clearly', async () => {
+  const requestClient: TencentRequestClient = {
+    async get() {
+      return { status: 120, message: 'QPS limit exceeded' }
+    },
+  }
+  const provider = new TencentMapProvider({ key: 'test-key', requestClient })
+
+  await assert.rejects(
+    () => provider.geocode('西南大学'),
+    /腾讯位置服务请求失败 \(120\): QPS limit exceeded/,
+  )
+})
+
+test('Tencent provider returns an empty list when geocoding has no result', async () => {
+  const requestClient: TencentRequestClient = {
+    async get() {
+      return { status: 347, message: 'no result' }
+    },
+  }
+  const provider = new TencentMapProvider({ key: 'test-key', requestClient })
+
+  assert.deepEqual(await provider.geocode('不存在的地点'), [])
 })
 
 test('Tencent provider supports reverse geocoding', async () => {

@@ -17,6 +17,7 @@ export interface TencentMapProviderOptions {
   key: string
   requestClient?: TencentRequestClient
   baseUrl?: string
+  region?: string
 }
 
 export class TencentMapProviderError extends Error {
@@ -54,17 +55,34 @@ function readString(value: unknown, description: string): string {
   return value
 }
 
-function readSuccessfulResult(response: unknown): Record<string, unknown> {
+interface TencentResponse {
+  root: Record<string, unknown>
+  status: number
+}
+
+function readResponse(response: unknown): TencentResponse {
   const root = readRecord(response, '响应')
   const status = readFiniteNumber(root.status, '状态码')
+  return { root, status }
+}
+
+function throwRequestError(
+  root: Record<string, unknown>,
+  status: number,
+): never {
+  const message =
+    typeof root.message === 'string' && root.message.trim().length > 0
+      ? root.message
+      : '请求失败'
+  throw new TencentMapProviderError(
+    `腾讯位置服务请求失败 (${status}): ${message}`,
+  )
+}
+
+function readSuccessfulResult(response: unknown): Record<string, unknown> {
+  const { root, status } = readResponse(response)
   if (status !== 0) {
-    const message =
-      typeof root.message === 'string' && root.message.trim().length > 0
-        ? root.message
-        : '请求失败'
-    throw new TencentMapProviderError(
-      `腾讯位置服务请求失败 (${status}): ${message}`,
-    )
+    throwRequestError(root, status)
   }
   return readRecord(root.result, '结果')
 }
@@ -142,6 +160,7 @@ export class TencentMapProvider implements MapProvider {
   private readonly key: string
   private readonly requestClient: TencentRequestClient
   private readonly baseUrl: string
+  private readonly region?: string
 
   constructor(options: TencentMapProviderOptions) {
     const key = options.key.trim()
@@ -152,27 +171,52 @@ export class TencentMapProvider implements MapProvider {
     this.requestClient =
       options.requestClient ?? createWechatTencentRequestClient()
     this.baseUrl = (options.baseUrl ?? TENCENT_MAP_BASE_URL).replace(/\/$/, '')
+    const region = options.region?.trim()
+    this.region = region && region.length > 0 ? region : undefined
   }
 
-  async geocode(keyword: string): Promise<CandidateCoordinate> {
+  async geocode(keyword: string): Promise<readonly CandidateCoordinate[]> {
     const address = keyword.trim()
     if (address.length === 0) {
       throw new Error('地理编码关键词不能为空')
     }
 
+    const parameters: Record<string, string | number> = {
+      key: this.key,
+      address,
+    }
+    if (this.region) {
+      parameters.region = this.region
+    }
     const response = await this.requestClient.get(
       `${this.baseUrl}/ws/geocoder/v1/`,
-      { key: this.key, address },
+      parameters,
     )
-    const result = readSuccessfulResult(response)
+    const { root, status } = readResponse(response)
+    if (status === 347) {
+      return []
+    }
+    if (status !== 0) {
+      throwRequestError(root, status)
+    }
+    if (root.result === undefined || root.result === null) {
+      return []
+    }
+
+    const result = readRecord(root.result, '结果')
+    if (result.location === undefined || result.location === null) {
+      return []
+    }
     const similarity = readFiniteNumber(result.similarity, '相似度')
 
-    return {
-      coordinate: readCoordinate(result.location),
-      source: 'tencent',
-      confidence: Math.min(1, Math.max(0, similarity)),
-      verified: false,
-    }
+    return [
+      {
+        coordinate: readCoordinate(result.location),
+        source: 'tencent',
+        confidence: Math.min(1, Math.max(0, similarity)),
+        verified: false,
+      },
+    ]
   }
 
   async reverseGeocode(coordinate: Coordinate): Promise<string> {

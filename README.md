@@ -182,7 +182,7 @@ miniprogram/
 
 ## 地图服务适配层
 
-`MapProvider` 是与厂商无关的地图能力边界，包含地理编码、逆地理编码和步行路线。`GeocodingService` 与 `WalkingRouteService` 只依赖该接口，因此未来可以替换腾讯、高德或测试实现，不影响校园 POI、校车线路推荐和 OD 匹配逻辑。
+`MapProvider` 是与厂商无关的地图能力边界，包含地理编码、逆地理编码和步行路线。`geocode()` 返回候选坐标数组：成功时可以包含一个或多个候选，查询无结果时返回空数组。`GeocodingService` 与 `WalkingRouteService` 只依赖该接口，因此未来可以替换腾讯、高德或测试实现，不影响校园 POI、校车线路推荐和 OD 匹配逻辑。
 
 ```text
 GeocodingService / WalkingRouteService
@@ -198,6 +198,14 @@ GeocodingService / WalkingRouteService
 - `/ws/direction/v1/walking/`：步行路线。
 
 腾讯地理编码结果只会形成 `CandidateCoordinate`，其 `verified` 固定为 `false`。候选坐标需要人工确认后，才能通过单独的数据维护流程转成正式 `BusStop.coordinate`；服务不会写入 Repository，也不会自动修改 `stops.json`。腾讯位置服务只提供地理能力，不参与决定校车线路、站点关系或推荐结果。
+
+开发阶段可以执行一次单地址查询：
+
+```bash
+npm run geocode -- "西南大学北碚校区图书馆"
+```
+
+脚本在运行时读取被 Git 忽略的 `miniprogram/config/config.local.ts`，通过 `TencentMapProvider` 发起真实请求，并只向终端输出未验证候选数组。脚本不会写入任何 JSON，不会覆盖现有坐标，也不会把候选自动标记为已验证。腾讯 API 返回错误时命令以非零退出码结束；查询无结果时正常输出空数组。
 
 ## 数据维护与校验
 
