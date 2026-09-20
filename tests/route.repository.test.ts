@@ -232,7 +232,7 @@ test('rejects a route that references an undefined stop', () => {
 
   assert.throws(
     () => catalog.getRouteDetails('invalid_route'),
-    /引用了未定义站点: missing_stop/,
+    /Route 无效线路 references unknown stop missing_stop/,
   )
 })
 
@@ -254,7 +254,7 @@ test('rejects an undeclared duplicate stop within a direction', () => {
 
   assert.throws(
     () => catalog.getRouteDetails('duplicate_route'),
-    /首尾站点相同，但未标记为环线/,
+    /returns to its first stop but is not marked as a loop/,
   )
 })
 
@@ -302,7 +302,7 @@ test('rejects an unclosed direction marked as a loop', () => {
 
   assert.throws(
     () => catalog.getRouteDetails('open_loop'),
-    /标记为环线，但首尾站点不同/,
+    /is marked as a loop but is not closed/,
   )
 })
 

@@ -64,8 +64,7 @@ function parseRoutes(value: unknown): readonly BusRoute[] {
     if (
       typeof id !== 'string' ||
       typeof name !== 'string' ||
-      !Array.isArray(directions) ||
-      directions.length === 0
+      !Array.isArray(directions)
     ) {
       throw new Error(`routes.json 第 ${index + 1} 项结构无效`)
     }

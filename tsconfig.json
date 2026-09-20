@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["miniprogram/**/*.ts", "tests/**/*.ts"]
+  "include": ["miniprogram/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"]
 }

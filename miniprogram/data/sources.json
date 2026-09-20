@@ -1,13 +1,26 @@
-[
-  {
-    "id": "swu_beibei_campus_map_2025",
-    "title": "西南大学北碚校区校园地图（2025）",
-    "usage": "仅用于确认 1～9 路校园车的线路编号、图示站点名称、站点顺序和环线结构，不用于 GPS 坐标。",
-    "status": "需要结合 2026 年校车站牌、官方通知和实际乘车进一步复核。",
-    "notes": [
-      "图片中的所有站点坐标均未推算，当前保持 null。",
-      "图示站名“中图”的完整名称，以及其是否与既有“图书馆”站相同，仍需人工确认。",
-      "线路表使用双向箭头；当前据此记录图示顺序和逆序，实际运营方向仍需现场复核。"
-    ]
-  }
-]
+{
+  "sources": [
+    {
+      "id": "swu_beibei_campus_map_2025",
+      "title": "西南大学北碚校区校园地图（2025）",
+      "usage": "仅用于确认 1～9 路校园车的线路编号、图示站点名称、站点顺序和环线结构，不用于 GPS 坐标。",
+      "status": "需要结合 2026 年校车站牌、官方通知和实际乘车进一步复核。",
+      "notes": [
+        "图片中的所有站点坐标均未推算，当前保持 null。",
+        "图示站名“中图”的完整名称，以及其是否与既有“图书馆”站相同，仍需人工确认。",
+        "线路表使用双向箭头；当前据此记录图示顺序和逆序，实际运营方向仍需现场复核。"
+      ]
+    }
+  ],
+  "routeSources": [
+    {"routeId":"route_1","source":"swu_beibei_campus_map_2025","status":"needs_review"},
+    {"routeId":"route_2","source":"swu_beibei_campus_map_2025","status":"needs_review"},
+    {"routeId":"route_3","source":"swu_beibei_campus_map_2025","status":"needs_review"},
+    {"routeId":"route_4","source":"swu_beibei_campus_map_2025","status":"needs_review"},
+    {"routeId":"route_5","source":"swu_beibei_campus_map_2025","status":"needs_review"},
+    {"routeId":"route_6","source":"swu_beibei_campus_map_2025","status":"needs_review"},
+    {"routeId":"route_7","source":"swu_beibei_campus_map_2025","status":"needs_review"},
+    {"routeId":"route_8","source":"swu_beibei_campus_map_2025","status":"needs_review"},
+    {"routeId":"route_9","source":"swu_beibei_campus_map_2025","status":"needs_review"}
+  ]
+}

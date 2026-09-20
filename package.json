@@ -5,7 +5,8 @@
   "description": "SWU Go - 西南大学北碚校区非官方校园校车导航微信小程序",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/**/*.test.ts"
+    "test": "tsx --test tests/**/*.test.ts",
+    "validate:data": "tsx scripts/validate-routes.ts"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
