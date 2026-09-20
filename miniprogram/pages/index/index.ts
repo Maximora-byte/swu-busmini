@@ -3,6 +3,11 @@ import {
   locationService,
 } from '../../services/location/location.service'
 import type { Coordinate } from '../../models/index'
+import {
+  routePolylineService,
+  type RouteMapPolyline,
+} from '../../services/map/route-polyline.service'
+import { routeNavigationService } from '../../services/navigation/route-navigation.service'
 import { routeCatalogService } from '../../services/route/route-catalog.service'
 
 const SWU_BEIBEI_CAMPUS: Coordinate = {
@@ -76,11 +81,14 @@ Page({
     locationStatusText: '正在获取你的位置…',
     canOpenSettings: false,
     busStopMarkers: [] as BusStopMarker[],
+    routePolylines: [] as RouteMapPolyline[],
     routeName: '',
     routeDirectionName: '',
     routeDirections: [] as RouteDirectionView[],
     routeStops: [] as RouteStopView[],
     routeCoordinateStatusText: '',
+    routeGeometryStatusText: '',
+    routeServiceNote: '',
     routeDetailsExpanded: false,
     routeDataErrorText: '',
     selectedRouteId: 'route_1',
@@ -105,6 +113,10 @@ Page({
       const details = routeCatalogService.getRouteDetails(
         routeId,
         directionName,
+      )
+      const navigation = routeNavigationService.getRouteNavigation(routeId)
+      const navigationDirection = navigation.directions.find(
+        ({ directionId }) => directionId === details.direction.name,
       )
       const verifiedStopIds = new Set(
         details.mappableStops.map((stop) => stop.id),
@@ -146,10 +158,21 @@ Page({
             padding: 4,
           },
         })),
+        routePolylines: navigationDirection?.geometry
+          ? [
+              routePolylineService.toMapPolyline(
+                navigationDirection.geometry,
+              ),
+            ]
+          : [],
         routeCoordinateStatusText:
           details.pendingCoordinateCount > 0
             ? `${details.pendingCoordinateCount} 个站点坐标待现场校准，暂不显示 marker`
             : '全部站点坐标已校准',
+        routeGeometryStatusText: navigationDirection?.geometry
+          ? '当前方向线路轨迹已加载'
+          : '当前方向线路轨迹待人工采集，暂以已知站序为参考',
+        routeServiceNote: navigation.note ?? '',
         routeDataErrorText: '',
       })
     } catch (error: unknown) {
@@ -160,7 +183,10 @@ Page({
         routeDirections: [],
         routeStops: [],
         busStopMarkers: [],
+        routePolylines: [],
         routeCoordinateStatusText: '',
+        routeGeometryStatusText: '',
+        routeServiceNote: '',
         routeDataErrorText:
           error instanceof Error ? error.message : '线路数据加载失败',
       })

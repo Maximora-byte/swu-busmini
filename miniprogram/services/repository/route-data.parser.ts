@@ -21,6 +21,39 @@ function isRouteDataStatus(value: unknown): value is RouteDataStatus {
   return value === 'needs_review' || value === 'verified'
 }
 
+function parseGeometry(
+  value: unknown,
+  routeId: string,
+  directionName: string,
+): BusDirection['geometry'] {
+  if (value === undefined) {
+    return undefined
+  }
+  if (!Array.isArray(value)) {
+    throw new Error(`线路 ${routeId} 方向 ${directionName} 的 geometry 无效`)
+  }
+
+  return value.map((point) => {
+    if (!isRecord(point)) {
+      throw new Error(`线路 ${routeId} 方向 ${directionName} 包含无效轨迹点`)
+    }
+    const { latitude, longitude } = point
+    if (
+      typeof latitude !== 'number' ||
+      !Number.isFinite(latitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      typeof longitude !== 'number' ||
+      !Number.isFinite(longitude) ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      throw new Error(`线路 ${routeId} 方向 ${directionName} 包含无效轨迹点`)
+    }
+    return { latitude, longitude }
+  })
+}
+
 function parseDirection(value: unknown, routeId: string): BusDirection {
   if (!isRecord(value)) {
     throw new Error(`线路 ${routeId} 包含无效方向`)
@@ -45,10 +78,13 @@ function parseDirection(value: unknown, routeId: string): BusDirection {
     throw new Error(`线路 ${routeId} 方向 ${name} 的重复站点白名单包含重复项`)
   }
 
+  const geometry = parseGeometry(value.geometry, routeId, name)
+
   return {
     name,
     isLoop,
     stopIds: [...stopIds],
+    ...(geometry ? { geometry } : {}),
     allowedRepeatedStopIds: allowedRepeatedStopIds
       ? [...allowedRepeatedStopIds]
       : undefined,

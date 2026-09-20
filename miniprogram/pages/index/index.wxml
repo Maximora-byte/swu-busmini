@@ -26,6 +26,7 @@
     longitude="{{longitude}}"
     scale="{{scale}}"
     markers="{{busStopMarkers}}"
+    polyline="{{routePolylines}}"
     show-location="{{hasLocation}}"
     show-scale
   ></map>
@@ -82,6 +83,8 @@
         </view>
       </scroll-view>
       <text class="route-panel__note">{{routeCoordinateStatusText}}</text>
+      <text class="route-panel__note">{{routeGeometryStatusText}}</text>
+      <text wx:if="{{routeServiceNote}}" class="route-panel__note route-panel__note--service">{{routeServiceNote}}</text>
       </block>
     </view>
   </view>

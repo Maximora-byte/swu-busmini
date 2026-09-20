@@ -73,8 +73,17 @@ export interface BusDirection {
   name: string
   isLoop: boolean
   stopIds: string[]
+  /** 经人工采集或确认的 GCJ-02 线路轨迹；缺失时仍可展示已知站序。 */
+  geometry?: Coordinate[]
   /** 图示明确重复经过、且不是环线首尾闭合的站点。 */
   allowedRepeatedStopIds?: string[]
+}
+
+/** 一个线路方向的厂商无关 GCJ-02 轨迹。 */
+export interface RouteGeometry {
+  routeId: string
+  directionId: string
+  points: Coordinate[]
 }
 
 /** 校车线路。正反方向分别建模，允许未来表达不同的单向站点。 */
@@ -93,6 +102,27 @@ export interface BusRoute {
   /** 线路服务方式、方向和站序的人工复核状态。 */
   dataStatus: RouteDataStatus
   directions: BusDirection[]
+}
+
+/** 线路导航返回的单个方向，不包含页面展示字段。 */
+export interface RouteNavigationDirection {
+  directionId: string
+  name: string
+  isLoop: boolean
+  stopIds: string[]
+  knownStops: BusStop[]
+  geometry?: RouteGeometry
+}
+
+/** 以线路本身为中心的导航信息。 */
+export interface RouteNavigation {
+  routeId: string
+  routeName: string
+  serviceType: RouteServiceType
+  allowIntermediateStop: boolean
+  dataStatus: RouteDataStatus
+  directions: RouteNavigationDirection[]
+  note?: string
 }
 
 export type CampusPOICategory =
