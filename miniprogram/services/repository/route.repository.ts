@@ -25,7 +25,7 @@ function parseDirection(value: unknown, routeId: string): BusDirection {
     typeof name !== 'string' ||
     typeof isLoop !== 'boolean' ||
     !isStringArray(stopIds) ||
-    stopIds.length < 2 ||
+    stopIds.length === 1 ||
     (allowedRepeatedStopIds !== undefined &&
       !isStringArray(allowedRepeatedStopIds))
   ) {

@@ -6,22 +6,37 @@ export interface RouteSourceAssignment {
   status: string
 }
 
+export interface RouteDataSource {
+  id: string
+}
+
+export type RouteDataValidationScope = 'route' | 'data' | 'stops' | 'sources'
+
 export type RouteDataValidationIssueCode =
   | 'unknown_stop'
   | 'duplicate_stop'
   | 'loop_not_closed'
   | 'non_loop_closed'
   | 'invalid_repeat_declaration'
+  | 'empty_direction'
   | 'empty_route'
   | 'missing_direction_name'
   | 'missing_source'
+  | 'duplicate_route_id'
+  | 'duplicate_stop_id'
+  | 'duplicate_source_id'
+  | 'unknown_source'
+  | 'unknown_route_source_assignment'
+  | 'duplicate_route_source_assignment'
 
 export interface RouteDataValidationIssue {
   code: RouteDataValidationIssueCode
-  routeId: string
-  routeName: string
+  scope: RouteDataValidationScope
+  routeId?: string
+  routeName?: string
   directionName?: string
   stopId?: string
+  sourceId?: string
   message: string
 }
 
@@ -39,12 +54,25 @@ function issue(
 ): RouteDataValidationIssue {
   return {
     code,
+    scope: 'route',
     routeId: route.id,
     routeName: route.name,
     directionName: direction?.name,
     stopId,
     message,
   }
+}
+
+function globalIssue(
+  scope: Exclude<RouteDataValidationScope, 'route'>,
+  code: RouteDataValidationIssueCode,
+  message: string,
+  details: Pick<
+    RouteDataValidationIssue,
+    'routeId' | 'stopId' | 'sourceId'
+  > = {},
+): RouteDataValidationIssue {
+  return { code, scope, message, ...details }
 }
 
 export function validateRoute(
@@ -72,6 +100,18 @@ export function validateRoute(
           direction,
         ),
       )
+    }
+
+    if (direction.stopIds.length === 0) {
+      issues.push(
+        issue(
+          route,
+          'empty_direction',
+          `Route ${route.name} direction ${directionLabel} has no stops`,
+          direction,
+        ),
+      )
+      continue
     }
 
     const stopIdCounts = new Map<string, number>()
@@ -171,15 +211,119 @@ export function validateRoute(
 export function validateRouteData(
   routes: readonly BusRoute[],
   stops: readonly BusStop[],
+  sources: readonly RouteDataSource[],
   routeSources: readonly RouteSourceAssignment[],
 ): RouteDataValidationResult {
-  const issues = routes.flatMap((route) => validateRoute(route, stops))
+  const issues: RouteDataValidationIssue[] = []
+  const routeIds = new Set<string>()
+  const stopIds = new Set<string>()
+  const sourceIds = new Set<string>()
+
+  for (const route of routes) {
+    if (routeIds.has(route.id)) {
+      issues.push(
+        globalIssue(
+          'data',
+          'duplicate_route_id',
+          `Duplicate route id: ${route.id}`,
+          { routeId: route.id },
+        ),
+      )
+    }
+    routeIds.add(route.id)
+  }
+
+  for (const stop of stops) {
+    if (stopIds.has(stop.id)) {
+      issues.push(
+        globalIssue(
+          'stops',
+          'duplicate_stop_id',
+          `Duplicate stop id: ${stop.id}`,
+          { stopId: stop.id },
+        ),
+      )
+    }
+    stopIds.add(stop.id)
+  }
+
+  for (const source of sources) {
+    if (sourceIds.has(source.id)) {
+      issues.push(
+        globalIssue(
+          'sources',
+          'duplicate_source_id',
+          `Duplicate source id: ${source.id}`,
+          { sourceId: source.id },
+        ),
+      )
+    }
+    sourceIds.add(source.id)
+  }
+
+  issues.push(...routes.flatMap((route) => validateRoute(route, stops)))
+
   const sourceAssignmentsByRouteId = new Map<string, RouteSourceAssignment[]>()
+  const assignmentKeys = new Set<string>()
 
   for (const assignment of routeSources) {
     const assignments = sourceAssignmentsByRouteId.get(assignment.routeId) ?? []
     assignments.push(assignment)
     sourceAssignmentsByRouteId.set(assignment.routeId, assignments)
+
+    const assignmentKey = `${assignment.routeId}\u0000${assignment.source}`
+    if (assignmentKeys.has(assignmentKey)) {
+      issues.push(
+        globalIssue(
+          'sources',
+          'duplicate_route_source_assignment',
+          `Duplicate route source assignment: ${assignment.routeId} + ${assignment.source}`,
+          { routeId: assignment.routeId, sourceId: assignment.source },
+        ),
+      )
+    }
+    assignmentKeys.add(assignmentKey)
+
+    if (!routeIds.has(assignment.routeId)) {
+      issues.push(
+        globalIssue(
+          'sources',
+          'unknown_route_source_assignment',
+          `Route source assignment references unknown route ${assignment.routeId}`,
+          { routeId: assignment.routeId, sourceId: assignment.source },
+        ),
+      )
+    }
+    if (
+      assignment.source.trim().length > 0 &&
+      !sourceIds.has(assignment.source)
+    ) {
+      issues.push(
+        globalIssue(
+          'sources',
+          'unknown_source',
+          `Route ${assignment.routeId} references unknown source ${assignment.source}`,
+          { routeId: assignment.routeId, sourceId: assignment.source },
+        ),
+      )
+    }
+
+    if (
+      routeIds.has(assignment.routeId) &&
+      (assignment.source.trim().length === 0 ||
+        assignment.status.trim().length === 0)
+    ) {
+      const route = routes.find(({ id }) => id === assignment.routeId)
+      if (route) {
+        issues.push(
+          issue(
+            route,
+            'missing_source',
+            `Route ${route.name} source assignment must have non-empty source and status`,
+          ),
+        )
+      }
+    }
   }
 
   for (const route of routes) {
@@ -189,7 +333,10 @@ export function validateRouteData(
       ({ source, status }) =>
         source.trim().length > 0 && status.trim().length > 0,
     )
-    if (!hasCompleteSource) {
+    const alreadyReported = issues.some(
+      ({ code, routeId }) => code === 'missing_source' && routeId === route.id,
+    )
+    if (!hasCompleteSource && !alreadyReported) {
       issues.push(
         issue(
           route,

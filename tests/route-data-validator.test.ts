@@ -3,6 +3,8 @@ import { test } from 'node:test'
 
 import type { BusRoute, BusStop } from '../miniprogram/models/index'
 import {
+  type RouteDataSource,
+  type RouteSourceAssignment,
   validateRoute,
   validateRouteData,
 } from '../miniprogram/services/validation/route-data-validator'
@@ -13,6 +15,13 @@ const stops: readonly BusStop[] = ['a', 'b', 'c'].map((id) => ({
   aliases: [],
   coordinate: null,
 }))
+
+const sources: readonly RouteDataSource[] = [{ id: 'source_1' }]
+const sourceAssignment: RouteSourceAssignment = {
+  routeId: 'route_test',
+  source: 'source_1',
+  status: 'needs_review',
+}
 
 function routeWith(
   stopIds: string[],
@@ -71,10 +80,125 @@ test('reports an empty direction name', () => {
   )
 })
 
+test('reports an empty direction stop list', () => {
+  const issues = validateRoute(routeWith([]), stops)
+
+  assert.deepEqual(
+    issues.map(({ code }) => code),
+    ['empty_direction'],
+  )
+  assert.match(issues[0]?.message ?? '', /direction 正向 has no stops/)
+})
+
 test('reports missing route source metadata', () => {
   const route = routeWith(['a', 'b'])
-  const result = validateRouteData([route], stops, [])
+  const result = validateRouteData([route], stops, sources, [])
 
   assert.equal(result.valid, false)
   assert.equal(result.issues.some(({ code }) => code === 'missing_source'), true)
+})
+
+test('requires non-empty source and status in every assignment', () => {
+  for (const assignment of [
+    { ...sourceAssignment, source: '   ' },
+    { ...sourceAssignment, status: '   ' },
+  ]) {
+    const result = validateRouteData(
+      [routeWith(['a', 'b'])],
+      stops,
+      sources,
+      [assignment],
+    )
+
+    assert.equal(
+      result.issues.some(({ code }) => code === 'missing_source'),
+      true,
+    )
+  }
+})
+
+test('reports duplicate route ids', () => {
+  const route = routeWith(['a', 'b'])
+  const result = validateRouteData(
+    [route, route],
+    stops,
+    sources,
+    [sourceAssignment],
+  )
+
+  assert.equal(
+    result.issues.some(({ code }) => code === 'duplicate_route_id'),
+    true,
+  )
+})
+
+test('reports duplicate stop ids', () => {
+  const result = validateRouteData(
+    [routeWith(['a', 'b'])],
+    [...stops, stops[0]!],
+    sources,
+    [sourceAssignment],
+  )
+
+  assert.equal(
+    result.issues.find(({ code }) => code === 'duplicate_stop_id')?.stopId,
+    'a',
+  )
+})
+
+test('reports duplicate source ids', () => {
+  const result = validateRouteData(
+    [routeWith(['a', 'b'])],
+    stops,
+    [...sources, sources[0]!],
+    [sourceAssignment],
+  )
+
+  assert.equal(
+    result.issues.find(({ code }) => code === 'duplicate_source_id')?.sourceId,
+    'source_1',
+  )
+})
+
+test('reports a route source assignment that references an unknown source', () => {
+  const result = validateRouteData([routeWith(['a', 'b'])], stops, sources, [
+    { ...sourceAssignment, source: 'unknown_source' },
+  ])
+
+  assert.equal(
+    result.issues.find(({ code }) => code === 'unknown_source')?.sourceId,
+    'unknown_source',
+  )
+})
+
+test('reports a source assignment that references an unknown route', () => {
+  const result = validateRouteData(
+    [routeWith(['a', 'b'])],
+    stops,
+    sources,
+    [sourceAssignment, { ...sourceAssignment, routeId: 'route_unknown' }],
+  )
+
+  assert.equal(
+    result.issues.find(
+      ({ code }) => code === 'unknown_route_source_assignment',
+    )?.routeId,
+    'route_unknown',
+  )
+})
+
+test('reports a duplicate route source assignment', () => {
+  const result = validateRouteData(
+    [routeWith(['a', 'b'])],
+    stops,
+    sources,
+    [sourceAssignment, sourceAssignment],
+  )
+
+  assert.equal(
+    result.issues.some(
+      ({ code }) => code === 'duplicate_route_source_assignment',
+    ),
+    true,
+  )
 })
