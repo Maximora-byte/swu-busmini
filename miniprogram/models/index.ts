@@ -4,6 +4,21 @@ export interface Coordinate {
   longitude: number
 }
 
+/** 外部地图服务返回、尚待人工复核的坐标候选。 */
+export interface CandidateCoordinate {
+  coordinate: Coordinate
+  source: string
+  confidence: number
+  verified: false
+}
+
+/** 地图 Provider 返回的步行路线；时长统一为秒，距离统一为米。 */
+export interface WalkingRouteResult {
+  distanceMeters: number
+  durationSeconds: number
+  polyline: Coordinate[]
+}
+
 /** 一次用户定位结果。accuracy 表示水平误差半径，单位为米。 */
 export interface Location {
   coordinate: Coordinate

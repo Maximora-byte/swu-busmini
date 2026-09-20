@@ -246,6 +246,33 @@ test('reports latitude or longitude outside valid ranges', () => {
   }
 })
 
+test('rejects a candidate coordinate in formal station data', () => {
+  const stopWithCandidate = {
+    id: 'candidate_stop',
+    name: '候选坐标站点',
+    aliases: [],
+    coordinate: {
+      coordinate: { latitude: 29.8, longitude: 106.4 },
+      source: 'tencent',
+      confidence: 0.9,
+      verified: false,
+    },
+  } as unknown as BusStop
+  const result = validateRouteData(
+    [routeWith(['a', 'b'])],
+    [...stops, stopWithCandidate],
+    sources,
+    [sourceAssignment],
+  )
+
+  assert.equal(
+    result.issues.find(
+      ({ code }) => code === 'candidate_coordinate_in_formal_data',
+    )?.stopId,
+    'candidate_stop',
+  )
+})
+
 test('reports duplicate source ids', () => {
   const result = validateRouteData(
     [routeWith(['a', 'b'])],

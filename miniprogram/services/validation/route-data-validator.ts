@@ -26,6 +26,7 @@ export type RouteDataValidationIssueCode =
   | 'duplicate_stop_id'
   | 'invalid_coordinate'
   | 'verified_coordinate_incomplete'
+  | 'candidate_coordinate_in_formal_data'
   | 'duplicate_source_id'
   | 'unknown_source'
   | 'unknown_route_source_assignment'
@@ -95,6 +96,21 @@ function validateStopCoordinate(
         'stops',
         'invalid_coordinate',
         `Stop ${stop.id} coordinate must be an object or null`,
+        { stopId: stop.id },
+      ),
+    ]
+  }
+
+  if (
+    'coordinate' in coordinate &&
+    'source' in coordinate &&
+    'confidence' in coordinate
+  ) {
+    return [
+      globalIssue(
+        'stops',
+        'candidate_coordinate_in_formal_data',
+        `Stop ${stop.id} contains a candidate coordinate instead of a verified station coordinate`,
         { stopId: stop.id },
       ),
     ]
