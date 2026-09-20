@@ -93,6 +93,20 @@ export interface PoiRouteRecommendations {
   routes: RouteRecommendation[]
 }
 
+/** 两个校园地点之间、按方向站序确认可直达的一条线路候选。 */
+export interface RoutePathRecommendation {
+  originPoiId: string
+  destinationPoiId: string
+  routeId: string
+  routeName: string
+  originStopIds: string[]
+  destinationStopIds: string[]
+  directions: string[]
+  serviceType: RouteServiceType
+  dataStatus: RouteDataStatus
+  notes: string[]
+}
+
 /** 实时车辆能力的稳定边界；MVP 可使用返回空数组的实现。 */
 export interface Vehicle {
   id: string
