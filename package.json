@@ -5,6 +5,7 @@
   "description": "SWU Go - 西南大学北碚校区非官方校园校车导航微信小程序",
   "scripts": {
     "geocode": "tsx scripts/geocode.ts",
+    "review:coordinates": "tsx scripts/review-coordinates.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/**/*.test.ts",
     "validate:data": "tsx scripts/validate-routes.ts"

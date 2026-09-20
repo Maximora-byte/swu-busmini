@@ -12,6 +12,20 @@ export interface CandidateCoordinate {
   verified: false
 }
 
+export type CoordinateReviewStatus =
+  | 'pending_review'
+  | 'verified'
+  | 'rejected'
+
+/** 外部候选坐标的人工审核记录；不会直接改写正式站点数据。 */
+export interface CoordinateReview {
+  targetId: string
+  candidateCoordinate: CandidateCoordinate
+  source: string
+  status: CoordinateReviewStatus
+  reviewedAt: string | null
+}
+
 /** 地图 Provider 返回的步行路线；时长统一为秒，距离统一为米。 */
 export interface WalkingRouteResult {
   distanceMeters: number

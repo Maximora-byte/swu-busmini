@@ -5,9 +5,9 @@ import type {
   VerifiedBusStop,
 } from '../../models/index'
 import {
-  busStopRepository,
   type BusStopRepository,
 } from '../repository/bus-stop.repository'
+import { reviewedBusStopRepository } from '../repository/reviewed-bus-stop.repository'
 import {
   routeRepository,
   type RouteRepository,
@@ -78,5 +78,5 @@ export function createRouteCatalogService(
 
 export const routeCatalogService = createRouteCatalogService(
   routeRepository,
-  busStopRepository,
+  reviewedBusStopRepository,
 )

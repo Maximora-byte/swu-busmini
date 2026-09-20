@@ -3,6 +3,11 @@ import routesData from '../miniprogram/data/routes.json'
 import sourcesData from '../miniprogram/data/sources.json'
 import stopsData from '../miniprogram/data/stops.json'
 import type { BusStop } from '../miniprogram/models/index'
+import { createCoordinateVerificationService } from '../miniprogram/services/location/coordinate-verification.service'
+import { createStaticBusStopRepository } from '../miniprogram/services/repository/bus-stop.repository'
+import { createStaticCoordinateReviewRepository } from '../miniprogram/services/repository/coordinate-review.repository'
+import { createReviewedBusStopRepository } from '../miniprogram/services/repository/reviewed-bus-stop.repository'
+import coordinateReviewsData from '../miniprogram/data/coordinate-reviews.json'
 import { parseRouteData } from '../miniprogram/services/repository/route-data.parser'
 import {
   type PoiDataValidationIssue,
@@ -62,6 +67,13 @@ function formatPoiIssue(issue: PoiDataValidationIssue): string {
 }
 
 function main(): void {
+  const coordinateReviews = createStaticCoordinateReviewRepository(
+    coordinateReviewsData,
+  )
+  createReviewedBusStopRepository(
+    createStaticBusStopRepository(stopsData),
+    createCoordinateVerificationService(coordinateReviews),
+  )
   const result = validateRouteData(
     routes,
     stops,
@@ -104,6 +116,8 @@ function main(): void {
       console.error(`  ${formatPoiIssue(validationIssue)}`)
     }
   }
+
+  console.log('✓ coordinate reviews')
 
   if (!result.valid || !poiResult.valid) {
     process.exitCode = 1

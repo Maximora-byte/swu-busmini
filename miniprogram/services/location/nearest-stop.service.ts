@@ -1,9 +1,9 @@
 import type { Coordinate, NearestStopResult } from '../../models/index'
 import { distanceBetween } from '../../utils/distance'
 import {
-  busStopRepository,
   type BusStopRepository,
 } from '../repository/bus-stop.repository'
+import { reviewedBusStopRepository } from '../repository/reviewed-bus-stop.repository'
 
 export interface NearestStopService {
   getNearestStops(origin: Coordinate): readonly NearestStopResult[]
@@ -38,4 +38,6 @@ export function createNearestStopService(
   }
 }
 
-export const nearestStopService = createNearestStopService(busStopRepository)
+export const nearestStopService = createNearestStopService(
+  reviewedBusStopRepository,
+)
