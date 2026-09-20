@@ -76,6 +76,23 @@ export interface CampusPOI {
   dataStatus: DataStatus
 }
 
+/** 从地点关联站点推导出的单线路直达候选。 */
+export interface RouteRecommendation {
+  routeId: string
+  routeName: string
+  matchedStopIds: string[]
+  directions: string[]
+  serviceType: RouteServiceType
+  dataStatus: RouteDataStatus
+  note?: string
+}
+
+/** 一次地点搜索及其线路推荐结果，保持领域语义而非页面展示结构。 */
+export interface PoiRouteRecommendations {
+  destination: CampusPOI
+  routes: RouteRecommendation[]
+}
+
 /** 实时车辆能力的稳定边界；MVP 可使用返回空数组的实现。 */
 export interface Vehicle {
   id: string
