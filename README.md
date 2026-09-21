@@ -6,7 +6,7 @@ SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航�
 
 ## 当前状态
 
-项目已完成 **Phase 13：离线线路轨迹生成 Pipeline**。当前版本可以获取并显示用户位置，在 1～9 路之间切换并查看方向、已知站序和人工确认的线路轨迹；没有轨迹时仍能查看站序。开发者可以用已验证站点坐标分段调用地图 Provider，离线生成待审核轨迹并缓存 API 结果。用户运行时只读取本地已验证轨迹，不调用腾讯路线 API。
+项目已完成 **Phase 14：线路导航 UI 与地图轨迹展示**。用户可以在 1～9 路之间切换、选择线路方向、查看已知站序与灵活停靠提示；存在人工确认轨迹时，地图会同时展示用户位置、已验证站点 marker 和线路 polyline。没有轨迹或站点坐标时仍可查看站序，用户运行时不会调用腾讯路线 API。
 
 线路数据第一版来源为《西南大学北碚校区校园地图（2025）》左上角线路表，仅用于确认线路编号、图示站名、站序和环线结构。2026 年实际运营方向、站牌名称和停靠情况仍需结合官方通知、现场站牌与实际乘车复核。
 
@@ -59,6 +59,7 @@ miniprogram/
 - `RouteGeometry`：以线路 ID、方向 ID 和 GCJ-02 点列表示的厂商无关线路轨迹；
 - `RouteGeometryCacheEntry`：以出行模式、起终点和返回点列保存的开发阶段 API 缓存；
 - `RouteNavigation`：线路方向、已知参考站点、轨迹、服务类型和候车提示；
+- `RouteNavigationViewModel`：页面可直接消费的单线路、单方向、已知站点、verified geometry 和停靠提示；
 - `CampusPOI`：可搜索校园地点、分类、关联站点及数据状态，不包含推测坐标；
 - `RouteRecommendation`：由地点关联关系推导出的候选线路、匹配站点、可用方向、服务类型和数据状态；
 - `RoutePathRecommendation`：起点与终点之间按站序确认可直达的线路、上下车站、方向、服务类型、数据状态和提示；
@@ -92,11 +93,12 @@ miniprogram/
 13. 建立候选坐标的人工审核、过滤和运行时应用流程（已完成）；
 14. 建立以线路方向、已知站点和可选轨迹为核心的线路导航（已完成）；
 15. 建立基于已验证站点和路线 API 缓存的离线轨迹生成 Pipeline（已完成）；
-16. 结合 2026 年站牌、通知和实际乘车复核线路、POI 关系、站点坐标及线路轨迹；
-17. 在页面接入上车前、下车后的步行路线；
-18. 增加路线排序、时刻表和多方案；
-19. 稳定后迁移可变数据到 CloudBase；
-20. 仅在获得正式授权接口后接入实时车辆。
+16. 完成线路列表、方向切换、站序和地图轨迹展示（已完成）；
+17. 结合 2026 年站牌、通知和实际乘车复核线路、POI 关系、站点坐标及线路轨迹；
+18. 在页面接入上车前、下车后的步行路线；
+19. 增加路线排序、时刻表和多方案；
+20. 稳定后迁移可变数据到 CloudBase；
+21. 仅在获得正式授权接口后接入实时车辆。
 
 ## 定位服务设计
 
@@ -240,23 +242,25 @@ npm run review:coordinates
 
 ## 线路导航
 
-`RouteNavigationService.getRouteNavigation(routeId)` 以校车线路为中心返回全部方向、已知参考站点、可选 `RouteGeometry`、服务类型和数据状态。线路轨迹不存在时不会阻止查询，页面继续显示已知站序并明确提示轨迹待人工采集。
+`RouteNavigationService` 提供线路列表、方向选项和 `getRouteNavigation(routeId, directionId)`。指定方向查询返回 `RouteNavigationViewModel`，其中只包含页面需要的线路名称、方向、服务类型、已知参考站点、verified geometry 和候车提示。线路轨迹不存在时不会阻止查询，页面继续显示已知站序并明确提示轨迹待人工采集。
 
 ```text
 RouteRepository / Route Catalog
               ↓
    RouteNavigationService
               ↓
-方向 + 已知站点 + 可选 RouteGeometry
+RouteNavigationViewModel
               ↓
- RoutePolylineService → 微信 map polyline
+Page → marker / RoutePolylineService → 微信 map
 ```
 
 `RoutePolylineService` 只把厂商无关的 `RouteGeometry` 转换成微信地图需要的 `points`、`color` 和 `width`，不会补点、推算轨迹或转换坐标系。轨迹必须使用经过人工采集或核对的 GCJ-02 坐标；当前正式 1～9 路尚未录入轨迹，所以地图不会绘制猜测线路。
 
 对于 `allowIntermediateStop: true` 的校园灵活停靠线路，线路导航显示“该线路支持沿途停靠，请结合现场情况选择安全位置候车”。已知站点仅作为线路运行参考，不代表只能在固定站点上下车。
 
-当前线路导航不计算最近上车点、步行距离或实时车辆，也不承诺图示线路与当日实际运营完全一致。
+页面通过 Service 获取 1～9 路列表，方向按钮同时显示方向名称和首末已知站点摘要。切换线路或方向后，站序、verified marker 与 verified polyline 会一起刷新；当前位置由独立定位服务维护，不会被线路切换清除。
+
+当前线路导航不计算最近上车点、步行距离、预计到达时间或实时车辆，也不承诺图示线路与当日实际运营完全一致。
 
 ## 离线线路轨迹生成
 

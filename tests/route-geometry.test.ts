@@ -187,7 +187,7 @@ test('does not expose unverified geometry to route navigation', () => {
     geometries,
   ).getRouteNavigation(route.id)
 
-  assert.equal(navigation.directions[0]?.geometry, undefined)
+  assert.equal(navigation.geometry, undefined)
 })
 
 test('repository returns geometry by route and direction', () => {

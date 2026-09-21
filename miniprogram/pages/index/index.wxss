@@ -184,10 +184,23 @@
 }
 
 .direction-switch__button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   margin: 0;
   color: #506159;
   border-color: #cbd6d0;
   background: #f7f9f8;
+}
+
+.direction-switch__name {
+  font-size: 24rpx;
+}
+
+.direction-switch__summary {
+  margin-top: 2rpx;
+  font-size: 18rpx;
+  opacity: 0.8;
 }
 
 .direction-switch__button--active {

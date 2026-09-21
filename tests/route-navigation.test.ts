@@ -70,12 +70,37 @@ function createNavigationService() {
   )
 }
 
-test('loads verified geometry for a route direction', () => {
-  const navigation = createNavigationService().getRouteNavigation(
+test('loads a route through the navigation service', () => {
+  const navigation = createNavigationService().getRoute(
     'route_with_geometry',
   )
 
-  assert.deepEqual(navigation.directions[0]?.geometry, {
+  assert.equal(navigation.routeId, 'route_with_geometry')
+  assert.equal(navigation.routeName, '轨迹线路')
+  assert.equal(navigation.directions.length, 1)
+})
+
+test('loads a selected direction as a navigation view model', () => {
+  const navigation = createNavigationService().getRouteNavigation(
+    'route_with_geometry',
+    '正向',
+  )
+
+  assert.equal(navigation.directionId, '正向')
+  assert.equal(navigation.directionName, '正向')
+  assert.deepEqual(
+    navigation.stops.map(({ stopId }) => stopId),
+    ['stop_a', 'stop_b'],
+  )
+})
+
+test('loads verified geometry for a route direction', () => {
+  const navigation = createNavigationService().getRouteNavigation(
+    'route_with_geometry',
+    '正向',
+  )
+
+  assert.deepEqual(navigation.geometry, {
     routeId: 'route_with_geometry',
     directionId: '正向',
     source: 'field_survey',
@@ -90,13 +115,12 @@ test('loads verified geometry for a route direction', () => {
 test('keeps known stop order available when geometry is absent', () => {
   const navigation = createNavigationService().getRouteNavigation(
     'route_without_geometry',
+    '图示方向',
   )
-  const [direction] = navigation.directions
 
-  assert.equal(direction?.geometry, undefined)
-  assert.deepEqual(direction?.stopIds, ['stop_a', 'stop_b'])
+  assert.equal(navigation.geometry, undefined)
   assert.deepEqual(
-    direction?.knownStops.map(({ id }) => id),
+    navigation.stops.map(({ stopId }) => stopId),
     ['stop_a', 'stop_b'],
   )
 })
@@ -104,6 +128,7 @@ test('keeps known stop order available when geometry is absent', () => {
 test('returns the safe waiting note for a flexible campus bus', () => {
   const navigation = createNavigationService().getRouteNavigation(
     'route_without_geometry',
+    '图示方向',
   )
 
   assert.equal(navigation.serviceType, 'flexible_campus_bus')
@@ -114,7 +139,8 @@ test('returns the safe waiting note for a flexible campus bus', () => {
 test('converts RouteGeometry to a WeChat map polyline', () => {
   const geometry = createNavigationService().getRouteNavigation(
     'route_with_geometry',
-  ).directions[0]?.geometry
+    '正向',
+  ).geometry
   assert.ok(geometry)
 
   const polyline = createRoutePolylineService().toMapPolyline(geometry, {

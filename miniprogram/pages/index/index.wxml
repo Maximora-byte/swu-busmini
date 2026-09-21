@@ -60,12 +60,15 @@
         <view class="direction-switch">
           <button
             wx:for="{{routeDirections}}"
-            wx:key="name"
+            wx:key="id"
             class="direction-switch__button {{item.selected ? 'direction-switch__button--active' : ''}}"
             size="mini"
-            data-direction-name="{{item.name}}"
+            data-direction-id="{{item.id}}"
             bindtap="handleDirectionChange"
-          >{{item.name}}</button>
+          >
+            <text class="direction-switch__name">{{item.name}}</text>
+            <text class="direction-switch__summary">{{item.summary}}</text>
+          </button>
         </view>
       </view>
       <text class="route-details__label route-details__stops-label">站点</text>

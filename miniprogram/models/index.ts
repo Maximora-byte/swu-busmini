@@ -146,6 +146,26 @@ export interface RouteNavigation {
   note?: string
 }
 
+/** 线路导航页面使用的已知参考站点，只暴露已验证坐标。 */
+export interface RouteNavigationStopViewModel {
+  stopId: string
+  stopName: string
+  coordinate?: Coordinate
+}
+
+/** 页面可直接消费的单线路、单方向导航状态。 */
+export interface RouteNavigationViewModel {
+  routeId: string
+  routeName: string
+  directionId: string
+  directionName: string
+  serviceType: RouteServiceType
+  allowIntermediateStop: boolean
+  stops: RouteNavigationStopViewModel[]
+  geometry?: RouteGeometry
+  note?: string
+}
+
 export type CampusPOICategory =
   | 'library'
   | 'dormitory'

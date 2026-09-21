@@ -8,7 +8,6 @@ import {
   type RouteMapPolyline,
 } from '../../services/map/route-polyline.service'
 import { routeNavigationService } from '../../services/navigation/route-navigation.service'
-import { routeCatalogService } from '../../services/route/route-catalog.service'
 
 const SWU_BEIBEI_CAMPUS: Coordinate = {
   latitude: 29.821737,
@@ -44,7 +43,9 @@ interface RouteStopView {
 }
 
 interface RouteDirectionView {
+  id: string
   name: string
+  summary: string
   selected: boolean
 }
 
@@ -96,61 +97,60 @@ Page({
   },
 
   onLoad() {
-    const routes = routeCatalogService.getRoutes()
+    const routes = routeNavigationService.getRoutes()
     this.setData({
       routeOptions: routes.map((route) => ({
-        id: route.id,
-        name: route.name,
-        selected: route.id === 'route_1',
+        id: route.routeId,
+        name: route.routeName,
+        selected: route.routeId === 'route_1',
       })),
     })
     this.loadRoute('route_1')
     void this.locateUser()
   },
 
-  loadRoute(routeId: string, directionName?: string) {
+  loadRoute(routeId: string, directionId?: string) {
     try {
-      const details = routeCatalogService.getRouteDetails(
+      const navigation = routeNavigationService.getRouteNavigation(
         routeId,
-        directionName,
+        directionId,
       )
-      const navigation = routeNavigationService.getRouteNavigation(routeId)
-      const navigationDirection = navigation.directions.find(
-        ({ directionId }) => directionId === details.direction.name,
-      )
-      const verifiedStopIds = new Set(
-        details.mappableStops.map((stop) => stop.id),
+      const directions = routeNavigationService.getDirections(routeId)
+      const mappableStops = navigation.stops.filter(
+        (stop) => stop.coordinate !== undefined,
       )
 
       this.setData({
-        routeName: details.route.name,
-        selectedRouteId: details.route.id,
+        routeName: navigation.routeName,
+        selectedRouteId: navigation.routeId,
         routeOptions: this.data.routeOptions.map((route) => ({
           ...route,
-          selected: route.id === details.route.id,
+          selected: route.id === navigation.routeId,
         })),
-        routeDirectionName: details.direction.name,
-        routeDirections: details.route.directions.map((direction) => ({
-          name: direction.name,
-          selected: direction.name === details.direction.name,
+        routeDirectionName: navigation.directionName,
+        routeDirections: directions.map((direction) => ({
+          id: direction.directionId,
+          name: direction.directionName,
+          summary: direction.summary,
+          selected: direction.directionId === navigation.directionId,
         })),
-        routeStops: details.stops.map((stop, index) => ({
-          key: `${stop.id}-${index}`,
-          id: stop.id,
-          name: stop.name,
-          hasVerifiedCoordinate: verifiedStopIds.has(stop.id),
-          isLast: index === details.stops.length - 1,
+        routeStops: navigation.stops.map((stop, index) => ({
+          key: `${stop.stopId}-${index}`,
+          id: stop.stopId,
+          name: stop.stopName,
+          hasVerifiedCoordinate: stop.coordinate !== undefined,
+          isLast: index === navigation.stops.length - 1,
         })),
-        busStopMarkers: details.mappableStops.map((stop, index) => ({
+        busStopMarkers: mappableStops.map((stop, index) => ({
           id: 1000 + index,
-          latitude: stop.coordinate.latitude,
-          longitude: stop.coordinate.longitude,
-          title: stop.name,
+          latitude: stop.coordinate!.latitude,
+          longitude: stop.coordinate!.longitude,
+          title: stop.stopName,
           iconPath: '/assets/icons/bus-stop-marker.svg',
           width: 30,
           height: 36,
           label: {
-            content: `📍${stop.name}站`,
+            content: `📍${stop.stopName}站`,
             color: '#126b47',
             fontSize: 12,
             borderRadius: 4,
@@ -158,18 +158,18 @@ Page({
             padding: 4,
           },
         })),
-        routePolylines: navigationDirection?.geometry
+        routePolylines: navigation.geometry
           ? [
               routePolylineService.toMapPolyline(
-                navigationDirection.geometry,
+                navigation.geometry,
               ),
             ]
           : [],
         routeCoordinateStatusText:
-          details.pendingCoordinateCount > 0
-            ? `${details.pendingCoordinateCount} 个站点坐标待现场校准，暂不显示 marker`
+          navigation.stops.length - mappableStops.length > 0
+            ? `${navigation.stops.length - mappableStops.length} 个站点坐标待现场校准，暂不显示 marker`
             : '全部站点坐标已校准',
-        routeGeometryStatusText: navigationDirection?.geometry
+        routeGeometryStatusText: navigation.geometry
           ? '当前方向线路轨迹已加载'
           : '当前方向线路轨迹待人工采集，暂以已知站序为参考',
         routeServiceNote: navigation.note ?? '',
@@ -231,9 +231,9 @@ Page({
   },
 
   handleDirectionChange(event: WechatMiniprogram.TouchEvent) {
-    const directionName = event.currentTarget.dataset.directionName
-    if (typeof directionName === 'string') {
-      this.loadRoute(this.data.selectedRouteId, directionName)
+    const directionId = event.currentTarget.dataset.directionId
+    if (typeof directionId === 'string') {
+      this.loadRoute(this.data.selectedRouteId, directionId)
     }
   },
 
