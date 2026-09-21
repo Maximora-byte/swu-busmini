@@ -1,4 +1,4 @@
-import reviewsData from '../../data/coordinate-reviews.json'
+import { coordinateReviews } from '../../data/coordinate-reviews'
 import type {
   CandidateCoordinate,
   CoordinateReview,
@@ -122,4 +122,4 @@ export function createStaticCoordinateReviewRepository(
 }
 
 export const coordinateReviewRepository =
-  createStaticCoordinateReviewRepository(reviewsData)
+  createStaticCoordinateReviewRepository(coordinateReviews)

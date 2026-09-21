@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 
 import geometryCacheData from '../miniprogram/data/geometry-cache.json'
-import routeGeometriesData from '../miniprogram/data/route-geometries.json'
+import { routeGeometries } from '../miniprogram/data/route-geometries'
 import type { RouteGeometry } from '../miniprogram/models/index'
 import { createRouteGeometryCache } from '../miniprogram/services/map/route-geometry-cache'
 import { createRouteGeometryGeneratorService } from '../miniprogram/services/map/route-geometry-generator.service'
@@ -13,6 +13,7 @@ import {
 import { reviewedBusStopRepository } from '../miniprogram/services/repository/reviewed-bus-stop.repository'
 import { createStaticRouteGeometryRepository } from '../miniprogram/services/repository/route-geometry.repository'
 import { routeRepository } from '../miniprogram/services/repository/route.repository'
+import { writeRouteGeometryData } from './route-geometry-data-writer'
 
 interface LocalConfig {
   tencentMapKey: string
@@ -64,10 +65,6 @@ function createNodeRequestClient(): TencentRequestClient {
 const cachePath = fileURLToPath(
   new URL('../miniprogram/data/geometry-cache.json', import.meta.url),
 )
-const geometryPath = fileURLToPath(
-  new URL('../miniprogram/data/route-geometries.json', import.meta.url),
-)
-
 async function main(): Promise<void> {
   const routeId = process.argv[2]?.trim() ?? ''
   if (routeId.length === 0) {
@@ -79,7 +76,7 @@ async function main(): Promise<void> {
   }
 
   const current = createStaticRouteGeometryRepository(
-    routeGeometriesData,
+    routeGeometries,
     routeRepository,
   ).getAll()
   const verifiedDirectionIds = new Set(
@@ -140,11 +137,7 @@ async function main(): Promise<void> {
         geometry.routeId !== routeId ||
         !generatedDirectionIds.has(geometry.directionId),
     )
-    await writeFile(
-      geometryPath,
-      `${JSON.stringify([...retained, ...generated], null, 2)}\n`,
-      'utf8',
-    )
+    await writeRouteGeometryData([...retained, ...generated])
     console.log(JSON.stringify({ routeId, geometries: generated }, null, 2))
     console.log('生成结果已进入 needs_review，人工确认前不会进入地图展示。')
   } finally {

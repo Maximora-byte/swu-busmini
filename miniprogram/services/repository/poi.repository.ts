@@ -1,4 +1,4 @@
-import poisData from '../../data/pois.json'
+import { pois } from '../../data/pois'
 import type { CampusPOI } from '../../models/index'
 import { parsePoiData } from './poi-data.parser'
 
@@ -36,4 +36,4 @@ export function createStaticPoiRepository(data: unknown): PoiRepository {
   }
 }
 
-export const poiRepository = createStaticPoiRepository(poisData)
+export const poiRepository = createStaticPoiRepository(pois)

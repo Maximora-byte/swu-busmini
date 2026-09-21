@@ -1,4 +1,4 @@
-import stopsData from '../../data/stops.json'
+import { stops } from '../../data/stops'
 import type {
   BusStop,
   BusStopCoordinate,
@@ -141,4 +141,4 @@ export function createStaticBusStopRepository(
   }
 }
 
-export const busStopRepository = createStaticBusStopRepository(stopsData)
+export const busStopRepository = createStaticBusStopRepository(stops)

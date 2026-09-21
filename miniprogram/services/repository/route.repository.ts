@@ -1,4 +1,4 @@
-import routesData from '../../data/routes.json'
+import { routes } from '../../data/routes'
 import type { BusRoute } from '../../models/index'
 import { parseRouteData } from './route-data.parser'
 
@@ -24,4 +24,4 @@ export function createStaticRouteRepository(data: unknown): RouteRepository {
   }
 }
 
-export const routeRepository = createStaticRouteRepository(routesData)
+export const routeRepository = createStaticRouteRepository(routes)

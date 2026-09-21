@@ -1,14 +1,14 @@
-import poisData from '../miniprogram/data/pois.json'
-import routesData from '../miniprogram/data/routes.json'
+import { pois } from '../miniprogram/data/pois'
+import { routes as routeRecords } from '../miniprogram/data/routes'
 import sourcesData from '../miniprogram/data/sources.json'
-import stopsData from '../miniprogram/data/stops.json'
-import routeGeometriesData from '../miniprogram/data/route-geometries.json'
+import { stops as stopRecords } from '../miniprogram/data/stops'
+import { routeGeometries } from '../miniprogram/data/route-geometries'
 import type { BusStop } from '../miniprogram/models/index'
 import { createCoordinateVerificationService } from '../miniprogram/services/location/coordinate-verification.service'
 import { createStaticBusStopRepository } from '../miniprogram/services/repository/bus-stop.repository'
 import { createStaticCoordinateReviewRepository } from '../miniprogram/services/repository/coordinate-review.repository'
 import { createReviewedBusStopRepository } from '../miniprogram/services/repository/reviewed-bus-stop.repository'
-import coordinateReviewsData from '../miniprogram/data/coordinate-reviews.json'
+import { coordinateReviews as coordinateReviewRecords } from '../miniprogram/data/coordinate-reviews'
 import { parseRouteData } from '../miniprogram/services/repository/route-data.parser'
 import {
   type PoiDataValidationIssue,
@@ -20,8 +20,8 @@ import {
 } from '../miniprogram/services/validation/route-data-validator'
 import { validateRouteGeometryData } from '../miniprogram/services/validation/route-geometry-validator'
 
-const routes = parseRouteData(routesData)
-const stops: readonly BusStop[] = stopsData
+const routes = parseRouteData(routeRecords)
+const stops: readonly BusStop[] = stopRecords
 
 function formatIssue(issue: RouteDataValidationIssue): string {
   if (issue.code === 'duplicate_stop' && issue.stopId) {
@@ -69,12 +69,12 @@ function formatPoiIssue(issue: PoiDataValidationIssue): string {
 }
 
 function main(): void {
-  const coordinateReviews = createStaticCoordinateReviewRepository(
-    coordinateReviewsData,
+  const coordinateReviewRepository = createStaticCoordinateReviewRepository(
+    coordinateReviewRecords,
   )
   createReviewedBusStopRepository(
-    createStaticBusStopRepository(stopsData),
-    createCoordinateVerificationService(coordinateReviews),
+    createStaticBusStopRepository(stopRecords),
+    createCoordinateVerificationService(coordinateReviewRepository),
   )
   const result = validateRouteData(
     routes,
@@ -82,8 +82,8 @@ function main(): void {
     sourcesData.sources,
     sourcesData.routeSources,
   )
-  const poiResult = validatePoiData(poisData, stops)
-  const geometryResult = validateRouteGeometryData(routeGeometriesData, routes)
+  const poiResult = validatePoiData(pois, stops)
+  const geometryResult = validateRouteGeometryData(routeGeometries, routes)
 
   for (const scope of ['data', 'stops', 'sources'] as const) {
     const scopedIssues = result.issues.filter((issue) => issue.scope === scope)

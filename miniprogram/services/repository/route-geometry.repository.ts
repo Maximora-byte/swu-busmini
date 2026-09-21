@@ -1,4 +1,4 @@
-import geometryData from '../../data/route-geometries.json'
+import { routeGeometries } from '../../data/route-geometries'
 import type { RouteGeometry } from '../../models/index'
 import { routeRepository, type RouteRepository } from './route.repository'
 import { validateRouteGeometryData } from '../validation/route-geometry-validator'
@@ -72,6 +72,6 @@ export function createStaticRouteGeometryRepository(
 }
 
 export const routeGeometryRepository = createStaticRouteGeometryRepository(
-  geometryData,
+  routeGeometries,
   routeRepository,
 )

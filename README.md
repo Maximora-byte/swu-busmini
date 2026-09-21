@@ -33,19 +33,19 @@ miniprogram/
 ├── pages/                 # 页面，只负责展示和用户交互
 ├── components/            # 可复用界面组件（按需创建）
 ├── config/                # 配置模板；本地密钥不入库
-├── data/                  # 初期静态线路、站点和 POI JSON
+├── data/                  # 微信运行时 TypeScript Data Adapter 与离线 JSON 镜像
 ├── models/                # 稳定的 TypeScript 领域模型
 ├── services/
 │   ├── location/          # 微信定位能力
 │   ├── map/               # 腾讯地图和路线 API 适配
 │   ├── navigation/        # 上下车站选择与路线计算
-│   ├── repository/        # 本地 JSON / CloudBase 数据访问边界
+│   ├── repository/        # TypeScript Data Adapter / CloudBase 数据访问边界
 │   ├── validation/        # 可复用的线路数据质量规则
 │   └── vehicle/           # 可插拔实时车辆 Provider
 └── utils/                 # 距离等无业务状态的工具函数
 ```
 
-目录会在功能真正需要时创建，避免一开始生成大量空文件。页面不直接承担路线算法或数据访问，方便以后从本地 JSON 切换到 CloudBase。
+目录会在功能真正需要时创建，避免一开始生成大量空文件。页面不直接承担路线算法或数据访问，方便以后从本地静态 Data Adapter 切换到 CloudBase。
 
 ## 核心数据模型
 
@@ -107,13 +107,14 @@ miniprogram/
 
 ## 校车数据设计
 
-- `miniprogram/data/stops.json` 保存去重后的站点记录；
-- `miniprogram/data/routes.json` 只用站点 ID 表达各方向的有序站点；
+- `miniprogram/data/stops.ts` 保存微信运行时使用的去重站点记录；
+- `miniprogram/data/routes.ts` 只用站点 ID 表达各方向的有序站点；
 - `miniprogram/data/sources.json` 记录数据来源、允许用途和待复核状态；
-- `miniprogram/data/coordinate-reviews.json` 独立保存候选坐标及人工审核状态，不覆盖正式站点数据；
-- `miniprogram/data/route-geometries.json` 独立保存生成或人工确认的方向轨迹，不改写线路站序；
-- `miniprogram/data/geometry-cache.json` 缓存开发阶段分段路线结果，减少重复 API 消耗；
-- Repository 负责读取和验证静态 JSON，禁止页面直接导入数据文件；
+- `miniprogram/data/coordinate-reviews.ts` 独立保存微信运行时使用的候选坐标及人工审核状态，不覆盖正式站点数据；
+- `miniprogram/data/route-geometries.ts` 独立保存微信运行时使用的方向轨迹，不改写线路站序；
+- 同名 JSON 文件作为离线数据维护镜像，由一致性测试防止与 TypeScript Adapter 漂移；
+- `miniprogram/data/geometry-cache.json` 只由 Node.js 开发脚本读取，缓存分段路线结果并减少重复 API 消耗，不进入小程序运行时；
+- Repository 负责读取和验证 TypeScript Data Adapter，禁止页面和 Service 直接导入静态数据文件；
 - `getVerifiedStops()` 只返回坐标完整且明确标记 `verified: true` 的站点；
 - Route Catalog Service 负责连接线路与站点，检查所有方向中的重复 stopId 和未定义站点，并只把已验证站点交给地图；
 - 以后切换到 CloudBase 时可以替换 Repository，而不改变页面和领域模型。
@@ -137,7 +138,7 @@ miniprogram/
 
 ## 校园 POI 知识层
 
-`miniprogram/data/pois.json` 保存少量高价值校园地点，字段包括稳定 ID、名称、别名、分类、关联站点 ID 和数据状态。POI 不包含 GPS 坐标，也不根据校园地图推算位置。第一版只包含图书馆、学生宿舍、二食堂、一号门和五号门；关系不确定的地点使用空 `relatedStopIds` 并保持 `needs_review`。
+`miniprogram/data/pois.ts` 保存微信运行时使用的少量高价值校园地点，字段包括稳定 ID、名称、别名、分类、关联站点 ID 和数据状态。POI 不包含 GPS 坐标，也不根据校园地图推算位置。第一版只包含图书馆、学生宿舍、二食堂、一号门和五号门；关系不确定的地点使用空 `relatedStopIds` 并保持 `needs_review`。
 
 查询链路为：
 
@@ -237,7 +238,7 @@ CandidateCoordinate
 npm run review:coordinates
 ```
 
-审核记录保存在 `miniprogram/data/coordinate-reviews.json`。`pending_review` 的 `reviewedAt` 必须为 `null`；只有人工核对后才能将状态改为 `verified` 或 `rejected`，同时填写审核时间。候选对象本身始终保持 `verified: false`，审核服务只在运行时将 `status: verified` 的记录转换为可供地图和最近站点服务使用的已验证坐标。
+微信运行时审核记录由 `miniprogram/data/coordinate-reviews.ts` 提供，`coordinate-reviews.json` 保留为离线维护镜像。`pending_review` 的 `reviewedAt` 必须为 `null`；只有人工核对后才能将状态改为 `verified` 或 `rejected`，同时填写审核时间。候选对象本身始终保持 `verified: false`，审核服务只在运行时将 `status: verified` 的记录转换为可供地图和最近站点服务使用的已验证坐标。
 
 `ReviewedBusStopRepository` 是正式站点 Repository 的只读装饰层：它不会写入或覆盖 `stops.json`，不会覆盖已经存在的正式坐标，并会过滤待审核和已拒绝候选。当前图书馆腾讯坐标仅作为 `pending_review` 示例保存，因此不会显示 marker，也不会参与最近站点计算。
 
@@ -339,7 +340,7 @@ npm run typecheck
 npm test
 ```
 
-任意一步失败都会使 workflow 失败。修改 `routes.json`、`stops.json`、`sources.json` 或 TypeScript 代码后，必须先通过本地验证和 CI，才能合并数据变更。
+任意一步失败都会使 workflow 失败。修改 `routes.ts`、`stops.ts`、对应 JSON 镜像、`sources.json` 或其他 TypeScript 代码后，必须先通过本地验证和 CI，才能合并数据变更。
 
 ## 安全与数据原则
 

@@ -1,15 +1,9 @@
-import { writeFile } from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
-
-import routeGeometriesData from '../miniprogram/data/route-geometries.json'
+import { routeGeometries } from '../miniprogram/data/route-geometries'
 import { createRouteGeometryReviewService } from '../miniprogram/services/map/route-geometry-review.service'
 import { reviewedBusStopRepository } from '../miniprogram/services/repository/reviewed-bus-stop.repository'
 import { createStaticRouteGeometryRepository } from '../miniprogram/services/repository/route-geometry.repository'
 import { routeRepository } from '../miniprogram/services/repository/route.repository'
-
-const geometryPath = fileURLToPath(
-  new URL('../miniprogram/data/route-geometries.json', import.meta.url),
-)
+import { writeRouteGeometryData } from './route-geometry-data-writer'
 
 type ReviewAction = 'approve' | 'reject'
 
@@ -23,7 +17,7 @@ function printRouteReview(routeId: string): void {
     throw new Error(`未找到线路: ${routeId}`)
   }
   const repository = createStaticRouteGeometryRepository(
-    routeGeometriesData,
+    routeGeometries,
     routeRepository,
   )
   const verifiedStopIds = new Set(
@@ -69,7 +63,7 @@ async function main(): Promise<void> {
   }
 
   const repository = createStaticRouteGeometryRepository(
-    routeGeometriesData,
+    routeGeometries,
     routeRepository,
   )
   const review = createRouteGeometryReviewService(repository)
@@ -78,11 +72,7 @@ async function main(): Promise<void> {
     action === 'approve'
       ? review.approve(current, routeId, directionId)
       : review.reject(current, routeId, directionId)
-  await writeFile(
-    geometryPath,
-    `${JSON.stringify(updated, null, 2)}\n`,
-    'utf8',
-  )
+  await writeRouteGeometryData(updated)
   console.log(
     action === 'approve'
       ? `已人工确认轨迹: ${routeId}/${directionId}`
