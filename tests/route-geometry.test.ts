@@ -99,7 +99,7 @@ test('generates and merges direction geometry without adjacent duplicates', asyn
   )
 
   assert.equal(provider.drivingCalls, 2)
-  assert.equal(geometry.dataStatus, 'needs_review')
+  assert.equal(geometry.dataStatus, 'generated')
   assert.equal(geometry.source, 'mock_driving')
   assert.deepEqual(geometry.points, [
     { latitude: 29.8, longitude: 106.4 },

@@ -13,6 +13,10 @@ export interface RouteGeometryRepository {
     routeId: string,
     directionId: string,
   ): RouteGeometry | undefined
+  getRouteGeometryForReview(
+    routeId?: string,
+    directionId?: string,
+  ): readonly RouteGeometry[]
 }
 
 function cloneGeometry(geometry: RouteGeometry): RouteGeometry {
@@ -52,6 +56,17 @@ export function createStaticRouteGeometryRepository(
     getVerifiedGeometry(routeId, directionId) {
       const geometry = getGeometry(routeId, directionId)
       return geometry?.dataStatus === 'verified' ? geometry : undefined
+    },
+    getRouteGeometryForReview(routeId, directionId) {
+      return geometries
+        .filter(
+          (geometry) =>
+            geometry.dataStatus !== 'verified' &&
+            (routeId === undefined || geometry.routeId === routeId) &&
+            (directionId === undefined ||
+              geometry.directionId === directionId),
+        )
+        .map(cloneGeometry)
     },
   }
 }

@@ -113,7 +113,7 @@ export function createRouteGeometryGeneratorService(
       routeId: route.id,
       directionId: direction.name,
       source,
-      dataStatus: 'needs_review',
+      dataStatus: 'generated',
       points,
     }
   }

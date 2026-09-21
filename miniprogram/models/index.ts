@@ -95,7 +95,10 @@ export interface RouteGeometry {
   points: Coordinate[]
 }
 
-export type RouteGeometryDataStatus = 'needs_review' | 'verified'
+export type RouteGeometryDataStatus =
+  | 'generated'
+  | 'needs_review'
+  | 'verified'
 
 export type RouteGeometryMode = 'walking' | 'driving'
 

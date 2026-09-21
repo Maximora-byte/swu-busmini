@@ -7,6 +7,7 @@
     "geocode": "tsx scripts/geocode.ts",
     "generate:geometry": "tsx scripts/generate-route-geometry.ts",
     "review:coordinates": "tsx scripts/review-coordinates.ts",
+    "review:geometry": "tsx scripts/review-route-geometry.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/**/*.test.ts",
     "validate:data": "tsx scripts/validate-routes.ts"

@@ -99,6 +99,20 @@ async function main(): Promise<void> {
     return
   }
 
+  const verifiedStopIds = new Set(
+    reviewedBusStopRepository.getVerifiedStops().map(({ id }) => id),
+  )
+  const missingStopIds = [
+    ...new Set(
+      directionsToGenerate.flatMap(({ stopIds }) =>
+        stopIds.filter((stopId) => !verifiedStopIds.has(stopId)),
+      ),
+    ),
+  ]
+  if (missingStopIds.length > 0) {
+    throw new Error(`missing coordinate: ${missingStopIds.join(', ')}`)
+  }
+
   const config = await loadLocalConfig()
   const cache = createRouteGeometryCache(geometryCacheData)
   const provider = new TencentMapProvider({
@@ -115,7 +129,8 @@ async function main(): Promise<void> {
   try {
     const generated: RouteGeometry[] = []
     for (const direction of directionsToGenerate) {
-      generated.push(await generator.generateDirection(route, direction))
+      const geometry = await generator.generateDirection(route, direction)
+      generated.push({ ...geometry, dataStatus: 'needs_review' })
     }
     const generatedDirectionIds = new Set(
       generated.map(({ directionId }) => directionId),
@@ -131,7 +146,7 @@ async function main(): Promise<void> {
       'utf8',
     )
     console.log(JSON.stringify({ routeId, geometries: generated }, null, 2))
-    console.log('生成结果状态为 needs_review，人工确认前不会进入地图展示。')
+    console.log('生成结果已进入 needs_review，人工确认前不会进入地图展示。')
   } finally {
     await writeFile(
       cachePath,

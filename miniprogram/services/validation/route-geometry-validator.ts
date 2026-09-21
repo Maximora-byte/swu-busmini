@@ -83,7 +83,9 @@ export function validateRouteGeometryData(
       typeof directionId !== 'string' ||
       directionId.trim().length === 0 ||
       typeof source !== 'string' ||
-      (dataStatus !== 'needs_review' && dataStatus !== 'verified') ||
+      (dataStatus !== 'generated' &&
+        dataStatus !== 'needs_review' &&
+        dataStatus !== 'verified') ||
       !Array.isArray(points)
     ) {
       issues.push({

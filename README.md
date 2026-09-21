@@ -6,7 +6,7 @@ SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航�
 
 ## 当前状态
 
-项目已完成 **Phase 14：线路导航 UI 与地图轨迹展示**。用户可以在 1～9 路之间切换、选择线路方向、查看已知站序与灵活停靠提示；存在人工确认轨迹时，地图会同时展示用户位置、已验证站点 marker 和线路 polyline。没有轨迹或站点坐标时仍可查看站序，用户运行时不会调用腾讯路线 API。
+项目已完成 **Phase 15：1 路真实线路 Demo 数据闭环校验流程**。1 路正反方向、站点引用、轨迹状态、缺失坐标预检、人工审核和生产展示门禁均已贯通。当前 1 路的 7 个相关站点仍缺少现场 verified 坐标，因此真实轨迹状态为 `missing`，页面安全回退为方向、站序和灵活停靠提示，不会绘制或请求猜测轨迹。
 
 线路数据第一版来源为《西南大学北碚校区校园地图（2025）》左上角线路表，仅用于确认线路编号、图示站名、站序和环线结构。2026 年实际运营方向、站牌名称和停靠情况仍需结合官方通知、现场站牌与实际乘车复核。
 
@@ -94,11 +94,12 @@ miniprogram/
 14. 建立以线路方向、已知站点和可选轨迹为核心的线路导航（已完成）；
 15. 建立基于已验证站点和路线 API 缓存的离线轨迹生成 Pipeline（已完成）；
 16. 完成线路列表、方向切换、站序和地图轨迹展示（已完成）；
-17. 结合 2026 年站牌、通知和实际乘车复核线路、POI 关系、站点坐标及线路轨迹；
-18. 在页面接入上车前、下车后的步行路线；
-19. 增加路线排序、时刻表和多方案；
-20. 稳定后迁移可变数据到 CloudBase；
-21. 仅在获得正式授权接口后接入实时车辆。
+17. 建立 1 路缺项检查、轨迹审核和生产展示门禁（已完成；现场坐标与真实轨迹待采集）；
+18. 结合 2026 年站牌、通知和实际乘车复核线路、POI 关系、站点坐标及线路轨迹；
+19. 在页面接入上车前、下车后的步行路线；
+20. 增加路线排序、时刻表和多方案；
+21. 稳定后迁移可变数据到 CloudBase；
+22. 仅在获得正式授权接口后接入实时车辆。
 
 ## 定位服务设计
 
@@ -277,8 +278,10 @@ MapProvider.drivingRoute()
         ↓
 合并分段、去除相邻重复点
         ↓
+生成器结果（generated）
+        ↓ 写入审核队列
 route-geometries.json（needs_review）
-        ↓ 人工核对
+        ↓ 人工 approve
 verified → RouteNavigation → 地图 polyline
 ```
 
@@ -288,11 +291,30 @@ verified → RouteNavigation → 地图 polyline
 npm run generate:geometry route_1
 ```
 
-脚本通过 `TencentMapProvider` 调用 `/ws/direction/v1/driving/`，读取本地且被 Git 忽略的腾讯 Key。它只写入独立的 `route-geometries.json` 和 `geometry-cache.json`，不会修改 `routes.json` 或 `stops.json`。生成结果固定为 `needs_review`；必须人工核对来源、方向和轨迹后才能改为 `verified`。
+脚本会先检查目标方向的全部站点是否具有 verified 坐标；存在缺项时直接输出 `missing coordinate`，不会读取 Key、创建 Provider 或发起腾讯请求。预检通过后才由 `TencentMapProvider` 调用 `/ws/direction/v1/driving/`。生成器返回 `generated`，写入独立审核文件时转为 `needs_review`；必须人工核对来源、方向和轨迹后才能改为 `verified`。脚本不会修改 `routes.json` 或 `stops.json`。
 
 缓存键由出行模式、起点经纬度和终点经纬度组成，方向不同会使用不同缓存项。即使一次生成在后续分段失败，已经成功获得的分段仍会写入缓存，避免再次消耗额度。
 
 `RouteGeometryRepository` 同时提供普通查询和已验证查询；运行时 `RouteNavigationService` 只调用 `getVerifiedGeometry()`。小程序页面不会构造 `TencentMapProvider`，用户查看、切换或查询线路时不会实时请求腾讯路线 API。当前正式站点坐标不足，因此仓库中的轨迹文件保持为空，不会为了演示生成假轨迹。
+
+## 1 路 Demo 审核闭环
+
+运行以下命令查看 1 路两个方向、首末站、轨迹状态、点数量和缺失坐标：
+
+```bash
+npm run review:geometry
+```
+
+当前检查结果为：正向“经管院 → 五号门”、反向“五号门 → 经管院”，两方向均为 `missing`、点数量为 0；缺少 `jingguanyuan`、`gate_6`、`gate_2`、`building_8`、`tianjiabing`、`yuanding`、`gate_5` 的 verified 坐标。该结果是数据缺口，不会用地图图片或腾讯候选坐标补齐。
+
+生成候选后，使用明确方向名称执行人工审核：
+
+```bash
+npm run review:geometry route_1 approve "图示正向"
+npm run review:geometry route_1 reject "图示正向"
+```
+
+`approve` 将已有 `generated` 或 `needs_review` 候选改为 `verified`；`reject` 将候选从轨迹数据集中移除。两者都不会修改 `routes.json`。生产页面只读取 `verified`，开发测试可以通过 Service 的 `previewUnverifiedGeometry` 显式查看未审核轨迹。
 
 ## 数据维护与校验
 

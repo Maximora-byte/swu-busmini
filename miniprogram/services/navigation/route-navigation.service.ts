@@ -17,11 +17,20 @@ export const FLEXIBLE_ROUTE_NAVIGATION_NOTE =
 export interface RouteNavigationService {
   getRoutes(): readonly RouteNavigationRouteOption[]
   getDirections(routeId: string): readonly RouteNavigationDirectionOption[]
-  getRoute(routeId: string): RouteNavigation
+  getRoute(
+    routeId: string,
+    options?: RouteNavigationQueryOptions,
+  ): RouteNavigation
   getRouteNavigation(
     routeId: string,
     directionId?: string,
+    options?: RouteNavigationQueryOptions,
   ): RouteNavigationViewModel
+}
+
+export interface RouteNavigationQueryOptions {
+  /** 仅供开发审核使用；生产页面不得开启。 */
+  previewUnverifiedGeometry?: boolean
 }
 
 export interface RouteNavigationRouteOption {
@@ -39,7 +48,10 @@ export function createRouteNavigationService(
   catalog: RouteCatalogService,
   geometries: RouteGeometryRepository = routeGeometryRepository,
 ): RouteNavigationService {
-  function getRoute(routeId: string): RouteNavigation {
+  function getRoute(
+    routeId: string,
+    options: RouteNavigationQueryOptions = {},
+  ): RouteNavigation {
     const route = catalog.getRoutes().find(({ id }) => id === routeId)
     if (!route) {
       throw new Error(`未找到线路: ${routeId}`)
@@ -59,10 +71,9 @@ export function createRouteNavigationService(
           isLoop: direction.isLoop,
           stopIds: [...direction.stopIds],
           knownStops: [...details.stops],
-          geometry: geometries.getVerifiedGeometry(
-            route.id,
-            direction.name,
-          ),
+          geometry: options.previewUnverifiedGeometry
+            ? geometries.getGeometry(route.id, direction.name)
+            : geometries.getVerifiedGeometry(route.id, direction.name),
         }
       }),
       note:
@@ -93,8 +104,8 @@ export function createRouteNavigationService(
       })
     },
     getRoute,
-    getRouteNavigation(routeId, directionId) {
-      const route = getRoute(routeId)
+    getRouteNavigation(routeId, directionId, options) {
+      const route = getRoute(routeId, options)
       const direction = directionId
         ? route.directions.find(({ directionId: id }) => id === directionId)
         : route.directions[0]
