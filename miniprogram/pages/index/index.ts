@@ -2,17 +2,12 @@ import {
   LocationServiceError,
   locationService,
 } from '../../services/location/location.service'
-import type { Coordinate } from '../../models/index'
+import { BEIBEI_VIEWPORT, getLocationViewport } from '../../services/map/map-viewport.service'
 import {
   routePolylineService,
   type RouteMapPolyline,
 } from '../../services/map/route-polyline.service'
 import { routeNavigationService } from '../../services/navigation/route-navigation.service'
-
-const SWU_BEIBEI_CAMPUS: Coordinate = {
-  latitude: 29.821737,
-  longitude: 106.422968,
-}
 
 type LocationStatusKind = 'loading' | 'success' | 'warning' | 'error'
 
@@ -74,9 +69,11 @@ function locationErrorView(error: unknown): {
 
 Page({
   data: {
-    latitude: SWU_BEIBEI_CAMPUS.latitude,
-    longitude: SWU_BEIBEI_CAMPUS.longitude,
-    scale: 15,
+    latitude: BEIBEI_VIEWPORT.center.latitude as number,
+    longitude: BEIBEI_VIEWPORT.center.longitude as number,
+    scale: BEIBEI_VIEWPORT.scale as number,
+    minScale: BEIBEI_VIEWPORT.minScale,
+    maxScale: BEIBEI_VIEWPORT.maxScale,
     hasLocation: false,
     locationStatusKind: 'loading' as LocationStatusKind,
     locationStatusText: '正在获取你的位置…',
@@ -107,6 +104,16 @@ Page({
     })
     this.loadRoute('route_1')
     void this.locateUser()
+  },
+
+  onReady() {
+    wx.createMapContext('campus-map', this).setBoundary({
+      southwest: BEIBEI_VIEWPORT.southwest,
+      northeast: BEIBEI_VIEWPORT.northeast,
+      fail: () => {
+        console.warn('地图浏览范围设置失败，保留北碚默认视野和缩放限制')
+      },
+    })
   },
 
   loadRoute(routeId: string, directionId?: string) {
@@ -202,16 +209,19 @@ Page({
 
     try {
       const location = await locationService.getCurrentLocation()
-      const { latitude, longitude } = location.coordinate
+      const viewport = getLocationViewport(location.coordinate)
+      const { latitude, longitude } = viewport.center
       const accuracy = Math.round(location.accuracy)
 
       this.setData({
         latitude,
         longitude,
-        scale: 17,
+        scale: viewport.scale,
         hasLocation: true,
-        locationStatusKind: location.isApproximate ? 'warning' : 'success',
-        locationStatusText: location.isApproximate
+        locationStatusKind: location.isApproximate || !viewport.isWithinArea ? 'warning' : 'success',
+        locationStatusText: !viewport.isWithinArea
+          ? '当前位置不在北碚城区浏览范围内，地图保持显示西大周边'
+          : location.isApproximate
           ? `已定位，但当前位置精度约为 ${accuracy} 米`
           : `定位成功，精度约为 ${accuracy} 米`,
         canOpenSettings: false,

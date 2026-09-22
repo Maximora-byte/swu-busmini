@@ -21,10 +21,13 @@
     </view>
   </view>
   <map
+    id="campus-map"
     class="campus-map"
     latitude="{{latitude}}"
     longitude="{{longitude}}"
     scale="{{scale}}"
+    min-scale="{{minScale}}"
+    max-scale="{{maxScale}}"
     markers="{{busStopMarkers}}"
     polyline="{{routePolylines}}"
     show-location="{{hasLocation}}"
