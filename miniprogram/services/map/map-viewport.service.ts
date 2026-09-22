@@ -10,6 +10,12 @@ export const BEIBEI_VIEWPORT = {
   maxScale: 19,
 } as const
 
+/** 复用已有校园中心，仅调整初始缩放；不从参考图片推算经纬度。 */
+export const CAMPUS_VIEWPORT = {
+  center: BEIBEI_VIEWPORT.center,
+  scale: 14,
+} as const
+
 export function getLocationViewport(coordinate: Coordinate) {
   const { southwest, northeast } = BEIBEI_VIEWPORT
   const isWithinArea = Number.isFinite(coordinate.latitude) &&
@@ -20,7 +26,7 @@ export function getLocationViewport(coordinate: Coordinate) {
     coordinate.longitude <= northeast.longitude
   return {
     isWithinArea,
-    center: isWithinArea ? coordinate : BEIBEI_VIEWPORT.center,
-    scale: isWithinArea ? 17 : BEIBEI_VIEWPORT.scale,
+    center: isWithinArea ? coordinate : CAMPUS_VIEWPORT.center,
+    scale: isWithinArea ? 17 : CAMPUS_VIEWPORT.scale,
   }
 }

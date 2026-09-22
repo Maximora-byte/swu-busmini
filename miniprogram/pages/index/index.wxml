@@ -1,97 +1,90 @@
 <view class="page {{routeDetailsExpanded ? 'page--route-expanded' : ''}}">
-  <view class="location-panel location-panel--{{locationStatusKind}}">
-    <view class="location-panel__content">
-      <view class="location-panel__dot"></view>
-      <text class="location-panel__text">{{locationStatusText}}</text>
+  <view class="campus-header">
+    <view class="campus-header__heading">
+      <text class="campus-header__title">西南大学 · 北碚校区</text>
+      <text class="campus-header__badge">SWU Go</text>
     </view>
-    <view class="location-panel__actions">
-      <button
-        wx:if="{{canOpenSettings}}"
-        class="location-panel__button"
-        size="mini"
-        open-type="openSetting"
-        bindopensetting="handleOpenSetting"
-      >去设置</button>
-      <button
-        wx:elif="{{locationStatusKind === 'error'}}"
-        class="location-panel__button"
-        size="mini"
-        bindtap="handleRetry"
-      >重试</button>
+    <view class="location-panel location-panel--{{locationStatusKind}}">
+      <view class="location-panel__content">
+        <view class="location-panel__dot"></view>
+        <text class="location-panel__text">{{locationStatusText}}</text>
+      </view>
+      <button wx:if="{{canOpenSettings}}" class="location-panel__button" size="mini"
+        open-type="openSetting" bindopensetting="handleOpenSetting">去设置</button>
+      <button wx:elif="{{locationStatusKind === 'error'}}" class="location-panel__button"
+        size="mini" bindtap="handleRetry">重试</button>
     </view>
   </view>
-  <map
-    id="campus-map"
-    class="campus-map"
-    latitude="{{latitude}}"
-    longitude="{{longitude}}"
-    scale="{{scale}}"
-    min-scale="{{minScale}}"
-    max-scale="{{maxScale}}"
-    markers="{{busStopMarkers}}"
-    polyline="{{routePolylines}}"
-    show-location="{{hasLocation}}"
-    show-scale
-  ></map>
+  <view class="map-toolbar">
+    <button class="map-toolbar__button" size="mini" bindtap="handleCampusOverview">校园全览</button>
+    <button class="map-toolbar__button" size="mini" bindtap="handleBeibeiOverview">北碚城区</button>
+    <button class="map-toolbar__button" size="mini" bindtap="handleRetry"
+      disabled="{{locationStatusKind === 'loading'}}">我的位置</button>
+  </view>
+  <map id="campus-map" class="campus-map"
+    latitude="{{latitude}}" longitude="{{longitude}}" scale="{{scale}}"
+    min-scale="{{minScale}}" max-scale="{{maxScale}}"
+    markers="{{busStopMarkers}}" polyline="{{routePolylines}}"
+    show-location="{{hasLocation}}" show-scale></map>
+
   <view class="route-panel {{routeDetailsExpanded ? 'route-panel--expanded' : ''}}">
+    <scroll-view class="route-selector" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="route-selector__track">
+        <button wx:for="{{routeOptions}}" wx:key="id"
+          class="route-selector__button {{item.selected ? 'route-selector__button--active' : ''}}"
+          style="border-color: {{item.color}}; background: {{item.selected ? item.color : '#ffffff'}}; color: {{item.selected ? item.textColor : '#26372f'}}"
+          size="mini" data-route-id="{{item.id}}" bindtap="handleRouteChange">
+          <text class="route-selector__dot" style="background: {{item.selected ? item.textColor : item.color}}"></text>{{item.name}}
+        </button>
+      </view>
+    </scroll-view>
     <button class="route-summary" bindtap="toggleRouteDetails">
       <view class="route-summary__identity">
-        <text class="route-summary__label">线路</text>
-        <text class="route-summary__name">{{routeName}}</text>
+        <text class="route-summary__name" style="background: {{routeColor}}; color: {{routeTextColor}}">{{routeName}}</text>
+        <view class="route-summary__description">
+          <text class="route-summary__kind">{{routeKindText}} · 已知参考站序</text>
+          <text class="route-summary__path">{{routeSummary}}</text>
+        </view>
       </view>
-      <text class="route-summary__action">{{routeDetailsExpanded ? '收起' : '查看线路'}}</text>
+      <text class="route-summary__action">{{routeDetailsExpanded ? '收起 ↑' : '站序 ↓'}}</text>
     </button>
-    <view wx:if="{{routeDetailsExpanded}}" class="route-details">
-      <view wx:if="{{routeDataErrorText}}" class="route-details__error">
-        <text>{{routeDataErrorText}}</text>
-      </view>
-      <block wx:else>
-      <scroll-view class="route-selector" scroll-x enhanced show-scrollbar="{{false}}">
-        <view class="route-selector__track">
-          <button
-            wx:for="{{routeOptions}}"
-            wx:key="id"
-            class="route-selector__button {{item.selected ? 'route-selector__button--active' : ''}}"
-            size="mini"
-            data-route-id="{{item.id}}"
-            bindtap="handleRouteChange"
-          >{{item.name}}</button>
-        </view>
-      </scroll-view>
-      <view class="route-details__direction">
-        <text class="route-details__label">方向</text>
-        <view class="direction-switch">
-          <button
-            wx:for="{{routeDirections}}"
-            wx:key="id"
-            class="direction-switch__button {{item.selected ? 'direction-switch__button--active' : ''}}"
-            size="mini"
-            data-direction-id="{{item.id}}"
-            bindtap="handleDirectionChange"
-          >
-            <text class="direction-switch__name">{{item.name}}</text>
-            <text class="direction-switch__summary">{{item.summary}}</text>
-          </button>
-        </view>
-      </view>
-      <text class="route-details__label route-details__stops-label">站点</text>
-      <scroll-view class="route-stops" scroll-y enhanced show-scrollbar="{{false}}">
-        <view class="route-stops__track">
-          <block wx:for="{{routeStops}}" wx:key="key">
-            <view class="route-stop">
+    <scroll-view wx:if="{{routeDetailsExpanded}}" class="route-details" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="route-details__content">
+        <view wx:if="{{routeDataErrorText}}" class="route-details__error">{{routeDataErrorText}}</view>
+        <block wx:else>
+          <text class="route-details__label">选择图示方向</text>
+          <view class="direction-switch">
+            <button wx:for="{{routeDirections}}" wx:key="id"
+              class="direction-switch__button"
+              style="background: {{item.selected ? routeColor : '#f3f5f3'}}; color: {{item.selected ? routeTextColor : '#506159'}}"
+              data-direction-id="{{item.id}}" bindtap="handleDirectionChange">
+              <text class="direction-switch__name">{{item.name}}</text>
+              <text class="direction-switch__summary">{{item.summary}}</text>
+            </button>
+          </view>
+          <view class="reference-notice">
+            <text>{{routeServiceNote}}</text>
+          </view>
+          <text class="route-details__label">已知参考站点 · 按途经顺序</text>
+          <view wx:if="{{!routeStops.length}}" class="route-panel__note">参考站点待补充</view>
+          <view class="route-stops__track">
+            <view wx:for="{{routeStops}}" wx:key="key" class="route-stop">
               <view class="route-stop__rail">
-                <view class="route-stop__dot {{item.hasVerifiedCoordinate ? '' : 'route-stop__dot--pending'}}"></view>
-                <view wx:if="{{!item.isLast}}" class="route-stop__line"></view>
+                <view class="route-stop__dot" style="border-color: {{routeColor}}; background: {{item.hasVerifiedCoordinate ? routeColor : '#ffffff'}}"></view>
+                <view wx:if="{{!item.isLast}}" class="route-stop__line" style="background: {{routeColor}}"></view>
               </view>
               <text class="route-stop__name">{{item.name}}</text>
+              <text wx:if="{{item.positionLabel}}" class="route-stop__position">{{item.positionLabel}}</text>
             </view>
-          </block>
-        </view>
-      </scroll-view>
-      <text class="route-panel__note">{{routeCoordinateStatusText}}</text>
-      <text class="route-panel__note">{{routeGeometryStatusText}}</text>
-      <text wx:if="{{routeServiceNote}}" class="route-panel__note route-panel__note--service">{{routeServiceNote}}</text>
-      </block>
-    </view>
+          </view>
+          <view class="route-data-notes">
+            <text class="route-panel__note">{{routeCoordinateStatusText}}</text>
+            <text class="route-panel__note">{{routeGeometryStatusText}}</text>
+            <text class="route-panel__source">参考 2025 校园地图 · 2026 实际运行待复核</text>
+            <text class="route-panel__source">非官方服务 · 请以现场停靠情况为准</text>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
   </view>
 </view>
