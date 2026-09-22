@@ -161,11 +161,13 @@ export const stops: readonly BusStop[] = [
   },
   {
     "id": "zhongtu",
-    "name": "中图",
-    "aliases": [],
+    "name": "中心图书馆",
+    "aliases": [
+      "中图"
+    ],
     "coordinate": null,
     "coordinateTodo": "TODO: waiting for field verification",
-    "dataTodo": "TODO: confirm the full station name and whether it is the same place as library"
+    "dataTodo": "2026-09-22 用户确认：2025 线路表中的中图指中心图书馆；实际候车位置仍待现场确认"
   },
   {
     "id": "gate_1",

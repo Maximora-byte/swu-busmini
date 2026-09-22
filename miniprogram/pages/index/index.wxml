@@ -1,4 +1,36 @@
 <view class="page {{routeDetailsExpanded ? 'page--route-expanded' : ''}}">
+  <view class="top-navigation">
+    <button class="top-navigation__tab {{activeTab === 'map' ? 'top-navigation__tab--active' : ''}}" data-tab="map" bindtap="handleTabChange">校园地图</button>
+    <button class="top-navigation__tab {{activeTab === 'navigation' ? 'top-navigation__tab--active' : ''}}" data-tab="navigation" bindtap="handleTabChange">线路导航</button>
+  </view>
+  <scroll-view wx:if="{{activeTab === 'navigation'}}" class="navigation-page" scroll-y>
+    <view class="navigation-page__content">
+      <text class="navigation-title">选好地点，找到校车线路</text>
+      <text class="navigation-subtitle">按校园参考站序查找，出发前请核对现场运营情况</text>
+      <view class="navigation-form">
+        <text class="navigation-label">从哪里出发（可选）</text>
+        <picker range="{{originNames}}" value="{{originIndex}}" bindchange="handleOriginChange">
+          <view class="navigation-picker">{{originNames[originIndex]}}<text>⌄</text></view>
+        </picker>
+        <text class="navigation-label">想去哪里</text>
+        <picker range="{{destinationNames}}" value="{{destinationIndex}}" bindchange="handleDestinationChange">
+          <view class="navigation-picker">{{destinationNames[destinationIndex]}}<text>⌄</text></view>
+        </picker>
+        <button class="navigation-submit" bindtap="handlePlanNavigation">{{originIndex ? '查询直达线路' : '查询途经线路'}}</button>
+      </view>
+      <text class="navigation-message">{{navigationMessage}}</text>
+      <view wx:for="{{navigationPlans}}" wx:key="id" class="navigation-result">
+        <view class="navigation-result__heading"><text>{{item.routeName}}</text><text>{{item.directionId}}</text></view>
+        <text class="navigation-result__row">上车参考：{{item.boardingText}}</text>
+        <text class="navigation-result__row">下车参考：{{item.destinationText}}</text>
+        <text class="navigation-result__path">{{item.pathText}}</text>
+        <text class="navigation-result__note">{{item.note}}</text>
+        <button class="navigation-open" data-plan-id="{{item.id}}" bindtap="handleOpenNavigationRoute">查看此方向与地图</button>
+      </view>
+      <text class="navigation-subtitle">已确认名称：中图 = 中心图书馆。坐标及真实行驶轨迹仍待审核，当前不提供逐路口导航。</text>
+    </view>
+  </scroll-view>
+  <view class="map-view" style="display: {{activeTab === 'map' ? 'flex' : 'none'}}">
   <view class="campus-header">
     <view class="campus-header__heading">
       <text class="campus-header__title">西南大学 · 北碚校区</text>
@@ -87,4 +119,5 @@
       </view>
     </scroll-view>
   </view>
+</view>
 </view>

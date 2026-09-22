@@ -81,7 +81,7 @@ test('returns multiple routes for a POI related to multiple stops', () => {
 
 test('returns an empty recommendation list for a POI without related stops', () => {
   assert.deepEqual(
-    routeRecommendationService.recommendRoutesForPoi('library'),
+    routeRecommendationService.recommendRoutesForPoi('student_dormitory'),
     [],
   )
 })

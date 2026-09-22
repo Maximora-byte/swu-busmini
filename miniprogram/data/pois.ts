@@ -4,12 +4,16 @@ import type { CampusPOI } from '../models/index'
 export const pois: readonly CampusPOI[] = [
   {
     "id": "library",
-    "name": "图书馆",
+    "name": "中心图书馆",
     "aliases": [
+      "中图",
+      "图书馆",
       "西大图书馆"
     ],
     "category": "library",
-    "relatedStopIds": [],
+    "relatedStopIds": [
+      "zhongtu"
+    ],
     "dataStatus": "needs_review"
   },
   {

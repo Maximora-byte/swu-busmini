@@ -18,7 +18,7 @@
   {"id":"liyuan","name":"李园","aliases":[],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
   {"id":"auditorium","name":"大礼堂","aliases":[],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
   {"id":"music_school","name":"音乐学院","aliases":[],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification"},
-  {"id":"zhongtu","name":"中图","aliases":[],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification","dataTodo":"TODO: confirm the full station name and whether it is the same place as library"},
+  {"id":"zhongtu","name":"中心图书馆","aliases":["中图"],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification","dataTodo":"2026-09-22 用户确认：2025 线路表中的中图指中心图书馆；实际候车位置仍待现场确认"},
   {"id":"gate_1","name":"一号门","aliases":["1号门"],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification","dataTodo":"TODO: retained from the previous dataset; not referenced by the 2025 numbered routes"},
   {"id":"library","name":"图书馆","aliases":[],"coordinate":null,"coordinateTodo":"TODO: waiting for field verification","dataTodo":"TODO: retained from the previous dataset; confirm relation to the 2025 map label 中图"}
 ]

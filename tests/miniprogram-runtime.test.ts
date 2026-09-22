@@ -9,8 +9,15 @@ import type { Coordinate } from '../miniprogram/models/index'
 import type { RawLocation } from '../miniprogram/services/location/location.service'
 import type { RouteNavigationService } from '../miniprogram/services/navigation/route-navigation.service'
 import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT } from '../miniprogram/services/map/map-viewport.service'
+import type { NavigationPlan } from '../miniprogram/services/navigation/navigation-planner.service'
 
 interface RuntimePageData {
+  activeTab: string
+  navigationPlaces: { id: string; name: string }[]
+  navigationPlans: NavigationPlan[]
+  navigationMessage: string
+  originIndex: number
+  destinationIndex: number
   latitude: number
   longitude: number
   scale: number
@@ -28,6 +35,11 @@ interface SelectionEvent {
 }
 
 interface RuntimePage {
+  handleTabChange(event: { currentTarget: { dataset: { tab: string } } }): void
+  handleOriginChange(event: { detail: { value: string } }): void
+  handleDestinationChange(event: { detail: { value: string } }): void
+  handlePlanNavigation(): void
+  handleOpenNavigationRoute(event: { currentTarget: { dataset: { planId: string } } }): void
   data: RuntimePageData
   cameraRequestVersion: number
   setData(update: Partial<RuntimePageData>): void
@@ -207,6 +219,37 @@ test('out-of-area location keeps the campus view and route/direction selection p
   assert.equal(page.data.routeStops[2].id, 'building_8')
   assert.equal(page.data.hasLocation, true)
   assert.equal(runtime.cameraMoves.length, 1)
+})
+
+test('navigation tab queries destinations and opens the matched direction without losing location', async () => {
+  const runtime = createRuntime({ latitude: 29.82, longitude: 106.42, accuracy: 10 })
+  runtime.load('pages/index/index.ts')
+  const page = runtime.getPage()
+  page.onLoad()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.handleTabChange({ currentTarget: { dataset: { tab: 'navigation' } } })
+  page.handlePlanNavigation()
+  assert.equal(page.data.navigationPlans.length, 2)
+  assert.ok(page.data.navigationPlans.every((plan) => plan.routeId === 'route_9'))
+  const gateIndex = page.data.navigationPlaces.findIndex((place) => place.id === 'poi:gate_5')
+  assert.ok(gateIndex >= 0)
+  page.handleOriginChange({ detail: { value: String(gateIndex + 1) } })
+  assert.equal(page.data.navigationPlans.length, 0)
+  page.handlePlanNavigation()
+  assert.equal(page.data.navigationPlans.length, 1)
+  const plan = page.data.navigationPlans[0]
+  assert.equal(plan.pathText, '五号门 → 橘园 → 梅园 → 中心图书馆')
+  page.handleOpenNavigationRoute({ currentTarget: { dataset: { planId: plan.id } } })
+  assert.equal(page.data.activeTab, 'map')
+  assert.equal(page.data.selectedRouteId, 'route_9')
+  assert.ok(page.data.routeDirections.some((direction) => direction.id === plan.directionId && direction.selected))
+  assert.equal(page.data.routeDetailsExpanded, true)
+  assert.equal(page.data.hasLocation, true)
+  page.handleDestinationChange({ detail: { value: String(gateIndex) } })
+  assert.equal(page.data.navigationPlans.length, 0)
+  page.handlePlanNavigation()
+  assert.equal(page.data.navigationPlans.length, 0)
+  assert.match(page.data.navigationMessage, /起点和终点相同/)
 })
 
 test('a pending manual location updates position without overriding a newer overview choice', async () => {

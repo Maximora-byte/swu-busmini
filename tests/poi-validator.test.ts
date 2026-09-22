@@ -104,9 +104,9 @@ test('resolves routes from a POI through related stops', () => {
   )
 })
 
-test('returns no routes when a POI has no verified stop relationship', () => {
+test('user-confirmed central library resolves route 9 through zhongtu', () => {
   const result = poiRouteService.getRoutesForPoi('library')
 
-  assert.deepEqual(result.poi.relatedStopIds, [])
-  assert.deepEqual(result.routes, [])
+  assert.deepEqual(result.poi.relatedStopIds, ['zhongtu'])
+  assert.deepEqual(result.routes.map(({ id }) => id), ['route_9'])
 })

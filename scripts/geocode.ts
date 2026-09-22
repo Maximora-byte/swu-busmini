@@ -54,7 +54,8 @@ function createNodeRequestClient(): TencentRequestClient {
 }
 
 async function main(): Promise<void> {
-  const keyword = process.argv.slice(2).join(' ').trim()
+  const verify = process.argv.includes('--verify')
+  const keyword = process.argv.slice(2).filter((arg) => arg !== '--verify').join(' ').trim()
   if (keyword.length === 0) {
     throw new Error('用法: npm run geocode "地址关键词"')
   }
@@ -69,7 +70,14 @@ async function main(): Promise<void> {
     keyword,
   )
 
-  console.log(JSON.stringify({ keyword, candidates }, null, 2))
+  const verification = verify
+    ? await Promise.all(candidates.map(async (candidate) => ({
+        coordinate: candidate.coordinate,
+        reverseAddress: await provider.reverseGeocode(candidate.coordinate),
+        status: 'pending_review',
+      })))
+    : undefined
+  console.log(JSON.stringify({ keyword, candidates, ...(verification ? { verification } : {}) }, null, 2))
 }
 
 main().catch((error: unknown) => {

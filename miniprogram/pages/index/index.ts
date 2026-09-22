@@ -8,6 +8,7 @@ import {
   getLocationViewport,
 } from '../../services/map/map-viewport.service'
 import type { RouteMapPolyline } from '../../services/map/route-polyline.service'
+import { navigationPlannerService, type NavigationPlace, type NavigationPlan } from '../../services/navigation/navigation-planner.service'
 import {
   routeMapPresentationService,
   type BusStopMarker,
@@ -35,6 +36,14 @@ Page({
   cameraRequestVersion: 0,
 
   data: {
+    activeTab: 'map',
+    navigationPlaces: [] as NavigationPlace[],
+    originNames: [] as string[],
+    destinationNames: [] as string[],
+    originIndex: 0,
+    destinationIndex: 0,
+    navigationPlans: [] as NavigationPlan[],
+    navigationMessage: '选择目的地，查询途经线路；指定起点后可查询直达方向。',
     latitude: CAMPUS_VIEWPORT.center.latitude as number,
     longitude: CAMPUS_VIEWPORT.center.longitude as number,
     scale: CAMPUS_VIEWPORT.scale as number,
@@ -63,6 +72,13 @@ Page({
   },
 
   onLoad() {
+    const places = navigationPlannerService.getPlaces()
+    this.setData({
+      navigationPlaces: places,
+      originNames: ['未指定起点（查看途经线路）', ...places.map(({ name }) => name)],
+      destinationNames: places.map(({ name }) => name),
+      destinationIndex: Math.max(0, places.findIndex(({ id }) => id === 'poi:library')),
+    })
     this.setData({ routeOptions: routeMapPresentationService.getRouteOptions('route_1') })
     this.loadRoute('route_1')
     void this.locateUser(false)
@@ -76,6 +92,42 @@ Page({
         console.warn('地图浏览范围设置失败，保留北碚默认视野和缩放限制')
       },
     })
+  },
+
+  handleTabChange(event: WechatMiniprogram.TouchEvent) {
+    const tab = event.currentTarget.dataset.tab
+    if (tab === 'map' || tab === 'navigation') this.setData({ activeTab: tab })
+  },
+
+  handleOriginChange(event: WechatMiniprogram.PickerChange) {
+    const index = Number(event.detail.value)
+    if (!Number.isInteger(index) || index < 0 || index >= this.data.originNames.length) return
+    this.setData({ originIndex: index, navigationPlans: [], navigationMessage: '起点已更新，请重新查询。' })
+  },
+
+  handleDestinationChange(event: WechatMiniprogram.PickerChange) {
+    const index = Number(event.detail.value)
+    if (!Number.isInteger(index) || index < 0 || index >= this.data.navigationPlaces.length) return
+    this.setData({ destinationIndex: index, navigationPlans: [], navigationMessage: '目的地已更新，请重新查询。' })
+  },
+
+  handlePlanNavigation() {
+    try {
+      const destination = this.data.navigationPlaces[this.data.destinationIndex]
+      if (!destination) throw new Error('请选择目的地')
+      const origin = this.data.originIndex > 0 ? this.data.navigationPlaces[this.data.originIndex - 1] : undefined
+      const result = navigationPlannerService.plan(origin?.id, destination.id)
+      this.setData({ navigationPlans: result.plans, navigationMessage: result.message })
+    } catch (error: unknown) {
+      this.setData({ navigationPlans: [], navigationMessage: error instanceof Error ? error.message : '查询失败，请重试' })
+    }
+  },
+
+  handleOpenNavigationRoute(event: WechatMiniprogram.TouchEvent) {
+    const plan = this.data.navigationPlans.find(({ id }) => id === event.currentTarget.dataset.planId)
+    if (!plan) return
+    this.loadRoute(plan.routeId, plan.directionId)
+    this.setData({ activeTab: 'map', routeDetailsExpanded: true })
   },
 
   loadRoute(routeId: string, directionId?: string) {
