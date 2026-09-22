@@ -29,6 +29,9 @@ jobs:
         run: npm ci
 
       - name: Validate route data
+        run: npm run check:data-sync
+
+      - name: Validate data relationships
         run: npm run validate:data
 
       - name: Typecheck

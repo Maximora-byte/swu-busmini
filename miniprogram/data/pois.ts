@@ -1,45 +1,62 @@
 import type { CampusPOI } from '../models/index'
 
-/** 微信运行时使用的校园地点数据 Adapter。 */
+/** 自动生成：修改同名 JSON 后运行 npm run sync:data，请勿手工编辑。 */
 export const pois: readonly CampusPOI[] = [
   {
-    id: 'library',
-    name: '图书馆',
-    aliases: ['西大图书馆'],
-    category: 'library',
-    relatedStopIds: [],
-    dataStatus: 'needs_review',
+    "id": "library",
+    "name": "图书馆",
+    "aliases": [
+      "西大图书馆"
+    ],
+    "category": "library",
+    "relatedStopIds": [],
+    "dataStatus": "needs_review"
   },
   {
-    id: 'student_dormitory',
-    name: '学生宿舍',
-    aliases: ['宿舍区'],
-    category: 'dormitory',
-    relatedStopIds: [],
-    dataStatus: 'needs_review',
+    "id": "student_dormitory",
+    "name": "学生宿舍",
+    "aliases": [
+      "宿舍区"
+    ],
+    "category": "dormitory",
+    "relatedStopIds": [],
+    "dataStatus": "needs_review"
   },
   {
-    id: 'canteen_2',
-    name: '二食堂',
-    aliases: ['第二食堂', '2食堂'],
-    category: 'canteen',
-    relatedStopIds: ['canteen_2'],
-    dataStatus: 'needs_review',
+    "id": "canteen_2",
+    "name": "二食堂",
+    "aliases": [
+      "第二食堂",
+      "2食堂"
+    ],
+    "category": "canteen",
+    "relatedStopIds": [
+      "canteen_2"
+    ],
+    "dataStatus": "needs_review"
   },
   {
-    id: 'gate_1',
-    name: '一号门',
-    aliases: ['1号门'],
-    category: 'gate',
-    relatedStopIds: ['gate_1'],
-    dataStatus: 'needs_review',
+    "id": "gate_1",
+    "name": "一号门",
+    "aliases": [
+      "1号门"
+    ],
+    "category": "gate",
+    "relatedStopIds": [
+      "gate_1"
+    ],
+    "dataStatus": "needs_review"
   },
   {
-    id: 'gate_5',
-    name: '五号门',
-    aliases: ['5号门'],
-    category: 'gate',
-    relatedStopIds: ['gate_5'],
-    dataStatus: 'needs_review',
-  },
+    "id": "gate_5",
+    "name": "五号门",
+    "aliases": [
+      "5号门"
+    ],
+    "category": "gate",
+    "relatedStopIds": [
+      "gate_5"
+    ],
+    "dataStatus": "needs_review"
+  }
 ]

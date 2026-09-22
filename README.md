@@ -112,7 +112,7 @@ miniprogram/
 - `miniprogram/data/sources.json` 记录数据来源、允许用途和待复核状态；
 - `miniprogram/data/coordinate-reviews.ts` 独立保存微信运行时使用的候选坐标及人工审核状态，不覆盖正式站点数据；
 - `miniprogram/data/route-geometries.ts` 独立保存微信运行时使用的方向轨迹，不改写线路站序；
-- 同名 JSON 文件作为离线数据维护镜像，由一致性测试防止与 TypeScript Adapter 漂移；
+- 同名 JSON 文件是离线维护数据源，TypeScript Adapter 由 `npm run sync:data` 生成；CI 检查和一致性测试共同防止遗漏同步；
 - `miniprogram/data/geometry-cache.json` 只由 Node.js 开发脚本读取，缓存分段路线结果并减少重复 API 消耗，不进入小程序运行时；
 - Repository 负责读取和验证 TypeScript Data Adapter，禁止页面和 Service 直接导入静态数据文件；
 - `getVerifiedStops()` 只返回坐标完整且明确标记 `verified: true` 的站点；
@@ -319,6 +319,17 @@ npm run review:geometry route_1 reject "图示正向"
 
 ## 数据维护与校验
 
+维护 `stops.json`、`routes.json`、`pois.json`、`coordinate-reviews.json`、`route-geometries.json` 后运行：
+
+```bash
+npm run sync:data
+npm run check:data-sync
+```
+
+JSON 是离线编辑入口，生成的同名 `.ts` 是微信运行时 Data Adapter；请将两者一起提交。同步只复制数据，不生成坐标，也不改变审核状态。脚本先解析全部 JSON，再更新 Adapter；同步不代替领域校验，需要继续执行以下校验与测试。轨迹生成和审核脚本使用同一生成逻辑，自动同步两种文件。
+
+`check:data-sync` 只读检查，发现缺失或过期的 Adapter 时以退出码 1 结束。运行时保持 `Page → Service → Repository → Data Adapter`。启动回归测试使用只允许 TypeScript 编译后 JS 模块的加载器，检查首页依赖及 1～9 路方向查询，拒绝 JSON、Node 模块和本地密钥依赖；它不能替代微信开发者工具和真机上的地图、定位验收。
+
 新增或修改线路、站点、方向或来源信息后，必须执行：
 
 ```bash
@@ -335,6 +346,7 @@ GitHub Actions 工作流位于 `.github/workflows/ci.yml`，在针对 `main` 的
 
 ```bash
 npm ci
+npm run check:data-sync
 npm run validate:data
 npm run typecheck
 npm test

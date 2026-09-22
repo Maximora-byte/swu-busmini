@@ -4,6 +4,8 @@
   "private": true,
   "description": "SWU Go - 西南大学北碚校区非官方校园校车导航微信小程序",
   "scripts": {
+    "sync:data": "tsx scripts/sync-data.ts",
+    "check:data-sync": "tsx scripts/sync-data.ts --check",
     "geocode": "tsx scripts/geocode.ts",
     "generate:geometry": "tsx scripts/generate-route-geometry.ts",
     "review:coordinates": "tsx scripts/review-coordinates.ts",
