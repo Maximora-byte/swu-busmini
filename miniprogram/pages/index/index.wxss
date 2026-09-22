@@ -27,6 +27,18 @@
 .navigation-result__path { display: block; padding: 18rpx; margin: 18rpx 0; background: #f3f6f0; border-radius: 10rpx; font-size: 25rpx; line-height: 1.7; }
 .navigation-result__note { display: block; color: #718078; font-size: 23rpx; line-height: 1.6; }
 .navigation-open { margin-top: 20rpx; color: #126b47; background: #edf5ef; font-size: 26rpx; }
+.navigation-section-title { display: block; margin: 28rpx 0 16rpx; font-size: 28rpx; font-weight: 600; color: #31574a; }
+.transfer-leg + .transfer-leg { margin-top: 22rpx; padding-top: 16rpx; border-top: 1rpx dashed #c8d5cd; }
+.network-controls { display: flex; align-items: center; flex: none; padding: 0 20rpx 8rpx; background: #ffffff; gap: 6rpx; }
+.network-control { display: flex; align-items: center; font-size: 23rpx; color: #31574a; }
+.network-control switch { transform: scale(0.68); margin: 0 -8rpx; }
+.network-fit { margin: 0 0 0 auto; padding: 0 16rpx; font-size: 23rpx; color: #31574a; background: #edf5ef; }
+.network-notice { flex: none; display: block; padding: 10rpx 24rpx; font-size: 21rpx; line-height: 1.45; color: #718078; background: #f4f6f1; }
+.network-notice--preview { color: #8b591b; background: #fff4dd; }
+.network-legend { flex: none; width: 100%; height: 44rpx; white-space: nowrap; }
+.network-legend__track { display: inline-flex; gap: 22rpx; }
+.network-legend__item { display: inline-flex; align-items: center; gap: 8rpx; font-size: 20rpx; color: #59746a; }
+.network-legend__line { width: 26rpx; height: 6rpx; border-radius: 3rpx; }
 
 .campus-header { flex: none; padding: 22rpx 28rpx 12rpx; background: #ffffff; }
 .campus-header__heading { display: flex; align-items: center; justify-content: space-between; }

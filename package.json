@@ -8,6 +8,7 @@
     "check:data-sync": "tsx scripts/sync-data.ts --check",
     "geocode": "tsx scripts/geocode.ts",
     "generate:geometry": "tsx scripts/generate-route-geometry.ts",
+    "generate:preview": "tsx scripts/generate-route-preview.ts",
     "review:coordinates": "tsx scripts/review-coordinates.ts",
     "review:geometry": "tsx scripts/review-route-geometry.ts",
     "typecheck": "tsc --noEmit",

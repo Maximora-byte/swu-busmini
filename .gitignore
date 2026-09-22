@@ -12,10 +12,10 @@ project.private.config.json
 !.env.example
 miniprogram/config/config.local.ts
 secrets.json
+.cache/route-preview-cache.json
 
 # Editor and operating-system files
 .idea/
 .vscode/
 .DS_Store
 Thumbs.db
-

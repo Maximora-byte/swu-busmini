@@ -1,5 +1,6 @@
 import type {
   BusDirection,
+  BusRoute,
   RoutePathRecommendation,
 } from '../../models/index'
 import {
@@ -10,6 +11,7 @@ import {
   routeCatalogService,
   type RouteCatalogService,
 } from '../route/route-catalog.service'
+import { findDirectedRouteLegs } from './directed-route-legs'
 
 export const FLEXIBLE_ORIGIN_DESTINATION_NOTE =
   '该线路支持沿途停靠，请结合现场情况确认上下车位置'
@@ -24,42 +26,21 @@ export interface OriginDestinationService {
 interface DirectionMatch {
   originStopIds: ReadonlySet<string>
   destinationStopIds: ReadonlySet<string>
+  minimumReferenceSegments: number
 }
 
 function matchDirection(
+  route: BusRoute,
   direction: BusDirection,
   originStopIds: ReadonlySet<string>,
   destinationStopIds: ReadonlySet<string>,
 ): DirectionMatch | undefined {
-  const matchedOriginStopIds = new Set<string>()
-  const matchedDestinationStopIds = new Set<string>()
-
-  for (let originIndex = 0; originIndex < direction.stopIds.length; originIndex += 1) {
-    const originStopId = direction.stopIds[originIndex]
-    if (!originStopId || !originStopIds.has(originStopId)) {
-      continue
-    }
-
-    for (
-      let destinationIndex = originIndex + 1;
-      destinationIndex < direction.stopIds.length;
-      destinationIndex += 1
-    ) {
-      const destinationStopId = direction.stopIds[destinationIndex]
-      if (destinationStopId && destinationStopIds.has(destinationStopId)) {
-        matchedOriginStopIds.add(originStopId)
-        matchedDestinationStopIds.add(destinationStopId)
-      }
-    }
-  }
-
-  if (matchedOriginStopIds.size === 0) {
-    return undefined
-  }
-
+  const legs = findDirectedRouteLegs(route, direction, originStopIds, destinationStopIds)
+  if (!legs.length) return undefined
   return {
-    originStopIds: matchedOriginStopIds,
-    destinationStopIds: matchedDestinationStopIds,
+    originStopIds: new Set(legs.map((leg) => leg.originStopId)),
+    destinationStopIds: new Set(legs.map((leg) => leg.destinationStopId)),
+    minimumReferenceSegments: legs[0].stopIds.length - 1,
   }
 }
 
@@ -92,10 +73,12 @@ export function createOriginDestinationService(
       return routes.getRoutes().flatMap((route) => {
         const matchedOriginStopIds = new Set<string>()
         const matchedDestinationStopIds = new Set<string>()
-        const directions: string[] = []
+        const directionMatches: { name: string; segments: number }[] = []
 
         for (const direction of route.directions) {
+          routes.getRouteDetails(route.id, direction.name)
           const match = matchDirection(
+            route,
             direction,
             originStopIds,
             destinationStopIds,
@@ -104,7 +87,7 @@ export function createOriginDestinationService(
             continue
           }
 
-          directions.push(direction.name)
+          directionMatches.push({ name: direction.name, segments: match.minimumReferenceSegments })
           match.originStopIds.forEach((stopId) =>
             matchedOriginStopIds.add(stopId),
           )
@@ -113,12 +96,13 @@ export function createOriginDestinationService(
           )
         }
 
-        if (directions.length === 0) {
+        if (directionMatches.length === 0) {
           return []
         }
 
-        return [
-          {
+        directionMatches.sort((left, right) => left.segments - right.segments ||
+          (left.name < right.name ? -1 : left.name > right.name ? 1 : 0))
+        const recommendation: RoutePathRecommendation = {
             originPoiId: originPoi.id,
             destinationPoiId: destinationPoi.id,
             routeId: route.id,
@@ -129,16 +113,18 @@ export function createOriginDestinationService(
             destinationStopIds: destinationPoi.relatedStopIds.filter(
               (stopId) => matchedDestinationStopIds.has(stopId),
             ),
-            directions,
+            directions: directionMatches.map(({ name }) => name),
             serviceType: route.serviceType,
             dataStatus: route.dataStatus,
             notes:
               route.serviceType === 'flexible_campus_bus'
                 ? [FLEXIBLE_ORIGIN_DESTINATION_NOTE]
                 : [],
-          },
-        ]
-      })
+          }
+        return [{ recommendation, segments: directionMatches[0].segments }]
+      }).sort((left, right) => left.segments - right.segments ||
+        (left.recommendation.routeId < right.recommendation.routeId ? -1 : left.recommendation.routeId > right.recommendation.routeId ? 1 : 0))
+        .map(({ recommendation }) => recommendation)
     },
   }
 }

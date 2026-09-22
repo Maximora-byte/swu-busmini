@@ -3,6 +3,8 @@ import { routes as routeRecords } from '../miniprogram/data/routes'
 import sourcesData from '../miniprogram/data/sources.json'
 import { stops as stopRecords } from '../miniprogram/data/stops'
 import { routeGeometries } from '../miniprogram/data/route-geometries'
+import { routePreviewData } from '../miniprogram/data/route-preview'
+import { routePreviewRepository } from '../miniprogram/services/repository/route-preview.repository'
 import type { BusStop } from '../miniprogram/models/index'
 import { createCoordinateVerificationService } from '../miniprogram/services/location/coordinate-verification.service'
 import { createStaticBusStopRepository } from '../miniprogram/services/repository/bus-stop.repository'
@@ -84,6 +86,9 @@ function main(): void {
   )
   const poiResult = validatePoiData(pois, stops)
   const geometryResult = validateRouteGeometryData(routeGeometries, routes)
+  const previewValid = routePreviewRepository.getAll().length === routePreviewData.segments.length &&
+    routePreviewData.candidates.every(({ candidate }) => candidate === null || candidate.verified === false)
+  console.log(`${previewValid ? '✓' : '✗'} experimental preview (unverified, offline only)`)
 
   for (const scope of ['data', 'stops', 'sources'] as const) {
     const scopedIssues = result.issues.filter((issue) => issue.scope === scope)
@@ -131,7 +136,7 @@ function main(): void {
     }
   }
 
-  if (!result.valid || !poiResult.valid || !geometryResult.valid) {
+  if (!result.valid || !poiResult.valid || !geometryResult.valid || !previewValid) {
     process.exitCode = 1
   }
 }

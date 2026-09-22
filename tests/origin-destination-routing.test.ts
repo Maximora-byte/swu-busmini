@@ -201,3 +201,37 @@ test('returns an empty list when either POI has no related stops', () => {
 
   assert.deepEqual(service.findDirectRoutes('origin', 'destination'), [])
 })
+
+test('closed-loop direct matching wraps once and ranks fewer reference segments first', () => {
+  const service = createService([
+    createRoute('route_loop', [
+      { name: 'longer', isLoop: true, stopIds: ['destination_a', 'origin_a', 'other', 'destination_a'] },
+      { name: 'shorter', isLoop: true, stopIds: ['destination_a', 'other', 'origin_a', 'destination_a'] },
+    ]),
+  ])
+  const [result] = service.findDirectRoutes('origin', 'destination')
+  assert.deepEqual(result.directions, ['shorter', 'longer'])
+  assert.deepEqual(result.originStopIds, ['origin_a'])
+  assert.deepEqual(result.destinationStopIds, ['destination_a'])
+})
+
+test('direct matching never treats riding a full loop to the same stop as a journey', () => {
+  const service = createService([
+    createRoute('route_loop', [
+      { name: 'loop', isLoop: true, stopIds: ['origin_a', 'other', 'origin_a'] },
+    ]),
+  ], [originPoi, { ...destinationPoi, relatedStopIds: ['origin_a'] }])
+  assert.deepEqual(service.findDirectRoutes('origin', 'destination'), [])
+})
+
+test('direct matching accepts declared repeated stops without adding extra loop traversals', () => {
+  const service = createService([
+    createRoute('route_loop', [{
+      name: 'loop', isLoop: true, allowedRepeatedStopIds: ['origin_a'],
+      stopIds: ['other', 'origin_a', 'origin_b', 'origin_a', 'destination_a', 'other'],
+    }]),
+  ])
+  const results = service.findDirectRoutes('origin', 'destination')
+  assert.equal(results.length, 1)
+  assert.deepEqual(results[0].directions, ['loop'])
+})

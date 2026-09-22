@@ -4,6 +4,8 @@ export interface RouteMapPolyline {
   points: Coordinate[]
   color: string
   width: number
+  /** 仅实验预览使用虚线，避免与已审核真实轨迹混淆。 */
+  dottedLine?: boolean
 }
 
 export interface RoutePolylineStyle {

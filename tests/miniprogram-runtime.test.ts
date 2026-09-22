@@ -9,12 +9,18 @@ import type { Coordinate } from '../miniprogram/models/index'
 import type { RawLocation } from '../miniprogram/services/location/location.service'
 import type { RouteNavigationService } from '../miniprogram/services/navigation/route-navigation.service'
 import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT } from '../miniprogram/services/map/map-viewport.service'
-import type { NavigationPlan } from '../miniprogram/services/navigation/navigation-planner.service'
+import type { NavigationPlan, TransferNavigationPlan } from '../miniprogram/services/navigation/navigation-planner.service'
+import type { RouteMapPolyline } from '../miniprogram/services/map/route-polyline.service'
 
 interface RuntimePageData {
   activeTab: string
   navigationPlaces: { id: string; name: string }[]
   navigationPlans: NavigationPlan[]
+  transferPlans: TransferNavigationPlan[]
+  includePreview: boolean
+  showAllRoutes: boolean
+  routePolylines: RouteMapPolyline[]
+  networkFitPoints: Coordinate[]
   navigationMessage: string
   originIndex: number
   destinationIndex: number
@@ -40,6 +46,10 @@ interface RuntimePage {
   handleDestinationChange(event: { detail: { value: string } }): void
   handlePlanNavigation(): void
   handleOpenNavigationRoute(event: { currentTarget: { dataset: { planId: string } } }): void
+  handleOpenTransferLeg(event: { currentTarget: { dataset: { planId: string; legIndex: number } } }): void
+  handlePreviewChange(event: { detail: { value: boolean } }): void
+  handleNetworkChange(event: { detail: { value: boolean } }): void
+  handleFitNetwork(): void
   data: RuntimePageData
   cameraRequestVersion: number
   setData(update: Partial<RuntimePageData>): void
@@ -59,6 +69,7 @@ function createRuntime(location?: RawLocation, deferLocation = false) {
   const modules = new Map<string, { exports: unknown }>()
   const cameraMoves: Coordinate[] = []
   const boundaries: { southwest: Coordinate; northeast: Coordinate }[] = []
+  const includedPoints: Coordinate[][] = []
   const locationRequests: string[] = []
   const pendingLocations: ((result: RawLocation) => void)[] = []
   let page: RuntimePage | undefined
@@ -80,6 +91,9 @@ function createRuntime(location?: RawLocation, deferLocation = false) {
         },
         setBoundary(boundary: { southwest: Coordinate; northeast: Coordinate }) {
           boundaries.push(boundary)
+        },
+        includePoints(options: { points: Coordinate[] }) {
+          includedPoints.push(options.points)
         },
       }
     },
@@ -121,6 +135,7 @@ function createRuntime(location?: RawLocation, deferLocation = false) {
     modules,
     cameraMoves,
     boundaries,
+    includedPoints,
     locationRequests,
     resolveLocation() {
       const success = pendingLocations.shift()
@@ -236,7 +251,7 @@ test('navigation tab queries destinations and opens the matched direction withou
   page.handleOriginChange({ detail: { value: String(gateIndex + 1) } })
   assert.equal(page.data.navigationPlans.length, 0)
   page.handlePlanNavigation()
-  assert.equal(page.data.navigationPlans.length, 1)
+  assert.equal(page.data.navigationPlans.length, 2)
   const plan = page.data.navigationPlans[0]
   assert.equal(plan.pathText, '五号门 → 橘园 → 梅园 → 中心图书馆')
   page.handleOpenNavigationRoute({ currentTarget: { dataset: { planId: plan.id } } })
@@ -250,6 +265,54 @@ test('navigation tab queries destinations and opens the matched direction withou
   page.handlePlanNavigation()
   assert.equal(page.data.navigationPlans.length, 0)
   assert.match(page.data.navigationMessage, /起点和终点相同/)
+})
+
+test('one-transfer UI opens either leg and changing places clears all stale plans', async () => {
+  const runtime = createRuntime({ latitude: 29.82, longitude: 106.42, accuracy: 10 })
+  runtime.load('pages/index/index.ts')
+  const page = runtime.getPage()
+  page.onLoad()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  const originIndex = page.data.navigationPlaces.findIndex((place) => place.id === 'poi:canteen_2')
+  page.handleOriginChange({ detail: { value: String(originIndex + 1) } })
+  page.handlePlanNavigation()
+  assert.equal(page.data.navigationPlans.length, 0)
+  assert.ok(page.data.transferPlans.length > 0)
+  const plan = page.data.transferPlans[0]
+  assert.equal(plan.legs[0].routeId, 'route_4')
+  assert.equal(plan.legs[1].routeId, 'route_9')
+  for (const legIndex of [0, 1]) {
+    page.handleOpenTransferLeg({ currentTarget: { dataset: { planId: plan.id, legIndex } } })
+    assert.equal(page.data.activeTab, 'map')
+    assert.equal(page.data.selectedRouteId, plan.legs[legIndex].routeId)
+    assert.ok(page.data.routeDirections.some((item) => item.selected && item.id === plan.legs[legIndex].directionId))
+    assert.equal(page.data.hasLocation, true)
+  }
+  page.handleOriginChange({ detail: { value: '0' } })
+  assert.equal(page.data.transferPlans.length, 0)
+  assert.equal(page.data.navigationPlans.length, 0)
+})
+
+test('experimental overlay is opt-in, switches offline, and never affects the location fix', async () => {
+  const runtime = createRuntime({ latitude: 29.82, longitude: 106.42, accuracy: 10 })
+  runtime.load('pages/index/index.ts')
+  const page = runtime.getPage()
+  page.onLoad()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(page.data.includePreview, false)
+  assert.equal(page.data.routePolylines.length, 0)
+  page.handlePreviewChange({ detail: { value: true } })
+  assert.equal(page.data.includePreview, true)
+  assert.ok(page.data.routePolylines.every((line) => line.dottedLine === true))
+  if (page.data.networkFitPoints.length > 0) {
+    page.handleFitNetwork()
+    assert.equal(runtime.includedPoints.length, 1)
+  }
+  page.handleNetworkChange({ detail: { value: false } })
+  assert.equal(page.data.showAllRoutes, false)
+  page.handlePreviewChange({ detail: { value: false } })
+  assert.equal(page.data.routePolylines.length, 0)
+  assert.equal(page.data.hasLocation, true)
 })
 
 test('a pending manual location updates position without overriding a newer overview choice', async () => {

@@ -16,7 +16,7 @@
         <picker range="{{destinationNames}}" value="{{destinationIndex}}" bindchange="handleDestinationChange">
           <view class="navigation-picker">{{destinationNames[destinationIndex]}}<text>⌄</text></view>
         </picker>
-        <button class="navigation-submit" bindtap="handlePlanNavigation">{{originIndex ? '查询直达线路' : '查询途经线路'}}</button>
+        <button class="navigation-submit" bindtap="handlePlanNavigation">{{originIndex ? '查询直达 / 一次换乘' : '查询途经线路'}}</button>
       </view>
       <text class="navigation-message">{{navigationMessage}}</text>
       <view wx:for="{{navigationPlans}}" wx:key="id" class="navigation-result">
@@ -26,6 +26,16 @@
         <text class="navigation-result__path">{{item.pathText}}</text>
         <text class="navigation-result__note">{{item.note}}</text>
         <button class="navigation-open" data-plan-id="{{item.id}}" bindtap="handleOpenNavigationRoute">查看此方向与地图</button>
+      </view>
+      <text wx:if="{{transferPlans.length}}" class="navigation-section-title">一次换乘 · 仅按共同参考站匹配</text>
+      <view wx:for="{{transferPlans}}" wx:key="id" wx:for-item="transfer" class="navigation-result">
+        <text class="navigation-result__heading">在 {{transfer.transferStopName}} 换乘</text>
+        <view wx:for="{{transfer.legs}}" wx:key="routeId" wx:for-item="leg" wx:for-index="legIndex" class="transfer-leg">
+          <text class="navigation-result__row">第 {{legIndex + 1}} 段 · {{leg.routeName}} · {{leg.directionId}}</text>
+          <text class="navigation-result__path">{{leg.pathText}}</text>
+          <button class="navigation-open" data-plan-id="{{transfer.id}}" data-leg-index="{{legIndex}}" bindtap="handleOpenTransferLeg">查看 {{leg.routeName}} 与地图</button>
+        </view>
+        <text class="navigation-result__note">{{transfer.note}}</text>
       </view>
       <text class="navigation-subtitle">已确认名称：中图 = 中心图书馆。坐标及真实行驶轨迹仍待审核，当前不提供逐路口导航。</text>
     </view>
@@ -53,6 +63,12 @@
     <button class="map-toolbar__button" size="mini" bindtap="handleRetry"
       disabled="{{locationStatusKind === 'loading'}}">我的位置</button>
   </view>
+  <view class="network-controls">
+    <label class="network-control"><switch checked="{{showAllRoutes}}" bindchange="handleNetworkChange" color="#126b47" />全部线路</label>
+    <label class="network-control"><switch checked="{{includePreview}}" bindchange="handlePreviewChange" color="#b56c17" />实验预览</label>
+    <button class="network-fit" size="mini" disabled="{{!networkFitPoints.length}}" bindtap="handleFitNetwork">看全线</button>
+  </view>
+  <text class="network-notice {{includePreview ? 'network-notice--preview' : ''}}">{{networkNotice}}</text>
   <map id="campus-map" class="campus-map"
     latitude="{{latitude}}" longitude="{{longitude}}" scale="{{scale}}"
     min-scale="{{minScale}}" max-scale="{{maxScale}}"
@@ -60,6 +76,14 @@
     show-location="{{hasLocation}}" show-scale></map>
 
   <view class="route-panel {{routeDetailsExpanded ? 'route-panel--expanded' : ''}}">
+    <scroll-view class="network-legend" scroll-x>
+      <view class="network-legend__track">
+        <view wx:for="{{networkLegend}}" wx:key="routeId" class="network-legend__item" data-route-id="{{item.routeId}}" bindtap="handleRouteChange">
+          <view class="network-legend__line" style="background: {{item.color}}"></view>
+          <text>{{item.name}} · {{item.status}}</text>
+        </view>
+      </view>
+    </scroll-view>
     <scroll-view class="route-selector" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="route-selector__track">
         <button wx:for="{{routeOptions}}" wx:key="id"
