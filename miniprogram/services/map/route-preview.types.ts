@@ -7,6 +7,12 @@ export interface RoutePreviewCandidate {
   candidate: CandidateCoordinate | null
   usableForPreview: boolean
   warnings: string[]
+  placeEvidence?: {
+    method: 'tencent_place_search'
+    id: string
+    title: string
+    address: string
+  }
 }
 
 /** Each segment is independent; missing segments must not be joined by straight lines. */

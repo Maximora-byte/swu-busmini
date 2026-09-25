@@ -46,11 +46,14 @@ Page({
     destinationIndex: 0,
     navigationPlans: [] as NavigationPlan[],
     transferPlans: [] as TransferNavigationPlan[],
-    showAllRoutes: true,
+    showAllRoutes: false,
     includePreview: false,
     networkLegend: [] as RouteNetworkLegend[],
     networkNotice: '',
     networkFitPoints: [] as Coordinate[],
+    networkSelectedTitle: '',
+    networkCoverageText: '',
+    networkMissingSegments: [] as string[],
     navigationMessage: '选择目的地，查询途经线路；指定起点后可查询直达方向。',
     latitude: CAMPUS_VIEWPORT.center.latitude as number,
     longitude: CAMPUS_VIEWPORT.center.longitude as number,
@@ -104,7 +107,10 @@ Page({
 
   handleTabChange(event: WechatMiniprogram.TouchEvent) {
     const tab = event.currentTarget.dataset.tab
-    if (tab === 'map' || tab === 'navigation') this.setData({ activeTab: tab })
+    if (tab === 'map' || tab === 'navigation') {
+      this.cameraRequestVersion += 1
+      this.setData({ activeTab: tab })
+    }
   },
 
   handleOriginChange(event: WechatMiniprogram.PickerChange) {
@@ -134,19 +140,29 @@ Page({
   handleOpenNavigationRoute(event: WechatMiniprogram.TouchEvent) {
     const plan = this.data.navigationPlans.find(({ id }) => id === event.currentTarget.dataset.planId)
     if (!plan) return
-    this.loadRoute(plan.routeId, plan.directionId)
-    this.setData({ activeTab: 'map', routeDetailsExpanded: true })
+    this.selectRoute(plan.routeId, plan.directionId)
   },
 
   handleOpenTransferLeg(event: WechatMiniprogram.TouchEvent) {
     const plan = this.data.transferPlans.find(({ id }) => id === event.currentTarget.dataset.planId)
     const leg = plan?.legs[Number(event.currentTarget.dataset.legIndex)]
     if (!leg) return
-    this.loadRoute(leg.routeId, leg.directionId)
-    this.setData({ activeTab: 'map', routeDetailsExpanded: true })
+    this.selectRoute(leg.routeId, leg.directionId)
+  },
+
+  selectRoute(routeId: string, directionId?: string) {
+    // 选线是用户明确请求查看这条参考路线，不需要再手动关闭总览。
+    const cameraVersion = ++this.cameraRequestVersion
+    this.setData({ showAllRoutes: false, includePreview: true })
+    const loaded = this.loadRoute(routeId, directionId)
+    this.setData({ activeTab: 'map', routeDetailsExpanded: !loaded }, () => {
+      // 等地图从导航页重新显示、布局完成后再移动镜头；忽略过期选择。
+      if (loaded && cameraVersion === this.cameraRequestVersion) this.fitCurrentNetwork()
+    })
   },
 
   refreshNetwork() {
+    if (this.data.routeDataErrorText) return
     const overlay = routeNetworkService.getOverlay({
       selectedRouteId: this.data.selectedRouteId,
       directionId: this.data.routeDirections.find((direction) => direction.selected)?.id,
@@ -154,15 +170,19 @@ Page({
       includePreview: this.data.includePreview,
     })
     this.setData({ routePolylines: overlay.polylines, networkLegend: overlay.legend,
-      networkNotice: overlay.notice, networkFitPoints: overlay.fitPoints })
+      networkNotice: overlay.notice, networkFitPoints: overlay.fitPoints,
+      networkSelectedTitle: overlay.selectedTitle, networkCoverageText: overlay.coverageText,
+      networkMissingSegments: overlay.missingSegments })
   },
 
   handlePreviewChange(event: WechatMiniprogram.SwitchChange) {
+    this.cameraRequestVersion += 1
     this.setData({ includePreview: event.detail.value })
     this.refreshNetwork()
   },
 
   handleNetworkChange(event: WechatMiniprogram.SwitchChange) {
+    this.cameraRequestVersion += 1
     this.setData({ showAllRoutes: event.detail.value })
     this.refreshNetwork()
   },
@@ -170,7 +190,14 @@ Page({
   handleFitNetwork() {
     if (this.data.networkFitPoints.length < 2) return
     this.cameraRequestVersion += 1
-    this.setData({ routeDetailsExpanded: false })
+    const cameraVersion = this.cameraRequestVersion
+    this.setData({ routeDetailsExpanded: false }, () => {
+      if (cameraVersion === this.cameraRequestVersion) this.fitCurrentNetwork()
+    })
+  },
+
+  fitCurrentNetwork() {
+    if (this.data.activeTab !== 'map' || this.data.networkFitPoints.length < 2) return
     wx.createMapContext('campus-map', this).includePoints({
       points: this.data.networkFitPoints, padding: [36, 36, 36, 36],
     })
@@ -184,8 +211,11 @@ Page({
         routeOptions: routeMapPresentationService.getRouteOptions(routeId),
       })
       this.refreshNetwork()
+      return true
     } catch (error: unknown) {
       this.setData({
+        selectedRouteId: routeId,
+        routeOptions: this.data.routeOptions.map((route) => ({ ...route, selected: false })),
         routeName: this.data.routeOptions.find((route) => route.id === routeId)?.name ?? routeId,
         routeDirections: [],
         routeStops: [],
@@ -194,6 +224,9 @@ Page({
         networkLegend: [],
         networkFitPoints: [],
         networkNotice: '线路数据加载失败，暂不显示路网。',
+        networkSelectedTitle: '',
+        networkCoverageText: '',
+        networkMissingSegments: [],
         routeSummary: '',
         routeKindText: '',
         routeCoordinateStatusText: '',
@@ -202,6 +235,7 @@ Page({
         routeDetailsExpanded: true,
         routeDataErrorText: error instanceof Error ? error.message : '线路数据加载失败',
       })
+      return false
     }
   },
 
@@ -262,12 +296,12 @@ Page({
 
   handleDirectionChange(event: WechatMiniprogram.TouchEvent) {
     const directionId = event.currentTarget.dataset.directionId
-    if (typeof directionId === 'string') this.loadRoute(this.data.selectedRouteId, directionId)
+    if (typeof directionId === 'string') this.selectRoute(this.data.selectedRouteId, directionId)
   },
 
   handleRouteChange(event: WechatMiniprogram.TouchEvent) {
     const routeId = event.currentTarget.dataset.routeId
-    if (typeof routeId === 'string') this.loadRoute(routeId)
+    if (typeof routeId === 'string') this.selectRoute(routeId)
   },
 
   toggleRouteDetails() {

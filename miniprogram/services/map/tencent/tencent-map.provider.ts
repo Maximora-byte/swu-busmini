@@ -21,6 +21,14 @@ export interface TencentMapProviderOptions {
   region?: string
 }
 
+/** External search evidence only; never a verified campus stop. */
+export interface TencentPlaceCandidate {
+  id: string
+  title: string
+  address: string
+  coordinate: Coordinate
+}
+
 export type TencentMapProviderErrorCode =
   | 'INVALID_KEY'
   | 'API_ERROR'
@@ -302,6 +310,32 @@ export class TencentMapProvider implements MapProvider {
     )
     const result = readSuccessfulResult(response)
     return readString(result.address, '地址')
+  }
+
+  /** Development acquisition uses exact-name evidence, not geocoder similarity. */
+  async searchPlaces(keyword: string): Promise<readonly TencentPlaceCandidate[]> {
+    const query = keyword.trim()
+    if (!query) throw new Error('地点搜索关键词不能为空')
+    const { root, status } = readResponse(await this.request('/ws/place/v1/search', {
+      key: this.key,
+      keyword: query,
+      boundary: 'region(北碚区,2)',
+      page_size: 20,
+      page_index: 1,
+    }))
+    if (status !== 0) throwRequestError(root, status)
+    if (!Array.isArray(root.data)) {
+      throw new TencentMapProviderError('INVALID_RESPONSE', '腾讯位置服务地点列表无效')
+    }
+    return root.data.map((value: unknown) => {
+      const place = readRecord(value, '地点')
+      return {
+        id: readString(place.id, '地点 ID'),
+        title: readString(place.title, '地点名称'),
+        address: typeof place.address === 'string' ? place.address : '',
+        coordinate: readCoordinate(place.location),
+      }
+    })
   }
 
   async walkingRoute(

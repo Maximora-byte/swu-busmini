@@ -38,6 +38,19 @@ test('single route and direction filtering do not show the other direction geome
   assert.equal(view.polylines.length, 0)
   assert.equal(view.legend.length, 1)
   assert.equal(view.legend[0].routeId, 'route_1')
+  assert.equal(view.selectedTitle, '1路 · 图示反向')
+  assert.match(view.coverageText, /0\/6 段/)
+  assert.equal(view.missingSegments.length, 6)
+  assert.equal(view.missingSegments[0], '五号门 → 圆顶')
+})
+
+test('selected route reports missing pairs without claiming a complete Tencent bus route', () => {
+  const view = service.getOverlay({ selectedRouteId: 'route_1', showAllRoutes: false, includePreview: true })
+  assert.equal(view.selectedTitle, '1路 · 图示正向')
+  assert.match(view.coverageText, /1\/6 段/)
+  assert.equal(view.missingSegments.length, 5)
+  assert.ok(!view.missingSegments.includes('经管院 → 六号门'))
+  assert.match(view.notice, /仅显示所选线路当前方向/)
 })
 
 test('separate preview segments remain separate instead of inventing a connecting road', () => {

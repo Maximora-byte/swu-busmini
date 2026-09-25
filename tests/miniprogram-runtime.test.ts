@@ -11,6 +11,7 @@ import type { RouteNavigationService } from '../miniprogram/services/navigation/
 import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT } from '../miniprogram/services/map/map-viewport.service'
 import type { NavigationPlan, TransferNavigationPlan } from '../miniprogram/services/navigation/navigation-planner.service'
 import type { RouteMapPolyline } from '../miniprogram/services/map/route-polyline.service'
+import { routePreviewRepository } from '../miniprogram/services/repository/route-preview.repository'
 
 interface RuntimePageData {
   activeTab: string
@@ -20,6 +21,7 @@ interface RuntimePageData {
   includePreview: boolean
   showAllRoutes: boolean
   routePolylines: RouteMapPolyline[]
+  networkLegend: { routeId: string }[]
   networkFitPoints: Coordinate[]
   navigationMessage: string
   originIndex: number
@@ -52,7 +54,7 @@ interface RuntimePage {
   handleFitNetwork(): void
   data: RuntimePageData
   cameraRequestVersion: number
-  setData(update: Partial<RuntimePageData>): void
+  setData(update: Partial<RuntimePageData>, callback?: () => void): void
   onLoad(): void
   onReady(): void
   loadRoute(routeId: string, directionId?: string): void
@@ -64,7 +66,7 @@ interface RuntimePage {
   toggleRouteDetails(): void
 }
 
-function createRuntime(location?: RawLocation, deferLocation = false) {
+function createRuntime(location?: RawLocation, deferLocation = false, deferRendering = false) {
   const root = fileURLToPath(new URL('../miniprogram/', import.meta.url))
   const modules = new Map<string, { exports: unknown }>()
   const cameraMoves: Coordinate[] = []
@@ -72,6 +74,7 @@ function createRuntime(location?: RawLocation, deferLocation = false) {
   const includedPoints: Coordinate[][] = []
   const locationRequests: string[] = []
   const pendingLocations: ((result: RawLocation) => void)[] = []
+  const pendingRendering: (() => void)[] = []
   let page: RuntimePage | undefined
   // 只提供本地定位和地图镜头 API，故意不提供 wx.request。
   const platform = location ? {
@@ -122,8 +125,10 @@ function createRuntime(location?: RawLocation, deferLocation = false) {
       },
       Page(configuration: Omit<RuntimePage, 'setData'>) {
         page = Object.assign(configuration, {
-          setData(this: RuntimePage, update: Partial<RuntimePageData>) {
+          setData(this: RuntimePage, update: Partial<RuntimePageData>, callback?: () => void) {
             Object.assign(this.data, update)
+            if (callback && deferRendering) pendingRendering.push(callback)
+            else callback?.()
           },
         })
       },
@@ -137,6 +142,9 @@ function createRuntime(location?: RawLocation, deferLocation = false) {
     boundaries,
     includedPoints,
     locationRequests,
+    flushRendering() {
+      pendingRendering.splice(0).forEach((callback) => callback())
+    },
     resolveLocation() {
       const success = pendingLocations.shift()
       assert.ok(success, 'a location request must be pending')
@@ -258,7 +266,9 @@ test('navigation tab queries destinations and opens the matched direction withou
   assert.equal(page.data.activeTab, 'map')
   assert.equal(page.data.selectedRouteId, 'route_9')
   assert.ok(page.data.routeDirections.some((direction) => direction.id === plan.directionId && direction.selected))
-  assert.equal(page.data.routeDetailsExpanded, true)
+  assert.equal(page.data.routeDetailsExpanded, false)
+  assert.equal(page.data.showAllRoutes, false)
+  assert.equal(page.data.includePreview, true)
   assert.equal(page.data.hasLocation, true)
   page.handleDestinationChange({ detail: { value: String(gateIndex) } })
   assert.equal(page.data.navigationPlans.length, 0)
@@ -285,6 +295,9 @@ test('one-transfer UI opens either leg and changing places clears all stale plan
     page.handleOpenTransferLeg({ currentTarget: { dataset: { planId: plan.id, legIndex } } })
     assert.equal(page.data.activeTab, 'map')
     assert.equal(page.data.selectedRouteId, plan.legs[legIndex].routeId)
+    assert.equal(page.data.showAllRoutes, false)
+    assert.equal(page.data.networkLegend.length, 1)
+    assert.equal(page.data.networkLegend[0].routeId, plan.legs[legIndex].routeId)
     assert.ok(page.data.routeDirections.some((item) => item.selected && item.id === plan.legs[legIndex].directionId))
     assert.equal(page.data.hasLocation, true)
   }
@@ -334,4 +347,65 @@ test('a pending manual location updates position without overriding a newer over
   assert.equal(page.data.latitude, BEIBEI_VIEWPORT.center.latitude)
   assert.equal(page.data.longitude, BEIBEI_VIEWPORT.center.longitude)
   assert.deepEqual(runtime.cameraMoves, [BEIBEI_VIEWPORT.center])
+})
+
+test('selecting any route isolates its current Tencent direction and fits only its points', async () => {
+  const runtime = createRuntime({ latitude: 29.82, longitude: 106.42, accuracy: 10 })
+  runtime.load('pages/index/index.ts')
+  const page = runtime.getPage()
+  page.onLoad()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(page.data.showAllRoutes, false)
+  for (let number = 1; number <= 9; number++) {
+    page.handleNetworkChange({ detail: { value: true } })
+    page.handlePreviewChange({ detail: { value: false } })
+    const routeId = `route_${number}`
+    page.handleRouteChange({ currentTarget: { dataset: { routeId } } })
+    assert.equal(page.data.showAllRoutes, false)
+    assert.equal(page.data.includePreview, true)
+    assert.equal(page.data.networkLegend.length, 1)
+    assert.equal(page.data.networkLegend[0].routeId, routeId)
+    assert.equal(page.data.routeDetailsExpanded, false)
+    for (const direction of page.data.routeDirections) {
+      const fitCount = runtime.includedPoints.length
+      page.handleDirectionChange({ currentTarget: { dataset: { directionId: direction.id } } })
+      const expected = routePreviewRepository.getSegments(routeId, direction.id)
+      assert.equal(page.data.routePolylines.length, expected.length)
+      assert.equal(JSON.stringify(page.data.routePolylines.map((line) => line.points)), JSON.stringify(expected.map((segment) => segment.points)))
+      assert.equal(runtime.includedPoints.length, fitCount + (expected.length ? 1 : 0))
+      assert.equal(page.data.hasLocation, true)
+    }
+  }
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'missing' } } })
+  assert.equal(page.data.routePolylines.length, 0)
+  assert.equal(page.data.networkFitPoints.length, 0)
+  page.handlePreviewChange({ detail: { value: true } })
+  page.handleNetworkChange({ detail: { value: true } })
+  assert.equal(page.data.routePolylines.length, 0)
+  assert.equal(page.data.selectedRouteId, 'missing')
+})
+
+test('deferred route fitting ignores older choices, hidden maps, and newer location requests', async () => {
+  const runtime = createRuntime({ latitude: 29.82, longitude: 106.42, accuracy: 10 }, true, true)
+  runtime.load('pages/index/index.ts')
+  const page = runtime.getPage()
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_1' } } })
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_3' } } })
+  assert.equal(runtime.includedPoints.length, 0)
+  runtime.flushRendering()
+  assert.equal(runtime.includedPoints.length, page.data.networkFitPoints.length ? 1 : 0)
+  const currentCount = runtime.includedPoints.length
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_4' } } })
+  page.handleTabChange({ currentTarget: { dataset: { tab: 'navigation' } } })
+  runtime.flushRendering()
+  assert.equal(runtime.includedPoints.length, currentCount)
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_3' } } })
+  const locating = page.locateUser()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  runtime.flushRendering()
+  assert.equal(runtime.includedPoints.length, currentCount)
+  runtime.resolveLocation()
+  await locating
+  assert.equal(runtime.cameraMoves.length, 1)
+  assert.equal(page.data.hasLocation, true)
 })

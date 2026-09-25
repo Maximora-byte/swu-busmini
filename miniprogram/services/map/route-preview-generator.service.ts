@@ -2,14 +2,17 @@ import type { BusRoute, BusStop, CandidateCoordinate, Coordinate, DrivingRouteRe
 import { getLocationViewport } from './map-viewport.service'
 import type { MapProvider } from './map-provider'
 import type { RoutePreviewCandidate, RoutePreviewData } from './route-preview.types'
+import type { TencentPlaceCandidate } from './tencent/tencent-map.provider'
+import { matchPreviewPlaces, PREVIEW_PLACE_NAMES } from './preview-place-matching'
 
 export interface RoutePreviewCache {
   geocodes: Record<string, readonly CandidateCoordinate[]>
   driving: Record<string, DrivingRouteResult>
+  places?: Record<string, readonly TencentPlaceCandidate[]>
 }
 
 export function createEmptyRoutePreviewCache(): RoutePreviewCache {
-  return { geocodes: {}, driving: {} }
+  return { geocodes: {}, driving: {}, places: {} }
 }
 
 export const PREVIEW_QUERY_NAMES: Readonly<Record<string, string>> = {
@@ -42,9 +45,10 @@ function safeErrorCode(error: unknown): string {
 export async function generateRoutePreview(
   routes: readonly BusRoute[],
   stops: readonly BusStop[],
-  provider: Pick<MapProvider, 'geocode' | 'drivingRoute'>,
+  provider: Pick<MapProvider, 'geocode' | 'drivingRoute'> & { searchPlaces?: (keyword: string) => Promise<readonly TencentPlaceCandidate[]> },
   cache: RoutePreviewCache = createEmptyRoutePreviewCache(),
   generatedAt = new Date().toISOString(),
+  options: { usePlaceSearch?: boolean } = {},
 ): Promise<RoutePreviewData> {
   const result: RoutePreviewData = { generatedAt, candidates: [], segments: [], warnings: [] }
   const usedIds = new Set(routes.flatMap(({ directions }) => directions.flatMap(({ stopIds }) => stopIds)))
@@ -56,16 +60,35 @@ export async function generateRoutePreview(
       result.warnings.push(`Unknown stop: ${stopId}`)
       continue
     }
-    const query = `重庆市北碚区西南大学${PREVIEW_QUERY_NAMES[stopId] ?? stop.name}`
+    const query = options.usePlaceSearch
+      ? `西南大学${PREVIEW_PLACE_NAMES[stopId] ?? stop.name}`
+      : `重庆市北碚区西南大学${PREVIEW_QUERY_NAMES[stopId] ?? stop.name}`
     const record: RoutePreviewCandidate = { stopId, query, candidate: null, usableForPreview: false, warnings: [] }
     try {
-      let values = cache.geocodes[query]
-      if (!values) {
-        values = await provider.geocode(query)
-        cache.geocodes[query] = values
+      let values: readonly CandidateCoordinate[] | undefined
+      if (options.usePlaceSearch) {
+        if (!provider.searchPlaces) throw new Error('PLACE_SEARCH_UNAVAILABLE')
+        const placeCache = cache.places ?? (cache.places = {})
+        let places = placeCache[query]
+        if (!places) places = placeCache[query] = await provider.searchPlaces(query)
+        const matches = matchPreviewPlaces(stop, places)
+        if (matches.length !== 1) {
+          record.warnings.push(matches.length === 0 ? 'No exact campus place match; no geocoding fallback' : 'Ambiguous campus place matches; manual review required')
+          values = []
+        } else {
+          const place = matches[0]!
+          record.placeEvidence = { method: 'tencent_place_search', id: place.id, title: place.title, address: place.address }
+          // Confidence reflects the exact-name match only, NOT coordinate or stop verification.
+          values = [{ coordinate: { ...place.coordinate }, source: 'tencent', confidence: 1, verified: false }]
+        }
+      } else {
+        values = cache.geocodes[query]
+        if (!values) values = cache.geocodes[query] = await provider.geocode(query)
       }
       const candidate = values[0]
-      if (!candidate) record.warnings.push('No geocoding result')
+      if (!candidate) {
+        if (!options.usePlaceSearch) record.warnings.push('No geocoding result')
+      }
       else if (!validCoordinate(candidate.coordinate) || !Number.isFinite(candidate.confidence) || candidate.confidence < 0 || candidate.confidence > 1) record.warnings.push('Invalid/outside Beibei coordinate or confidence')
       else {
         record.candidate = { coordinate: { ...candidate.coordinate }, source: 'tencent', confidence: candidate.confidence, verified: false }

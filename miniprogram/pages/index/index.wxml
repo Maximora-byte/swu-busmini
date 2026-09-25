@@ -64,8 +64,8 @@
       disabled="{{locationStatusKind === 'loading'}}">我的位置</button>
   </view>
   <view class="network-controls">
-    <label class="network-control"><switch checked="{{showAllRoutes}}" bindchange="handleNetworkChange" color="#126b47" />全部线路</label>
-    <label class="network-control"><switch checked="{{includePreview}}" bindchange="handlePreviewChange" color="#b56c17" />实验预览</label>
+    <label class="network-control"><switch checked="{{showAllRoutes}}" bindchange="handleNetworkChange" color="#126b47" />路网总览</label>
+    <label class="network-control"><switch checked="{{includePreview}}" bindchange="handlePreviewChange" color="#b56c17" />腾讯参考</label>
     <button class="network-fit" size="mini" disabled="{{!networkFitPoints.length}}" bindtap="handleFitNetwork">看全线</button>
   </view>
   <text class="network-notice {{includePreview ? 'network-notice--preview' : ''}}">{{networkNotice}}</text>
@@ -76,6 +76,10 @@
     show-location="{{hasLocation}}" show-scale></map>
 
   <view class="route-panel {{routeDetailsExpanded ? 'route-panel--expanded' : ''}}">
+    <view class="selected-route-heading">
+      <text style="color: {{routeColor}}">{{networkSelectedTitle}}</text>
+      <text class="selected-route-heading__coverage">{{networkCoverageText}}</text>
+    </view>
     <scroll-view class="network-legend" scroll-x>
       <view class="network-legend__track">
         <view wx:for="{{networkLegend}}" wx:key="routeId" class="network-legend__item" data-route-id="{{item.routeId}}" bindtap="handleRouteChange">
@@ -84,6 +88,12 @@
         </view>
       </view>
     </scroll-view>
+    <view class="direction-tabs">
+      <button wx:for="{{routeDirections}}" wx:key="id" size="mini"
+        class="direction-tabs__button"
+        style="background: {{item.selected ? routeColor : '#f3f5f3'}}; color: {{item.selected ? routeTextColor : '#506159'}}"
+        data-direction-id="{{item.id}}" bindtap="handleDirectionChange">{{item.name}}</button>
+    </view>
     <scroll-view class="route-selector" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="route-selector__track">
         <button wx:for="{{routeOptions}}" wx:key="id"
@@ -134,6 +144,9 @@
             </view>
           </view>
           <view class="route-data-notes">
+            <text class="route-panel__note">{{networkCoverageText}}</text>
+            <text wx:if="{{includePreview && networkMissingSegments.length}}" class="route-panel__note">缺失 / 待核对的路线段：</text>
+            <text wx:if="{{includePreview}}" wx:for="{{networkMissingSegments}}" wx:key="*this" class="route-panel__note">· {{item}}</text>
             <text class="route-panel__note">{{routeCoordinateStatusText}}</text>
             <text class="route-panel__note">{{routeGeometryStatusText}}</text>
             <text class="route-panel__source">参考 2025 校园地图 · 2026 实际运行待复核</text>

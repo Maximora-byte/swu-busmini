@@ -39,6 +39,11 @@
 .network-legend__track { display: inline-flex; gap: 22rpx; }
 .network-legend__item { display: inline-flex; align-items: center; gap: 8rpx; font-size: 20rpx; color: #59746a; }
 .network-legend__line { width: 26rpx; height: 6rpx; border-radius: 3rpx; }
+.selected-route-heading { display: flex; flex-direction: column; gap: 4rpx; margin-bottom: 10rpx; font-size: 25rpx; font-weight: 600; }
+.selected-route-heading__coverage { font-size: 21rpx; font-weight: 400; color: #826523; }
+.direction-tabs { display: flex; gap: 10rpx; margin: 6rpx 0 10rpx; flex: none; }
+.direction-tabs__button { flex: 1; margin: 0; padding: 0 12rpx; font-size: 23rpx; line-height: 48rpx; }
+.direction-tabs__button::after { border: none; }
 
 .campus-header { flex: none; padding: 22rpx 28rpx 12rpx; background: #ffffff; }
 .campus-header__heading { display: flex; align-items: center; justify-content: space-between; }

@@ -22,6 +22,9 @@ export interface RouteNetworkView {
   legend: RouteNetworkLegend[]
   fitPoints: Coordinate[]
   notice: string
+  selectedTitle: string
+  coverageText: string
+  missingSegments: string[]
 }
 
 /** 路网叠加仅消费本地仓库；候选折线是显式开启的实验图层，不进入正式轨迹。 */
@@ -40,6 +43,9 @@ export function createRouteNetworkService(
         .filter((route) => options.showAllRoutes || route.selected)
       const polylines: RouteMapPolyline[] = []
       const legend: RouteNetworkLegend[] = []
+      let selectedTitle = ''
+      let coverageText = ''
+      let missingSegments: string[] = []
       // 选中线路最后绘制且加粗；不偏移任何真实坐标。
       const drawingOrder = [...routes].sort((a, b) => Number(a.selected) - Number(b.selected))
       for (const route of drawingOrder) {
@@ -48,6 +54,19 @@ export function createRouteNetworkService(
         const verified = view.routePolylines
         const pending = options.includePreview && verified.length === 0 && directionId
           ? previews.getSegments(route.id, directionId) : []
+        if (route.selected) {
+          selectedTitle = `${route.name} · ${directionId ?? '方向待确认'}`
+          const expected = view.routeStops.slice(1).map((stop, index) => ({
+            from: view.routeStops[index], to: stop,
+          }))
+          missingSegments = verified.length > 0 ? [] : expected.filter(({ from, to }) =>
+            !pending.some((segment) => segment.fromStopId === from.id && segment.toStopId === to.id),
+          ).map(({ from, to }) => `${from.name} → ${to.name}`)
+          coverageText = verified.length > 0 ? '已显示人工审核轨迹'
+            : options.includePreview
+              ? `腾讯参考路线 ${expected.length - missingSegments.length}/${expected.length} 段 · 待核对${missingSegments.length ? '，缺失段留空' : ''}`
+              : '点击线路编号即可查看腾讯参考路线（待核对）'
+        }
         const lines: RouteMapPolyline[] = verified.length > 0
           ? verified.map((line) => ({ ...line, width: route.selected ? 8 : 4 }))
           : pending.map((segment) => ({
@@ -70,11 +89,14 @@ export function createRouteNetworkService(
         polylines,
         legend: routes.map((route) => legend.find((item) => item.routeId === route.id)!),
         fitPoints,
+        selectedTitle,
+        coverageText,
+        missingSegments,
         notice: options.includePreview
-          ? '虚线为腾讯驾车实验片段，坐标与走向未审核，不是实际校车轨迹；缺失段留空。各线路显示图示首方向，选中线路可切换方向。'
+          ? `虚线为腾讯驾车参考片段，坐标与走向未审核，不是实际校车轨迹。${options.showAllRoutes ? '总览显示各线首方向；点击编号只看该线。' : '仅显示所选线路当前方向，不代表实时导航。'}`
           : polylines.length > 0
             ? '实线为已审核轨迹，颜色对应线路；重叠路段可单独选线查看。'
-            : '暂无已审核轨迹。可主动开启实验预览查看自动生成结果，勿据此判断候车位置。',
+            : '暂无已审核轨迹。点击线路编号可查看腾讯参考路线，勿据此判断候车位置。',
       }
     },
   }
