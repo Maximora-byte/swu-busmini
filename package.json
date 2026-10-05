@@ -34,7 +34,8 @@
     ],
     "reporter": [
       "text",
-      "lcov"
-    ]
+      "lcovonly"
+    ],
+    "excludeAfterRemap": true
   }
 }
