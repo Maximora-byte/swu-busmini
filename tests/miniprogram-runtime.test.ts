@@ -133,7 +133,8 @@ function createRuntime(location?: RawLocation, deferLocation = false, deferRende
         })
       },
       ...(platform ? { wx: platform } : {}),
-    }, { filename: path, timeout: 1000 })
+    // V8 coverage instruments nested module loads; retain a bounded sandbox on shared CI CPUs.
+    }, { filename: path, timeout: process.env.NODE_V8_COVERAGE ? 5000 : 1000 })
     return module.exports
   }
   return {
