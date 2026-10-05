@@ -9,18 +9,25 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
+    permissions:
+      contents: read
+      id-token: write
     name: Data and code quality
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
           cache: npm
@@ -38,4 +45,13 @@ jobs:
         run: npm run typecheck
 
       - name: Test
-        run: npm test
+        run: npm run test:coverage
+      - name: Upload existing test coverage
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
+        with:
+          use_oidc: true
+          files: coverage/lcov.info
+          flags: unit
+          disable_search: true
+          disable_telem: true
+          fail_ci_if_error: false
