@@ -400,10 +400,12 @@ npm ci
 npm run check:data-sync
 npm run validate:data
 npm run typecheck
-npm test
+npm run test:coverage
 ```
 
-任意一步失败都会使 workflow 失败。修改 `routes.ts`、`stops.ts`、对应 JSON 镜像、`sources.json` 或其他 TypeScript 代码后，必须先通过本地验证和 CI，才能合并数据变更。
+`test:coverage` 使用 c8 运行现有测试并生成覆盖率报告；随后工作流通过 OIDC 将 `coverage/lcov.info` 上传到 Codecov。上传失败不会使 CI 失败（`fail_ci_if_error: false`）。
+
+上述安装、数据校验、类型检查或测试任意一步失败都会使 workflow 失败。修改 `routes.ts`、`stops.ts`、对应 JSON 镜像、`sources.json` 或其他 TypeScript 代码后，必须先通过本地验证和 CI，才能合并数据变更。
 
 ## 安全与数据原则
 
