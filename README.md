@@ -1,9 +1,22 @@
+<a id="top"></a>
+<div align="center">
+
 # SWU Go
+
+**西南大学北碚校区校车导航：查线路、选方向、看参考站序。**
+
+<sub>微信小程序 · TypeScript · 非官方开源项目 · MIT</sub>
+
+[快速开始](#quick-start) · [当前状态](#status) · [开发文档](#development) · [数据维护](#data-maintenance) · [CI](#ci) · [安全原则](#safety)
+
+</div>
+
 
 SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航微信小程序。项目首先解决“从哪里上车、坐哪一路、往哪个方向、在哪里下车”的问题，并保证在没有实时车辆数据时仍可使用。
 
 > 本项目为学生个人开发的非官方项目，与西南大学官方不存在隶属或授权关系。
 
+<a id="status"></a>
 ## 当前状态
 
 项目已完成 **Phase 15：1 路真实线路 Demo 数据闭环校验流程**。1 路正反方向、站点引用、轨迹状态、缺失坐标预检、人工审核和生产展示门禁均已贯通。当前 1 路的 7 个相关站点仍缺少现场 verified 坐标，因此真实轨迹状态为 `missing`，页面安全回退为方向、站序和灵活停靠提示，不会绘制或请求猜测轨迹。
@@ -18,6 +31,7 @@ SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航�
 
 地图默认以已有校园中心显示西大周边；首次定位只更新当前位置和状态，保持校园视野。工具栏可切换“校园全览”“北碚城区”，或主动查看“我的位置”。`setBoundary` 和缩放限制仍约束北碚城区浏览范围；范围外定位会回退到校园视野。矩形窗口只是界面配置，不是精确行政区或校园边界，也不作为校车站点坐标来源。
 
+<a id="quick-start"></a>
 ## 运行方式
 
 1. 安装 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)。
@@ -29,6 +43,14 @@ SWU Go 是面向西南大学北碚校区的非官方、开源校园校车导航�
 真机测试定位前，还需要在微信公众平台完成《小程序用户隐私保护指引》中的位置信息用途声明。开发者工具可模拟位置，但其结果不能替代真机的 GPS 与权限拒绝场景测试。
 
 基础 `map` 组件不需要腾讯位置服务 Key。使用腾讯地理编码或步行路线能力时，复制 `miniprogram/config/config.example.ts` 为已被 Git 忽略的 `config.local.ts`，填写自己的 WebService Key，并在腾讯位置服务控制台配置小程序请求来源及 `https://apis.map.qq.com` 合法域名；不要提交真实 Key。
+
+<a id="development"></a>
+## 开发文档
+
+按需展开下列说明；现有实现、数据边界与操作命令完整保留。
+
+<details>
+<summary><strong>目录、数据模型、定位与线路推荐</strong></summary>
 
 ## 计划目录
 
@@ -189,6 +211,10 @@ miniprogram/
 只有当某个起点关联站出现在同一方向的某个终点关联站之前时，该方向才会进入结果。同一线路的多个有效方向合并为一条领域结果，同时保留实际匹配的上下车站 ID。不存在的起点或终点 POI 会返回明确错误；POI 没有关联站点或不存在共同直达线路时返回空数组。
 
 灵活校园车结果会提示“该线路支持沿途停靠，请结合现场情况确认上下车位置”，不承诺一定停靠。当前只计算静态线路连通性，不计算 GPS 或步行距离、不判断最近站点，也不代表实时车辆状态。现在另有一次换乘查询，见下节。
+</details>
+
+<details>
+<summary><strong>实验预览、离线生成与一次换乘</strong></summary>
 
 ## 彩色路网实验预览与一次换乘
 
@@ -217,6 +243,10 @@ npm run validate:data
 2026-09-25 使用地点标题证据重新采集：22 次地点搜索和 40 次驾车请求，16 个唯一地点候选，生成 **94/118 个有方向路段记录**（共享路段在不同线路中分别引用，并非 94 条独立道路）。修正了早期地理编码中六号门、26 教、外语院等候选偏差；圆顶、西师街、二食堂、大礼堂仍缺可靠匹配，不生成相邻路段。3/6/8 路参考片段数量完整，但所有路线仍待实际乘车核验。见 [本次图片与腾讯结果比对](docs/tencent-route-comparison-2026-09-25.md)；[9 月 22 日记录](docs/route-preview-trial-2026-09-22.md)仅作为历史实验保留。
 
 在线路导航中选起终点后，先显示直达，再列出至多 6 个一次换乘候选。只在**同一 stopId** 换乘，必须是两条不同线路且两段方向有效、非零长度；明确闭合环线最多绕一圈。结果按参考站序段数和稳定 ID 排序，不承诺最短距离、最快或可安全换乘。示例：二食堂 → 中心图书馆，可查询 4 路接 9 路；每段可单独打开对应方向与地图。换乘站是否同侧、实际是否停靠、道路是否可安全穿越，仍需现场确认；不提供步行连接、两次以上换乘、实时车辆或时刻表。
+</details>
+
+<details>
+<summary><strong>地图适配、坐标审核与真实轨迹闭环</strong></summary>
 
 ## 空间能力基础层
 
@@ -367,7 +397,9 @@ npm run review:geometry route_1 reject "图示正向"
 ```
 
 `approve` 将已有 `generated` 或 `needs_review` 候选改为 `verified`；`reject` 将候选从轨迹数据集中移除。两者都不会修改 `routes.json`。生产页面只读取 `verified`，开发测试可以通过 Service 的 `previewUnverifiedGeometry` 显式查看未审核轨迹。
+</details>
 
+<a id="data-maintenance"></a>
 ## 数据维护与校验
 
 维护 `stops.json`、`routes.json`、`pois.json`、`coordinate-reviews.json`、`route-geometries.json` 后运行：
@@ -391,6 +423,7 @@ npm run validate:data
 
 线路数据录入时先在 `sources.json` 登记来源及复核状态，再按原始资料录入站名和顺序。图片资料只用于其能够清晰支持的信息，不用于推算坐标；状态保持 `needs_review`，直到结合当年官方通知、现场站牌和实际乘车完成人工复核。提交前应依次运行 `npm run validate:data`、`npm run typecheck` 和 `npm test`。
 
+<a id="ci"></a>
 ## 持续集成
 
 GitHub Actions 工作流位于 `.github/workflows/ci.yml`，在针对 `main` 的 push 和 pull request 上使用 Node.js 24 LTS 自动执行：
@@ -400,11 +433,14 @@ npm ci
 npm run check:data-sync
 npm run validate:data
 npm run typecheck
-npm test
+npm run test:coverage
 ```
 
-任意一步失败都会使 workflow 失败。修改 `routes.ts`、`stops.ts`、对应 JSON 镜像、`sources.json` 或其他 TypeScript 代码后，必须先通过本地验证和 CI，才能合并数据变更。
+`test:coverage` 使用 c8 运行现有测试并生成覆盖率报告；随后工作流通过 OIDC 将 `coverage/lcov.info` 上传到 Codecov。上传失败不会使 CI 失败（`fail_ci_if_error: false`）。
 
+上述安装、数据校验、类型检查或测试任意一步失败都会使 workflow 失败。修改 `routes.ts`、`stops.ts`、对应 JSON 镜像、`sources.json` 或其他 TypeScript 代码后，必须先通过本地验证和 CI，才能合并数据变更。
+
+<a id="safety"></a>
 ## 安全与数据原则
 
 - 不提交 AppSecret、地图 Key、访问令牌、Cookie 或用户身份数据；
@@ -415,3 +451,5 @@ npm test
 ## License
 
 [MIT](LICENSE)
+
+[返回顶部](#top)
