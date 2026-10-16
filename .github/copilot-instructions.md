@@ -1,12 +1,12 @@
 # Copilot repository instructions
 
-Read the nearest AGENTS.md and existing contribution instructions before edits. Keep one focused branch and PR; preserve existing behavior, licences and owner labels.
+Read the nearest AGENTS.md, if present, and existing contribution instructions before edits. Keep one focused branch and PR; preserve existing behavior, licences and owner labels.
 
 ## Repository context
 WeChat campus bus mini-program, TypeScript, offline route JSON and reviewed coordinates. Preserve source provenance and needs_review states. Client-shipped configuration is public.
 
 ## Validation
-npm ci; npm run check:data-sync; npm run validate:data; npm run typecheck; npm test. Do not run paid map generation/geocoding or approve coordinates without explicit authorization.
+npm ci; npm run check:data-sync; npm run validate:data; npm run typecheck; npm run test:coverage. Do not run paid map generation/geocoding or approve coordinates without explicit authorization.
 Use existing tests once, selecting affected components. Report actual commands, failures and unavailable checks. Add regression tests for changed behavior or security boundaries, not documentation-only changes. Retain lockfiles and existing CI gates.
 
 ## Credentials and operations
@@ -17,4 +17,4 @@ Do not merge, deploy, change App permissions, relax branch protection, run produ
 ## Review and cost
 Respond in the user's language; prioritize correctness, security and actionable findings. Human reviews and CI determine acceptance. Request Copilot review manually once a human code PR is ready; skip routine image, dependency and documentation bot PRs. Keep automatic review, review on every push, and paid overage off unless separately requested. Use the supported Auto model for Copilot Student.
 
-matchall-bot owns labels; ImgBot owns image optimization; Codecov owns coverage evidence; Copilot assists implementation and review; Doppler owns explicitly approved secret distribution. Preserve the existing lightweight image path, cancellation, path selection and one combined coverage upload. See .github/DEVELOPMENT_FLOW.md.
+matchall-bot owns labels; ImgBot owns image optimization; Codecov owns coverage evidence; Copilot assists implementation and review; Doppler owns explicitly approved secret distribution. This repository currently has one quality job and one coverage upload, with cancellation of superseded runs; it has no separate image job, matrix or path selection. Preserve the configured checks. See .github/DEVELOPMENT_FLOW.md.

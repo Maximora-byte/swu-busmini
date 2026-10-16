@@ -1,6 +1,6 @@
-# PR / Issue 自动标签
+# PR / Issue 自动标签（保留的工作流说明）
 
-本仓库通过 `.github/workflows/auto-label.yml` 自动给 PR 和 Issue 添加标签。
+本页说明仓库保留的 `.github/workflows/auto-label.yml` 规则与手动入口。当前协作约定见 [开发流程](DEVELOPMENT_FLOW.md)：标签由 matchall-bot 负责，旧自动标签工作流按该约定保持禁用。文件仍在仓库中不代表 GitHub 上已启用；以下行为仅描述该工作流被授权启用并执行时的机制。
 
 - Issue 创建、修改、重新打开时重新分类。
 - PR 创建、修改、重新打开、推送新提交、准备评审时重新分类。
@@ -42,4 +42,4 @@
 
 编辑工作流中 `definitions`、`titleRules`、`bodyRules` 和文件路径匹配规则。
 保留 `pull_request_target` 下只运行可信默认分支脚本的设计，不添加 PR 分支 checkout 或执行 PR 代码。
-本工作流只覆盖安装它的仓库；新建仓库时需要复制工作流。
+本工作流仅覆盖安装它的仓库；此处保留旧规则机制，不作为新仓默认接入步骤，当前约定见[开发流程](DEVELOPMENT_FLOW.md)。
