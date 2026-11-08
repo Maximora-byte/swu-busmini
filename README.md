@@ -3,6 +3,8 @@
 
 # SWU Go
 
+简体中文 | [English](README.en.md)
+
 **西南大学北碚校区校车导航：查线路、选方向、看参考站序。**
 
 <sub>微信小程序 · TypeScript · 非官方开源项目 · MIT</sub>
