@@ -81,7 +81,7 @@ Page({
     destinationMode: 'search', destinationCoordinate: null as Coordinate | null,
     originQuery: '当前位置', destinationQuery: '', activeSearchField: '', searchVersion: 0,
     searchResults: [] as CampusSearchSuggestion[], searchMessage: '',
-    nativePlacePicking: false, placeSelectionMessage: '',
+    nativePlacePicking: false, placeSelectionMessage: '', placeMessageField: '',
     originPlaceDetails: '', destinationPlaceDetails: '',
     originNearbyStops: [] as CampusSearchSuggestion['nearbyStops'], destinationNearbyStops: [] as CampusSearchSuggestion['nearbyStops'],
     mapSelectionField: '', mapSelectionMessage: '', mapCircles: [] as ReferenceCircle[],
@@ -386,7 +386,7 @@ Page({
     this.setData({
       journeys: [], selectedJourneyId: '', journeyPreview: null, planMessageVisible: false, locating: false, journeyMessage: '选择已更新，请重新查询。',
       activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1,
-      mapSelectionField: '', mapSelectionMessage: '', placeSelectionMessage: '',
+      mapSelectionField: '', mapSelectionMessage: '', placeSelectionMessage: '', placeMessageField: '',
       ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
     })
     if (redraw) this.showRoute(this.data.selectedRouteId, false)
@@ -462,7 +462,7 @@ Page({
       this.setData({ focusedSearchField: '', keyboardHeight: 0 })
       this.clearJourneys()
       if (field === 'origin') this.confirmedOriginStopId = ''
-      this.setData({ placeSelectionMessage: `${suggestion.name}：名称和用途已收录，请用腾讯地图或地图选点确认具体位置后推荐站点。`,
+      this.setData({ placeMessageField: field, placeSelectionMessage: `${suggestion.name}：名称和用途已收录，请用腾讯地图或地图选点确认具体位置后推荐站点。`,
         ...(field === 'origin' ? { originQuery: suggestion.name, originMode: 'search', originCoordinate: null, originIndex: -1,
           originPlaceDetails: suggestion.details ?? '', originNearbyStops: [], locationMessage: '' } : { destinationQuery: suggestion.name, destinationMode: 'search', destinationCoordinate: null,
           destinationIndex: -1, destinationPlaceDetails: suggestion.details ?? '', destinationNearbyStops: [] }) })
@@ -491,7 +491,7 @@ Page({
     const version = ++this.endpointRequestVersion, request = ++this.nativePlaceRequestVersion
     this.mapLocationRequestVersion += 1
     this.pendingTencentPlace = null
-    this.setData({ nativePlacePicking: true, locating: false, mapLocating: false, placeSelectionMessage: '',
+    this.setData({ nativePlacePicking: true, locating: false, mapLocating: false, placeSelectionMessage: '', placeMessageField: field,
       ...(this.data.locating ? { locationMessage: '本次定位已取消，可重新定位或选择起点。' } : {}),
       ...(this.data.mapLocating ? { mapLocationMessage: '定位已取消，可重新定位。' } : {}) })
     try {
