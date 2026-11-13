@@ -62,7 +62,7 @@ Page({
     sheetSnap: 'peek' as SheetSnap, sheetGeometry: getSheetGeometry(INITIAL_SHEET, 'peek', 0),
     focusedSearchField: '', keyboardHeight: 0, sheetScrollTarget: '', planMessageVisible: false,
     journeyPreview: null as { title: string; boardingName: string; alightingName: string; routeText: string; distanceText: string; connectionText: string } | null,
-    viewMode: 'map', showAllRoutes: false, referenceReverse: false,
+    viewMode: 'map', showAllRoutes: true, referenceReverse: false,
     routeStops: [] as CurrentRouteStopView[], routeSummary: '', routeColor: '#126b47', selectedVisitKey: '',
     routeDetailsExpanded: false, dataNotesExpanded: false,
     mapLegend: [] as { routeId: string; name: string; color: string }[],
@@ -70,9 +70,9 @@ Page({
     sourceText: '', directionStatusText: '实际运营方向尚未独立确认，请现场核对。',
     routeOptions: [] as { id: string; name: string; color: string }[], selectedRouteId: '', routeName: '',
     stopOptions: [] as { id: string; label: string }[], stopNames: [] as string[], stopPickerNames: [] as string[],
-    originIndex: 0, destinationIndex: 0, originMode: 'search', originCoordinate: null as Coordinate | null,
+    originIndex: 0, destinationIndex: 0, originMode: 'location', originCoordinate: null as Coordinate | null,
     destinationMode: 'search', destinationCoordinate: null as Coordinate | null,
-    originQuery: '', destinationQuery: '', activeSearchField: '', searchVersion: 0,
+    originQuery: '当前位置', destinationQuery: '', activeSearchField: '', searchVersion: 0,
     searchResults: [] as TransitStopSuggestion[], searchMessage: '',
     mapSelectionField: '', mapSelectionMessage: '', mapCircles: [] as ReferenceCircle[],
     locating: false, locationMessage: '', journeyMessage: '选择上、下车参考点，查询直达或一次换乘方案。',
@@ -88,6 +88,7 @@ Page({
     const sheetSnap = query.view === 'journey' ? 'half' : 'peek'
     this.dataset = currentTransitRepository.getDataset()
     const dataset = this.dataset
+    const initialRouteId = dataset.routes.some(({ id }) => id === query.routeId) ? query.routeId! : ''
     const eligibleStopIds = new Set(dataset.routes.flatMap((route) => route.visits.filter(isAutomaticBoardingVisit).map(({ stopId }) => stopId)))
     const planningStops = dataset.stops.filter(({ id }) => eligibleStopIds.has(id))
     const nameCounts = new Map<string, number>()
@@ -102,9 +103,10 @@ Page({
       viewMode: query.view === 'journey' ? 'journey' : 'map',
       stopOptions, stopNames: stopOptions.map(({ label }) => label), destinationIndex: stopOptions.length > 1 ? 1 : 0,
       stopPickerNames: ['请选择候车参考站', ...stopOptions.map(({ label }) => label)],
-      originQuery: '', destinationQuery: '', sheetSnap, sheetGeometry: getSheetGeometry(this.sheetLayout, sheetSnap, 1),
+      originMode: 'location', originQuery: '当前位置', destinationQuery: '', showAllRoutes: !initialRouteId,
+      sheetSnap, sheetGeometry: getSheetGeometry(this.sheetLayout, sheetSnap, 1),
     })
-    this.showRoute(dataset.routes.some(({ id }) => id === query.routeId) ? query.routeId! : dataset.routes[0].id)
+    this.showRoute(initialRouteId)
   },
 
   onReady() {
@@ -189,11 +191,11 @@ Page({
     this.handleDismissKeyboard()
     const d = this.data
     const originIndex = d.destinationIndex, destinationIndex = d.originIndex
-    const originMode = d.destinationMode, destinationMode = d.originMode === 'coordinate' ? 'map' : d.originMode
+    const originMode = d.destinationMode, destinationMode = d.originMode === 'coordinate' ? 'map' : d.originMode === 'location' ? 'search' : d.originMode
     const originCoordinate = d.destinationCoordinate ? { ...d.destinationCoordinate } : null
     const destinationCoordinate = d.originCoordinate ? { ...d.originCoordinate } : null
     const originQuery = originMode === 'map' ? '地图所选起点' : d.destinationQuery
-    const destinationQuery = d.originMode === 'coordinate' ? '原定位位置' : destinationMode === 'map' ? '地图所选终点' : d.originQuery
+    const destinationQuery = d.originMode === 'location' ? '' : d.originMode === 'coordinate' ? '原定位位置' : destinationMode === 'map' ? '地图所选终点' : d.originQuery
     this.clearJourneys()
     this.confirmedOriginStopId = ['stop', 'place'].includes(originMode) ? this.data.stopOptions[originIndex]?.id ?? '' : ''
     this.setData({ viewMode: 'journey', originIndex, destinationIndex, originMode, destinationMode, originCoordinate, destinationCoordinate,
@@ -233,18 +235,17 @@ Page({
   },
   showRoute(routeId: string, fit = true) {
     const dataset = this.dataset
-    const route = dataset?.routes.find(({ id }) => id === routeId)
-    if (!dataset || !route) return
+    if (!dataset || (!dataset.routes.some(({ id }) => id === routeId) && !(routeId === '' && this.data.showAllRoutes))) return
     const version = ++this.cameraRequestVersion
-    const view = getCurrentMapPresentation(dataset, route.id, {
-      network: this.data.viewMode === 'map' && this.data.showAllRoutes, reverse: this.data.referenceReverse,
+    const view = getCurrentMapPresentation(dataset, routeId, {
+      network: this.data.showAllRoutes, reverse: this.data.referenceReverse,
     })
     const ids = new Set(view.stopIds)
     const eligibleIds = new Set(view.eligibleStopIds)
     this.setData({
-      selectedRouteId: route.id, routeName: route.name, routeColor: route.color, selectedJourneyId: '', stopMessage: '', selectedVisitKey: '',
+      selectedRouteId: view.routeId, routeName: view.name, routeColor: view.color, selectedJourneyId: '', stopMessage: '', selectedVisitKey: '',
       routeStops: view.stops, routeSummary: view.summary, mapLegend: view.legend,
-      mapTitle: this.data.viewMode === 'map' && this.data.showAllRoutes ? '十条现行线路总览' : `${route.name} · 运营方发布轨迹`,
+      mapTitle: this.data.showAllRoutes ? '自动匹配 · 十条现行线路总览' : `${view.name} · 运营方发布轨迹`,
       routeWarnings: view.warnings, mapPolylines: view.polylines,
       mapMarkers: dataset.stops.filter(({ id }) => ids.has(id)).map((stop) => {
         if (eligibleIds.has(stop.id)) return marker(dataset, stop)
@@ -284,7 +285,7 @@ Page({
     else this.showRoute(this.data.selectedRouteId)
   },
   handleNetworkChange(event: WechatMiniprogram.SwitchChange) {
-    this.setData({ showAllRoutes: !!event.detail.value, viewMode: 'map' })
+    this.setData({ showAllRoutes: !!event.detail.value || !this.data.selectedRouteId, viewMode: 'map' })
     this.showRoute(this.data.selectedRouteId)
   },
   handleReferenceOrderChange(event: WechatMiniprogram.TouchEvent) {
@@ -395,10 +396,16 @@ Page({
     const change = { detail: { value: String(index) } } as WechatMiniprogram.PickerChange
     if (event.currentTarget.dataset.field === 'origin') this.handleOriginChange(change)
     else if (event.currentTarget.dataset.field === 'destination') this.handleDestinationChange(change)
+    else return
+    this.replanIfReady()
   },
   handleSearchFocus(event: WechatMiniprogram.TouchEvent) {
     const field = endpointField(event.currentTarget.dataset.field)
     if (!field || !this.pageVisible) return
+    if (field === 'origin' && this.data.originMode === 'location') {
+      this.clearJourneys()
+      this.setData({ originMode: 'search', originQuery: '', locationMessage: '' })
+    }
     this.setData({ viewMode: 'journey' })
     this.setData({ focusedSearchField: field, sheetScrollTarget: `${field}-field`, dataNotesExpanded: false })
     if (this.data.sheetSnap !== 'full') this.setSheetSnap('full', false)
@@ -487,6 +494,7 @@ Page({
     return circles
   },
   showPlanningOverview(fit = false) {
+    this.setData({ showAllRoutes: true })
     this.showRoute(this.data.selectedRouteId, false)
     const mapCircles = this.referenceCircles()
     const version = this.cameraRequestVersion
@@ -500,13 +508,13 @@ Page({
     this.clearJourneys()
     const version = this.endpointRequestVersion
     const fallback = this.data.stopOptions.findIndex(({ id }) => id === this.confirmedOriginStopId)
-    this.setData({ locating: true, originMode: fallback >= 0 ? 'stop' : 'search', originCoordinate: null, locationMessage: '正在定位…',
-      originQuery: fallback >= 0 ? this.dataset?.stops.find(({ id }) => id === this.confirmedOriginStopId)?.name ?? '' : '' })
+    this.setData({ locating: true, originMode: fallback >= 0 ? 'stop' : 'location', originCoordinate: null, locationMessage: '正在定位…',
+      originQuery: fallback >= 0 ? this.dataset?.stops.find(({ id }) => id === this.confirmedOriginStopId)?.name ?? '' : '当前位置' })
     try {
       const location = await locationService.getCurrentLocation()
       if (version !== this.endpointRequestVersion || !this.pageVisible) return
       this.setData({
-        originMode: 'coordinate', originCoordinate: location.coordinate, originQuery: '我的位置',
+        originMode: 'coordinate', originCoordinate: location.coordinate, originQuery: '当前位置',
         locationMessage: `已使用本次定位结果${location.isApproximate ? '，定位精度较低，请核对候车位置' : ''}；接驳距离按直线估算。`,
       })
     } catch (error: unknown) {
@@ -528,6 +536,7 @@ Page({
       this.setSheetSnap('full', false)
       this.setData({ journeyMessage: `请从搜索结果或地图选择${this.data.originMode === 'search' ? '起点' : '终点'}，输入文字尚未确认。` }); return
     }
+    if (this.data.originMode === 'location') { void this.handleUseLocation(); return }
     try {
       const origin = this.data.originMode !== 'stop' && this.data.originCoordinate
         ? { kind: 'coordinate' as const, coordinate: this.data.originCoordinate }

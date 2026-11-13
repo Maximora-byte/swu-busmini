@@ -170,6 +170,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
   }
   return {
     fitPoints, fitPadding, openedStops, cameraMoves, mapPayloadWrites: () => mapPayloadWrites,
+    pendingLocationCount: () => pendingLocation.length,
     flushMapMeasurements(width = 390, height = 294) {
       pendingMapMeasurement.splice(0).forEach((callback) => callback({ width, height }))
     },
@@ -221,8 +222,9 @@ test('new default journey entry shows ten operator routes and published geometry
   assert.equal(runtime.fitPoints.length, 0, 'native map must be ready before camera requests')
   page.onReady()
   assert.ok(runtime.fitPoints.length > 0)
-  const route = runtime.dataset().routes.find(({ id }) => id === page.data.selectedRouteId)!
-  assert.equal(JSON.stringify(page.data.mapPolylines[0].points), JSON.stringify(route.points))
+  assert.equal(page.data.selectedRouteId, '')
+  assert.equal(page.data.mapPolylines.length, 10)
+  assert.equal(JSON.stringify(page.data.mapPolylines.map(({ points }) => points)), JSON.stringify(runtime.dataset().routes.map(({ points }) => points)))
 })
 
 test('a delayed map measurement cannot restore the previous route or move a hidden page', () => {
@@ -372,7 +374,7 @@ test('a hidden page discards a pending location instead of resurrecting old orig
   runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
   await locating
   page.onShow()
-  assert.equal(page.data.originMode, 'search')
+  assert.equal(page.data.originMode, 'location')
   assert.equal(page.data.originCoordinate, null)
 })
 
@@ -390,7 +392,7 @@ test('a failed location refresh cannot silently reuse a previous successful GPS 
   assert.equal(page.data.originCoordinate, null, 'refresh must invalidate the old fix before completion')
   runtime.rejectLocation()
   await retry
-  assert.equal(page.data.originMode, 'search')
+  assert.equal(page.data.originMode, 'location')
   assert.equal(page.data.originCoordinate, null)
   assert.equal(page.data.locating, false)
 })
@@ -410,7 +412,7 @@ test('refreshing location then hiding or changing destination leaves no old fix 
   await refresh
   page.onShow()
   assert.equal(page.data.originCoordinate, null)
-  assert.equal(page.data.originMode, 'search')
+  assert.equal(page.data.originMode, 'location')
   assert.equal(page.data.locating, false)
   assert.doesNotMatch(page.data.locationMessage, /正在定位/)
   const pending = page.handleUseLocation()
@@ -555,7 +557,7 @@ test('map selection requires an explicit field, validates coordinates and suppor
   page.handleDestinationChange({ detail: { value: '1' } })
   const point = { ...runtime.dataset().stops[0].coordinate }
   page.handleMapTap({ detail: point })
-  assert.equal(page.data.originMode, 'search')
+  assert.equal(page.data.originMode, 'location')
   page.handleStartMapSelection({ currentTarget: { dataset: { field: 'destination' } } })
   page.handleCancelMapSelection()
   page.handleMapTap({ detail: point })
@@ -607,6 +609,7 @@ test('a successful location request automatically refreshes the recommendation f
   const runtime = createRuntime()
   const page = runtime.page()
   page.onLoad()
+  searchInput(page, 'origin', '')
   searchInput(page, 'destination', '校医院')
   selectSuggestion(page, 'destination', '校医院')
   const locating = page.handleUseLocation()
@@ -623,7 +626,7 @@ test('unified campus map defaults to current data and all-route mode has an accu
   page.onLoad()
   page.onReady()
   assert.equal(page.data.viewMode, 'map')
-  assert.deepEqual(Array.from(page.data.mapLegend, ({ routeId }) => routeId), ['route_1'])
+  assert.equal(page.data.mapLegend.length, 10)
   page.handleNetworkChange({ detail: { value: true } })
   assert.equal(page.data.mapLegend.length, 10)
   assert.equal(page.data.mapPolylines.length, 10)
@@ -689,7 +692,7 @@ test('map-only location preserves planned endpoints and a later overview prevent
   const cameraCount = runtime.cameraMoves.length
   runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
   await locating
-  assert.equal(page.data.originMode, 'search')
+  assert.equal(page.data.originMode, 'location')
   assert.equal(page.data.originIndex, oldOrigin)
   assert.equal(page.data.mapLocation?.latitude, 29.82)
   assert.equal(runtime.cameraMoves.length, cameraCount)
@@ -720,18 +723,105 @@ test('switching tabs or hiding cancels the map-only locating status and discards
   assert.equal(page.data.mapLocation, null)
 })
 
-test('glass home requires explicitly confirmed endpoints instead of preset example stations', () => {
+test('glass home defaults to current location and waits for a destination before requesting GPS', async () => {
   const runtime = createRuntime()
   const page = runtime.page()
   page.onLoad()
-  assert.equal(page.data.originQuery, '')
+  assert.equal(page.data.originMode, 'location')
+  assert.equal(page.data.originQuery, '当前位置')
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(runtime.pendingLocationCount(), 0)
   assert.equal(page.data.destinationQuery, '')
   page.handlePlanJourney()
   assert.equal(page.data.journeys.length, 0)
   assert.equal(page.data.sheetSnap, 'full')
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(runtime.pendingLocationCount(), 0, 'no destination means no location request')
   searchInput(page, 'destination', '校医院')
   selectSuggestion(page, 'destination', '校医院')
-  assert.equal(page.data.journeys.length, 0, 'a destination alone must not select a default origin')
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(runtime.pendingLocationCount(), 1)
+  assert.equal(page.data.locating, true)
+  page.handlePlanJourney()
+  assert.equal(runtime.pendingLocationCount(), 1, 'repeated planning must not duplicate GPS')
+  runtime.resolveLocation(runtime.dataset().stops[0].coordinate)
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(page.data.originMode, 'coordinate')
+  assert.equal(page.data.originQuery, '当前位置')
+  assert.ok(page.data.journeys.length, 'a destination and a real fix automatically recommend a route')
+})
+
+test('automatic origin failure never fabricates a station and manual input cancels a delayed fix', async () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  searchInput(page, 'destination', '校医院')
+  selectSuggestion(page, 'destination', '校医院')
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  runtime.rejectLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(page.data.originMode, 'location')
+  assert.equal(page.data.originQuery, '当前位置')
+  assert.equal(page.data.journeys.length, 0)
+  assert.match(page.data.locationMessage, /权限|定位失败/)
+  assert.equal(runtime.pendingLocationCount(), 0)
+  const retry = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  searchInput(page, 'origin', '中图')
+  runtime.resolveLocation(runtime.dataset().stops[0].coordinate)
+  await retry
+  assert.equal(page.data.originQuery, '中图')
+  assert.equal(page.data.originCoordinate, null)
+})
+
+test('correcting a destination during automatic GPS keeps current-origin intent and rejects the older fix', async () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  searchInput(page, 'destination', '校医院')
+  selectSuggestion(page, 'destination', '校医院')
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  searchInput(page, 'destination', '中图')
+  selectSuggestion(page, 'destination', '中心图书馆')
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(runtime.pendingLocationCount(), 2)
+  assert.equal(page.data.originMode, 'location')
+  runtime.rejectLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(page.data.locating, true, 'the older failure must not stop the newer request')
+  assert.equal(page.data.originCoordinate, null)
+  runtime.resolveLocation(runtime.dataset().stops[0].coordinate)
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(page.data.destinationQuery, '中心图书馆')
+  assert.equal(page.data.originMode, 'coordinate')
+  assert.ok(page.data.journeys.length)
+})
+
+test('default planning overview has no preselected line and manual browsing does not constrain the planner', () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  assert.equal(page.data.selectedRouteId, '')
+  assert.equal(page.data.showAllRoutes, true)
+  assert.equal(page.data.mapPolylines.length, 10)
+  page.handleOpenPlanner()
+  assert.equal(page.data.mapLegend.length, 10)
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_8' } } })
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  page.handlePlanJourney()
+  assert.deepEqual(Array.from(page.data.journeys[0].legs, ({ routeId }) => routeId), ['route_1', 'route_2'])
+})
+
+test('swapping an unresolved current origin leaves the destination unconfirmed', () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  page.handleDestinationChange({ detail: { value: '28' } })
+  page.handleSwapEndpoints()
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originIndex, 28)
+  assert.equal(page.data.destinationMode, 'search')
+  assert.equal(page.data.destinationQuery, '')
+  assert.equal(page.data.journeys.length, 0)
+  assert.equal(runtime.pendingLocationCount(), 0)
 })
 
 test('settled sheet state controls map fitting and stale drag completion is ignored', () => {
@@ -776,8 +866,8 @@ test('failed GPS has no default origin but can fall back to a genuinely confirme
   await new Promise<void>((resolve) => setImmediate(resolve))
   runtime.rejectLocation()
   await request
-  assert.equal(page.data.originMode, 'search')
-  assert.equal(page.data.originQuery, '')
+  assert.equal(page.data.originMode, 'location')
+  assert.equal(page.data.originQuery, '当前位置')
   page.handleOriginChange({ detail: { value: '2' } })
   request = page.handleUseLocation()
   await new Promise<void>((resolve) => setImmediate(resolve))
@@ -848,7 +938,7 @@ test('an unconfirmed exact picker has a placeholder so selecting the first real 
   const page = runtime.page()
   page.onLoad()
   page.handleExactStopChange({ currentTarget: { dataset: { field: 'origin' } }, detail: { value: '0' } })
-  assert.equal(page.data.originMode, 'search')
+  assert.equal(page.data.originMode, 'location')
   page.handleExactStopChange({ currentTarget: { dataset: { field: 'origin' } }, detail: { value: '1' } })
   assert.equal(page.data.originMode, 'stop')
   assert.equal(page.data.originIndex, 0)
