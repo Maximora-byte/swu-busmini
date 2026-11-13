@@ -10,8 +10,14 @@ import type { TransitDataset } from '../miniprogram/models/current-transit'
 import type { TransitJourney } from '../miniprogram/services/navigation/transit-journey.service'
 import type { TransitStopSuggestion } from '../miniprogram/services/navigation/transit-stop-search.service'
 import type { CurrentRouteStopView } from '../miniprogram/services/map/current-transit-map.service'
+import type { SheetGeometry, SheetSnap } from '../miniprogram/services/map/map-sheet-layout'
 
 interface PageData {
+  sheetSnap: SheetSnap
+  sheetGeometry: SheetGeometry
+  focusedSearchField: string
+  keyboardHeight: number
+  journeyPreview: { boardingName: string; alightingName: string; title: string } | null
   viewMode: string
   showAllRoutes: boolean
   referenceReverse: boolean
@@ -63,6 +69,7 @@ interface JourneyPage {
   handleRouteChange(event: Event): void
   handleOriginChange(event: { detail: { value: string } }): void
   handleDestinationChange(event: { detail: { value: string } }): void
+  handleExactStopChange(event: Event & { detail: { value: string } }): void
   handlePlanJourney(): void
   handleShowJourney(event: Event): void
   handleOpenStop(event: Event): void
@@ -81,6 +88,15 @@ interface JourneyPage {
   handleCampusOverview(): void
   handleBeibeiOverview(): void
   handleMapLocate(): Promise<void>
+  setSheetSnap(snap: SheetSnap): void
+  handleSheetGestureEnd(value: { snap: string; epoch: number }): void
+  handleOpenPlanner(): void
+  handleBrowseRoutes(): void
+  handleShowJourneyDetails(): void
+  handleSwapEndpoints(): void
+  handleDismissKeyboard(): void
+  onResize(event: { size: { windowWidth: number; windowHeight: number } }): void
+  handleKeyboardHeightChange(event: { detail: { height: number }; currentTarget: { dataset: { field: string } } }): void
 }
 
 function createRuntime(deferRendering = false, deferMapMeasurement = false) {
@@ -93,8 +109,10 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
   const fitPadding: number[][] = []
   const pendingMapMeasurement: ((rect: { width: number; height: number }) => void)[] = []
   const openedStops: Coordinate[] = []
+  let mapPayloadWrites = 0
   let page: JourneyPage | undefined
   const wx = {
+    getWindowInfo() { return { windowWidth: 375, windowHeight: 667, screenHeight: 667, safeArea: { bottom: 667 } } },
     createMapContext() {
       return { setBoundary() {}, moveToLocation(point: Coordinate) { cameraMoves.push(point) }, includePoints(options: { points: Coordinate[]; padding: number[] }) {
         fitPoints.push(options.points)
@@ -140,6 +158,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
       Page(configuration: JourneyPage) {
         page = Object.assign(configuration, {
           setData(this: JourneyPage, update: Partial<PageData>, callback?: () => void) {
+            if ('mapPolylines' in update) mapPayloadWrites += 1
             Object.assign(this.data, update)
             if (callback && deferRendering) pendingRendering.push(callback)
             else callback?.()
@@ -150,7 +169,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
     return module.exports
   }
   return {
-    fitPoints, fitPadding, openedStops, cameraMoves,
+    fitPoints, fitPadding, openedStops, cameraMoves, mapPayloadWrites: () => mapPayloadWrites,
     flushMapMeasurements(width = 390, height = 294) {
       pendingMapMeasurement.splice(0).forEach((callback) => callback({ width, height }))
     },
@@ -229,7 +248,7 @@ test('fitting a compact map leaves a usable viewport after reserving marker labe
   page.onReady()
   runtime.flushMapMeasurements(280, 100)
   const [top, right, bottom, left] = runtime.fitPadding[0]
-  assert.ok(top > bottom, 'above-marker callouts need more space than the bottom edge')
+  assert.ok(top > 0 && bottom > 0, 'search chrome, callouts and the bottom sheet all need map space')
   assert.ok(top + bottom < 100)
   assert.ok(left + right < 280)
 })
@@ -353,7 +372,7 @@ test('a hidden page discards a pending location instead of resurrecting old orig
   runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
   await locating
   page.onShow()
-  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originMode, 'search')
   assert.equal(page.data.originCoordinate, null)
 })
 
@@ -371,7 +390,7 @@ test('a failed location refresh cannot silently reuse a previous successful GPS 
   assert.equal(page.data.originCoordinate, null, 'refresh must invalidate the old fix before completion')
   runtime.rejectLocation()
   await retry
-  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originMode, 'search')
   assert.equal(page.data.originCoordinate, null)
   assert.equal(page.data.locating, false)
 })
@@ -391,7 +410,7 @@ test('refreshing location then hiding or changing destination leaves no old fix 
   await refresh
   page.onShow()
   assert.equal(page.data.originCoordinate, null)
-  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originMode, 'search')
   assert.equal(page.data.locating, false)
   assert.doesNotMatch(page.data.locationMessage, /正在定位/)
   const pending = page.handleUseLocation()
@@ -533,9 +552,10 @@ test('map selection requires an explicit field, validates coordinates and suppor
   const page = runtime.page()
   page.onLoad()
   page.onReady()
+  page.handleDestinationChange({ detail: { value: '1' } })
   const point = { ...runtime.dataset().stops[0].coordinate }
   page.handleMapTap({ detail: point })
-  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originMode, 'search')
   page.handleStartMapSelection({ currentTarget: { dataset: { field: 'destination' } } })
   page.handleCancelMapSelection()
   page.handleMapTap({ detail: point })
@@ -669,7 +689,7 @@ test('map-only location preserves planned endpoints and a later overview prevent
   const cameraCount = runtime.cameraMoves.length
   runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
   await locating
-  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originMode, 'search')
   assert.equal(page.data.originIndex, oldOrigin)
   assert.equal(page.data.mapLocation?.latitude, 29.82)
   assert.equal(runtime.cameraMoves.length, cameraCount)
@@ -698,4 +718,152 @@ test('switching tabs or hiding cancels the map-only locating status and discards
   assert.equal(page.data.mapLocating, false)
   assert.doesNotMatch(page.data.mapLocationMessage, /正在定位/)
   assert.equal(page.data.mapLocation, null)
+})
+
+test('glass home requires explicitly confirmed endpoints instead of preset example stations', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  assert.equal(page.data.originQuery, '')
+  assert.equal(page.data.destinationQuery, '')
+  page.handlePlanJourney()
+  assert.equal(page.data.journeys.length, 0)
+  assert.equal(page.data.sheetSnap, 'full')
+  searchInput(page, 'destination', '校医院')
+  selectSuggestion(page, 'destination', '校医院')
+  assert.equal(page.data.journeys.length, 0, 'a destination alone must not select a default origin')
+})
+
+test('settled sheet state controls map fitting and stale drag completion is ignored', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  const epoch = page.data.sheetGeometry.epoch
+  page.setSheetSnap('full')
+  const fits = runtime.fitPoints.length
+  page.handleSheetGestureEnd({ snap: 'peek', epoch })
+  assert.equal(page.data.sheetSnap, 'full')
+  assert.equal(runtime.fitPoints.length, fits)
+  page.handleSheetGestureEnd({ snap: 'peek', epoch: page.data.sheetGeometry.epoch })
+  assert.equal(page.data.sheetSnap, 'peek')
+  assert.ok(runtime.fitPoints.length > fits)
+})
+
+test('compact recommendation and editing stay on the same map and preserve the selected journey', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  page.handlePlanJourney()
+  const selected = page.data.selectedJourneyId
+  assert.equal(page.data.sheetSnap, 'peek')
+  assert.equal(page.data.journeyPreview?.boardingName, '经管院')
+  assert.equal(page.data.journeyPreview?.alightingName, '校医院')
+  page.handleShowJourneyDetails()
+  assert.equal(page.data.sheetSnap, 'full')
+  page.handleBrowseRoutes()
+  page.handleOpenPlanner()
+  assert.equal(page.data.selectedJourneyId, selected)
+})
+
+test('failed GPS has no default origin but can fall back to a genuinely confirmed station', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  let request = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  runtime.rejectLocation()
+  await request
+  assert.equal(page.data.originMode, 'search')
+  assert.equal(page.data.originQuery, '')
+  page.handleOriginChange({ detail: { value: '2' } })
+  request = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  runtime.rejectLocation()
+  await request
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originIndex, 2)
+})
+
+test('typing several characters does not resend unchanged map geometry on each input', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  const writes = runtime.mapPayloadWrites()
+  for (const value of ['中', '中心', '中心图', '中心图书馆']) searchInput(page, 'destination', value)
+  assert.equal(runtime.mapPayloadWrites(), writes)
+  assert.equal(page.data.sheetSnap, 'full', 'active input must expose its suggestions in the sheet')
+})
+
+test('swapping confirmed endpoints replans the opposite source geometry without changing stop identities', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.handleOriginChange({ detail: { value: '54' } })
+  page.handleDestinationChange({ detail: { value: '68' } })
+  page.handlePlanJourney()
+  page.handleSwapEndpoints()
+  assert.equal(page.data.originIndex, 68)
+  assert.equal(page.data.destinationIndex, 54)
+  assert.equal(page.data.journeys[0].legs[0].directionId, 'reverse')
+  assert.equal(page.data.journeys[0].legs[0].points.length, 61)
+})
+
+test('keyboard space shrinks only the visible sheet scroll area and stale keyboard events cannot reopen it', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.handleOpenPlanner()
+  const fullHeight = page.data.sheetGeometry.scrollHeight
+  page.handleKeyboardHeightChange({ currentTarget: { dataset: { field: 'destination' } }, detail: { height: 220 } })
+  assert.equal(page.data.sheetGeometry.scrollHeight, fullHeight - 220)
+  page.onResize({ size: { windowWidth: 375, windowHeight: 447 } })
+  assert.equal(page.data.sheetGeometry.windowHeight, 667)
+  page.handleKeyboardHeightChange({ currentTarget: { dataset: { field: 'destination' } }, detail: { height: 0 } })
+  assert.equal(page.data.focusedSearchField, '', 'dismissing the keyboard must not refocus a recreated sheet input')
+  page.handleDismissKeyboard()
+  assert.equal(page.data.sheetGeometry.scrollHeight, fullHeight)
+  page.handleKeyboardHeightChange({ currentTarget: { dataset: { field: 'destination' } }, detail: { height: 220 } })
+  assert.equal(page.data.keyboardHeight, 0)
+})
+
+test('search focus waits for the expanded sheet to mount and is canceled by a newer browse action', () => {
+  const runtime = createRuntime(true)
+  const page = runtime.page()
+  page.onLoad()
+  page.handleOpenPlanner()
+  assert.equal(page.data.focusedSearchField, '', 'the hidden field must not receive focus before rendering')
+  page.handleBrowseRoutes()
+  runtime.flushRendering()
+  assert.equal(page.data.focusedSearchField, '')
+  page.handleOpenPlanner()
+  runtime.flushRendering()
+  assert.equal(page.data.focusedSearchField, 'destination')
+})
+
+test('an unconfirmed exact picker has a placeholder so selecting the first real station is a change', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.handleExactStopChange({ currentTarget: { dataset: { field: 'origin' } }, detail: { value: '0' } })
+  assert.equal(page.data.originMode, 'search')
+  page.handleExactStopChange({ currentTarget: { dataset: { field: 'origin' } }, detail: { value: '1' } })
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originIndex, 0)
+})
+
+test('planning from a focused confirmed input clears keyboard space before building the compact card', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  page.handleOpenPlanner()
+  page.handleKeyboardHeightChange({ currentTarget: { dataset: { field: 'destination' } }, detail: { height: 250 } })
+  page.handlePlanJourney()
+  assert.equal(page.data.sheetSnap, 'peek')
+  assert.equal(page.data.keyboardHeight, 0)
+  assert.ok(page.data.sheetGeometry.scrollHeight >= 116, 'the compact route card must remain visible after keyboard dismissal')
 })
