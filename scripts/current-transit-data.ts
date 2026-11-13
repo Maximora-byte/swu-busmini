@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import type { Coordinate } from '../miniprogram/models/index'
 import type { TransitDataset, TransitStop, TransitVisit } from '../miniprogram/models/current-transit'
 import { distanceBetween } from '../miniprogram/utils/distance'
+import { MAX_AUTOMATIC_BOARDING_OFFSET_METERS } from '../miniprogram/services/navigation/transit-visit-policy'
 
 export interface CurrentTransitSource {
   source: string
@@ -137,8 +138,15 @@ function parseSource(value: unknown): CurrentTransitSource {
   return { source: text(item.source), observedAt: date(item.observedAt), routes }
 }
 
-function project(point: Coordinate, points: Coordinate[], cumulative: number[]): Omit<TransitVisit, 'stopId' | 'sourceIndex'> {
-  let best: Omit<TransitVisit, 'stopId' | 'sourceIndex'> | undefined
+type Projection = Omit<TransitVisit, 'stopId' | 'sourceIndex'>
+
+function nearestProjection(
+  point: Coordinate,
+  points: Coordinate[],
+  cumulative: number[],
+  accept: (projection: Projection) => boolean = () => true,
+): Projection | undefined {
+  let best: Projection | undefined
   for (let segmentIndex = 0; segmentIndex < points.length - 1; segmentIndex++) {
     const start = points[segmentIndex]
     const end = points[segmentIndex + 1]
@@ -152,13 +160,39 @@ function project(point: Coordinate, points: Coordinate[], cumulative: number[]):
     const ratio = Math.max(0, Math.min(1, (px * dx + py * dy) / (dx * dx + dy * dy)))
     const projected = { latitude: start.latitude + ratio * dy, longitude: start.longitude + ratio * (end.longitude - start.longitude) }
     const offsetMeters = distanceBetween(point, projected)
+    const candidate = { segmentIndex, ratio, mileageMeters: cumulative[segmentIndex] + length * ratio, offsetMeters }
+    if (!accept(candidate)) continue
     if (!best || offsetMeters < best.offsetMeters - 1e-9) {
-      best = { segmentIndex, ratio, mileageMeters: cumulative[segmentIndex] + length * ratio, offsetMeters }
+      best = candidate
     }
   }
+  return best
+}
+
+function project(point: Coordinate, points: Coordinate[], cumulative: number[]): Projection {
+  const best = nearestProjection(point, points, cumulative)
   if (!best) throw new Error('Current geometry has zero length / 长度为零')
   if (best.offsetMeters > 150) throw new Error('Station offset 偏离 published route exceeds 150 meters')
   return best
+}
+
+export interface PublishedRouteReturn extends Projection {
+  remainingMeters: number
+}
+
+/** Mathematical near-return only: no cyclic service, extra edge, direction or coordinate is inferred. */
+export function analyzePublishedRouteReturn(points: Coordinate[]): PublishedRouteReturn | undefined {
+  if (points.length < 3) return undefined
+  const cumulative = [0]
+  for (let index = 1; index < points.length; index++) {
+    cumulative.push(cumulative[index - 1] + distanceBetween(points[index - 1], points[index]))
+  }
+  const totalMeters = cumulative[cumulative.length - 1]
+  const projection = nearestProjection(points[points.length - 1], points, cumulative, (candidate) =>
+    candidate.segmentIndex < points.length - 2 &&
+    candidate.mileageMeters > 0 && totalMeters - candidate.mileageMeters >= 200)
+  if (!projection || projection.offsetMeters > 2) return undefined
+  return { ...projection, remainingMeters: totalMeters - projection.mileageMeters }
 }
 
 /** Deterministic, development-only projection and identity generation from the public static allowlist. */
@@ -182,8 +216,11 @@ export function buildCurrentTransitDataset(input: unknown): TransitDataset {
       stops.set(stopId, { id: stopId, name: station.name, coordinate: rounded })
       return { stopId, sourceIndex, ...project(rounded, route.points, cumulative) }
     }).sort((left, right) => left.mileageMeters - right.mileageMeters || left.sourceIndex - right.sourceIndex)
-    const warnings = visits.filter((visit) => visit.offsetMeters > 35).map((visit) =>
-      `「${stops.get(visit.stopId)!.name}」偏离发布轨迹约 ${Math.round(visit.offsetMeters)} 米（超过35米），请结合现场确认。`)
+    const warnings = visits.filter((visit) => visit.offsetMeters > MAX_AUTOMATIC_BOARDING_OFFSET_METERS).map((visit) =>
+      `「${stops.get(visit.stopId)!.name}」偏离发布轨迹约 ${Math.round(visit.offsetMeters)} 米（超过${MAX_AUTOMATIC_BOARDING_OFFSET_METERS}米），位置待核对，暂不作为本线路自动上下车/换乘点；未判定实际停靠情况。`)
+    if (analyzePublishedRouteReturn(route.points)) {
+      warnings.push('发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。')
+    }
     return { id: route.id, name: route.name, color: route.color, points: route.points, visits, warnings }
   })
   return {

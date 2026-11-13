@@ -4,6 +4,7 @@ import type { Coordinate } from '../miniprogram/models/index'
 import type { TransitDataset, TransitRoute, TransitStop, TransitVisit } from '../miniprogram/models/current-transit'
 import { currentTransitDataset } from '../miniprogram/data/current-transit'
 import { createTransitJourneyService, transitJourneyService } from '../miniprogram/services/navigation/transit-journey.service'
+import { isAutomaticBoardingVisit } from '../miniprogram/services/navigation/transit-visit-policy'
 
 const p = (longitude: number, latitude = 29.81): Coordinate => ({ latitude, longitude })
 const stop = (id: string, coordinate: Coordinate, name = id): TransitStop => ({ id, name, coordinate })
@@ -25,13 +26,19 @@ function assertPoints(actual: Coordinate[], expected: Coordinate[]): void {
   })
 }
 
+test('automatic boarding admits the inclusive 35-meter boundary and rejects nonfinite or negative offsets', () => {
+  for (const [offsetMeters, eligible] of [[0, true], [35, true], [35.000001, false], [55, false], [-1, false], [NaN, false], [Infinity, false], [-Infinity, false]] as const) {
+    assert.equal(isAutomaticBoardingVisit({ offsetMeters }), eligible, `offset ${offsetMeters}`)
+  }
+})
+
 // These fixtures catch using endpoint coordinates as roads, losing reverse direction,
 // or re-finding repeated stops by ID instead of retaining their visit occurrence.
 test('direct and reverse journeys crop to projected anchors and retain internal source vertices', () => {
   const points = [p(106.420), p(106.421), p(106.422), p(106.423)]
   const data = dataset([
-    stop('a', p(106.42025, 29.8105)), stop('b', p(106.421)), stop('c', p(106.42275)),
-  ], [route('r', points, [visit('a', 0, .25, 25, 55), visit('b', 1, 0, 100), visit('c', 2, .75, 275)], ['轨迹发布范围未闭合'])])
+    stop('a', p(106.42025, 29.8102)), stop('b', p(106.421)), stop('c', p(106.42275)),
+  ], [route('r', points, [visit('a', 0, .25, 25, 35), visit('b', 1, 0, 100), visit('c', 2, .75, 275)], ['轨迹发布范围未闭合'])])
   const service = createTransitJourneyService(data)
   const forward = service.plan(endpoint('a'), endpoint('c')).journeys[0]
   assert.equal(forward.legs.length, 1)
@@ -43,7 +50,6 @@ test('direct and reverse journeys crop to projected anchors and retain internal 
   assert.equal(forward.rideDistanceMeters, 250)
   assert.equal(forward.accessDistanceMeters, 0)
   assert.equal(forward.egressDistanceMeters, 0)
-  assert.ok(forward.warnings.some((warning) => warning.includes('55') && warning.includes('偏移')))
   assert.ok(forward.warnings.includes('轨迹发布范围未闭合'))
   const reverse = service.plan(endpoint('c'), endpoint('a')).journeys[0].legs[0]
   assert.equal(reverse.directionId, 'reverse')
@@ -228,7 +234,10 @@ test('caller mutations cannot change later geometry or warnings', () => {
   const input = dataset([stop('a', a), stop('b', b)], [route('r', [a, b], [visit('a', 0, 0, 0), visit('b', 0, 1, 100)], ['公开数据'])])
   const service = createTransitJourneyService(input)
   input.routes[0].points[0].latitude = 0
-  const first = service.plan(endpoint('a'), endpoint('b')).journeys[0]
+  input.stops.length = 0
+  const firstResult = service.plan(endpoint('a'), endpoint('b'))
+  assert.equal(firstResult.journeys.length, 1)
+  const first = firstResult.journeys[0]
   first.legs[0].points[0].latitude = 0
   first.legs[0].stopIds.push('injected')
   first.warnings.push('injected')
@@ -269,4 +278,101 @@ test('published route 1 and 2 connect at exact shared 5号门 instead of merging
   assert.deepEqual(viaGate5.legs.map((leg) => [leg.boardingVisitIndex, leg.alightingVisitIndex]), [[0, 15], [14, 13]])
   assert.ok(result.journeys.every((journey) => journey.legs.length === 2))
   assert.ok(result.journeys.every((journey) => journey.legs.every((leg) => leg.routeId !== 'route_9')))
+})
+
+test('off-route visits cannot be automatic endpoints but do not truncate source geometry or occurrence indices', () => {
+  const a = p(106.410), x = p(106.420), d = p(106.430)
+  const data = dataset([stop('a', a), stop('x', p(106.420, 29.8105)), stop('d', d)], [
+    route('r', [a, x, d], [visit('a', 0, 0, 0), visit('x', 1, 0, 1000, 55), visit('d', 1, 1, 2000)]),
+  ])
+  const snapshot = JSON.stringify(data)
+  const service = createTransitJourneyService(data)
+  const fromX = service.plan(endpoint('x'), endpoint('d'))
+  assert.deepEqual(fromX.journeys, [])
+  assert.match(fromX.message, /待核对|核对/)
+  assert.deepEqual(service.plan(endpoint('a'), endpoint('x')).journeys, [])
+  const through = service.plan(endpoint('a'), endpoint('d')).journeys[0]
+  assert.deepEqual(through.legs[0].stopIds, ['a', 'd'])
+  assert.equal(through.legs[0].boardingVisitIndex, 0)
+  assert.equal(through.legs[0].alightingVisitIndex, 2)
+  assert.deepEqual(through.legs[0].points, [a, x, d])
+  assert.equal(through.rideDistanceMeters, 2000)
+  assert.ok(through.warnings.some((warning) => warning.includes('待核对') && warning.includes('55')))
+  const reverse = service.plan(endpoint('d'), endpoint('a')).journeys[0].legs[0]
+  assert.deepEqual(reverse.stopIds, ['d', 'a'])
+  assert.deepEqual(reverse.points, [d, x, a])
+  assert.equal(reverse.boardingVisitIndex, 2)
+  assert.equal(reverse.alightingVisitIndex, 0)
+  assert.equal(JSON.stringify(data), snapshot)
+})
+
+test('GPS candidates exclude stops whose only published visit is quarantined', () => {
+  const a = p(106.410), x = p(106.420), d = p(106.430)
+  const service = createTransitJourneyService(dataset([stop('a', a), stop('x', x), stop('d', d)], [
+    route('r', [a, x, d], [visit('a', 0, 0, 0), visit('x', 1, 0, 1000, 55), visit('d', 1, 1, 2000)]),
+  ]))
+  const result = service.plan({ kind: 'coordinate', coordinate: x }, endpoint('d'))
+  assert.deepEqual(result.journeys, [])
+  assert.match(result.message, /800|核对|范围/)
+})
+
+test('quarantine is route-scoped and prevents either side of an otherwise exact-ID transfer', () => {
+  const a = p(106.420), x = p(106.421), d = p(106.422)
+  for (const [firstOffset, secondOffset] of [[55, 0], [0, 55]]) {
+    const service = createTransitJourneyService(dataset([stop('a', a), stop('x', x), stop('d', d)], [
+      route('first', [a, x], [visit('a', 0, 0, 0), visit('x', 0, 1, 100, firstOffset)]),
+      route('second', [x, d], [visit('x', 0, 0, 0, secondOffset), visit('d', 0, 1, 100)]),
+    ]))
+    assert.deepEqual(service.plan(endpoint('a'), endpoint('d')).journeys, [])
+    if (firstOffset === 0) {
+      assert.equal(service.plan(endpoint('a'), endpoint('x')).journeys[0].legs[0].routeId, 'first')
+      assert.deepEqual(service.plan(endpoint('x'), endpoint('d')).journeys, [])
+    } else {
+      assert.equal(service.plan(endpoint('x'), endpoint('d')).journeys[0].legs[0].routeId, 'second')
+      assert.equal(service.plan({ kind: 'coordinate', coordinate: x }, endpoint('d')).journeys[0].legs[0].routeId, 'second')
+      assert.deepEqual(service.plan(endpoint('a'), endpoint('x')).journeys, [])
+      assert.deepEqual(service.plan(endpoint('x'), endpoint('a')).journeys, [])
+    }
+  }
+})
+
+test('published 3B 2号门 is quarantined for boarding and alighting while route 3 and other 3B stops stay usable', () => {
+  const route3B = currentTransitDataset.routes.find((item) => item.id === 'route_3b')!
+  const route3 = currentTransitDataset.routes.find((item) => item.id === 'route_3')!
+  const gate2 = 'stop_d10213da43f348b4'
+  const origin = route3B.visits[0].stopId
+  const destination = route3B.visits[route3B.visits.length - 1].stopId
+  const snapshot = JSON.stringify(currentTransitDataset)
+  assert.ok(route3B.visits.find((item) => item.stopId === gate2)!.offsetMeters > 83)
+  const only3B = createTransitJourneyService({ ...currentTransitDataset, routes: [route3B] })
+  assert.deepEqual(only3B.plan(endpoint(gate2), endpoint(destination)).journeys, [])
+  assert.deepEqual(only3B.plan(endpoint(origin), endpoint(gate2)).journeys, [])
+  const ordinary3B = only3B.plan(endpoint(origin), endpoint(destination)).journeys[0].legs[0]
+  assert.equal(ordinary3B.routeId, 'route_3b')
+  assert.ok(!ordinary3B.stopIds.includes(gate2))
+  assert.equal(ordinary3B.boardingVisitIndex, 0)
+  assert.equal(ordinary3B.alightingVisitIndex, 18)
+  const only3 = createTransitJourneyService({ ...currentTransitDataset, routes: [route3] })
+  assert.equal(only3.plan(endpoint(gate2), endpoint(route3.visits[0].stopId)).journeys[0].legs[0].routeId, 'route_3')
+  const combined = createTransitJourneyService({ ...currentTransitDataset, routes: [route3B, route3] })
+  const fromSharedStop = combined.plan(endpoint(gate2), endpoint(origin)).journeys
+  assert.ok(fromSharedStop.length)
+  assert.ok(fromSharedStop.every((journey) => journey.legs.every((leg) =>
+    leg.routeId !== 'route_3b' || (leg.boardingStopId !== gate2 && leg.alightingStopId !== gate2))))
+  assert.equal(JSON.stringify(currentTransitDataset), snapshot)
+})
+
+test('published 3B cannot transfer at its quarantined 2号门 even when it is the only shared available visit', () => {
+  const route3B = currentTransitDataset.routes.find((item) => item.id === 'route_3b')!
+  const route3 = currentTransitDataset.routes.find((item) => item.id === 'route_3')!
+  const gate2 = 'stop_d10213da43f348b4'
+  const taoyuan = 'stop_303888fcc2579cea'
+  const apartment = 'stop_ce61f1a750a9320c'
+  // Restrict route 3 boarding choices to isolate this particular real shared stop;
+  // both lines retain their complete published geometry and measured visit offsets.
+  const restrictedRoute3 = { ...route3, visits: route3.visits.filter((item) => item.stopId === gate2 || item.stopId === taoyuan) }
+  const service = createTransitJourneyService({ ...currentTransitDataset, routes: [route3B, restrictedRoute3] })
+  assert.deepEqual(service.plan(endpoint(apartment), endpoint(taoyuan)).journeys, [])
+  assert.deepEqual(service.plan(endpoint(taoyuan), endpoint(apartment)).journeys, [])
+  assert.equal(service.plan(endpoint(gate2), endpoint(taoyuan)).journeys[0].legs[0].routeId, 'route_3')
 })

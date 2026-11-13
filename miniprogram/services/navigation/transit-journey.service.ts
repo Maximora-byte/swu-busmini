@@ -2,6 +2,7 @@ import type { Coordinate } from '../../models/index'
 import type { TransitDataset, TransitRoute, TransitStop, TransitVisit } from '../../models/current-transit'
 import { distanceBetween } from '../../utils/distance'
 import { currentTransitRepository } from '../repository/current-transit.repository'
+import { isAutomaticBoardingVisit } from './transit-visit-policy'
 
 export type TransitJourneyEndpoint = { kind: 'stop'; stopId: string } | { kind: 'coordinate'; coordinate: Coordinate }
 export interface TransitJourneyLeg {
@@ -82,7 +83,7 @@ function toLeg(ride: Ride): TransitJourneyLeg {
     alightingStopId: route.visits[alightingIndex].stopId,
     boardingVisitIndex: boardingIndex,
     alightingVisitIndex: alightingIndex,
-    stopIds: visits.map((visit) => visit.stopId),
+    stopIds: visits.filter(isAutomaticBoardingVisit).map((visit) => visit.stopId),
     points: ridePoints(ride),
     distanceMeters: ride.distanceMeters,
   }
@@ -90,9 +91,12 @@ function toLeg(ride: Ride): TransitJourneyLeg {
 
 function rideWarnings(ride: Ride): string[] {
   const warnings = [...ride.route.warnings]
-  for (const [label, index] of [['上车站', ride.boardingIndex], ['下车站', ride.alightingIndex]] as const) {
-    const offset = ride.route.visits[index].offsetMeters
-    if (offset > 35) warnings.push(`${label}与公布轨迹偏移约 ${Math.round(offset)} 米，乘车区段按轨迹投影显示。`)
+  const first = Math.min(ride.boardingIndex, ride.alightingIndex)
+  const last = Math.max(ride.boardingIndex, ride.alightingIndex)
+  for (const visit of ride.route.visits.slice(first, last + 1)) {
+    if (!isAutomaticBoardingVisit(visit)) {
+      warnings.push(`本区段含待核对位置（偏移约 ${Math.round(visit.offsetMeters)} 米），暂不作为本线路自动上下车或换乘点。`)
+    }
   }
   return warnings
 }
@@ -100,24 +104,27 @@ function rideWarnings(ride: Ride): string[] {
 /** Static plans cover only the published open path and at most one exact-ID transfer. */
 export function createTransitJourneyService(dataset: TransitDataset): TransitJourneyService {
   // Keep factory inputs and returned map geometry from becoming mutable shared state.
+  const hasSourceStops = dataset.stops.length > 0
   const routes = dataset.routes.map((route) => ({
     ...route,
     points: route.points.map(copyPoint),
     visits: route.visits.map((visit) => ({ ...visit })),
     warnings: [...route.warnings],
   }))
-  const usedStops = new Set(routes.flatMap((route) => route.visits.map((visit) => visit.stopId)))
+  const currentStopIds = new Set(routes.flatMap((route) => route.visits.map((visit) => visit.stopId)))
+  const usedStops = new Set(routes.flatMap((route) => route.visits.filter(isAutomaticBoardingVisit).map((visit) => visit.stopId)))
   const stops = dataset.stops.filter((stop) => usedStops.has(stop.id)).map((stop) => ({ ...stop, coordinate: copyPoint(stop.coordinate) }))
   const stopsById = new Map(stops.map((stop) => [stop.id, stop]))
   const ridesByOrigin = new Map<string, Map<string, Ride[]>>()
   for (const route of routes) {
     for (let boardingIndex = 0; boardingIndex < route.visits.length; boardingIndex += 1) {
       const boarding = route.visits[boardingIndex]
-      if (!stopsById.has(boarding.stopId)) continue
+      if (!isAutomaticBoardingVisit(boarding) || !stopsById.has(boarding.stopId)) continue
       for (let alightingIndex = 0; alightingIndex < route.visits.length; alightingIndex += 1) {
         const alighting = route.visits[alightingIndex]
         const distanceMeters = Math.abs(alighting.mileageMeters - boarding.mileageMeters)
-        if (boarding.stopId === alighting.stopId || !stopsById.has(alighting.stopId) || distanceMeters <= 1) continue
+        if (!isAutomaticBoardingVisit(alighting) || boarding.stopId === alighting.stopId ||
+          !stopsById.has(alighting.stopId) || distanceMeters <= 1) continue
         let destinations = ridesByOrigin.get(boarding.stopId)
         if (!destinations) ridesByOrigin.set(boarding.stopId, destinations = new Map())
         let rides = destinations.get(alighting.stopId)
@@ -131,7 +138,9 @@ export function createTransitJourneyService(dataset: TransitDataset): TransitJou
     if (endpoint?.kind === 'stop') {
       const stop = stopsById.get(endpoint.stopId)
       return stop ? { candidates: [{ stop, distanceMeters: 0 }], message: '' } :
-        { candidates: [], message: '所选站点不在当前公布线路中，请重新选择。' }
+        { candidates: [], message: currentStopIds.has(endpoint.stopId) ?
+          '所选站点的位置待核对，暂不作为其线路自动上下车点，请重新选择。' :
+          '所选站点不在当前公布线路中，请重新选择。' }
     }
     if (endpoint?.kind !== 'coordinate' || !isCoordinate(endpoint.coordinate)) {
       return { candidates: [], message: '地点坐标无效，请重新选择或重新定位。' }
@@ -145,7 +154,8 @@ export function createTransitJourneyService(dataset: TransitDataset): TransitJou
 
   return {
     plan(origin, destination) {
-      if (!routes.length || !stops.length) return { journeys: [], message: '暂无当前线路数据，不能提供乘车方案。' }
+      if (!routes.length || !hasSourceStops) return { journeys: [], message: '暂无当前线路数据，不能提供乘车方案。' }
+      if (!stops.length) return { journeys: [], message: '当前公布站点的位置仍待核对，暂不能生成自动上下车方案。' }
       const from = candidates(origin)
       const to = candidates(destination)
       if (from.message || to.message) return { journeys: [], message: from.message || to.message }
@@ -188,7 +198,7 @@ export function createTransitJourneyService(dataset: TransitDataset): TransitJou
         a.rideDistanceMeters - b.rideDistanceMeters || a.id.localeCompare(b.id)).slice(0, MAX_JOURNEYS)
       return {
         journeys: ranked,
-        message: ranked.length ? '按换乘次数、接驳直线距离和乘车里程排序；仅提供静态方案。' :
+        message: ranked.length ? '按公布路径生成候选，实际运营方向尚待核对；按换乘次数、接驳直线距离和乘车里程排序。' :
           '当前公布路径范围内没有直达或一次换乘方案。',
       }
     },

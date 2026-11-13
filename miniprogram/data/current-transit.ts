@@ -2849,7 +2849,7 @@ export const currentTransitDataset: TransitDataset = {
         }
       ],
       "warnings": [
-        "「2号门」偏离发布轨迹约 83 米（超过35米），请结合现场确认。"
+        "「2号门」偏离发布轨迹约 83 米（超过35米），位置待核对，暂不作为本线路自动上下车/换乘点；未判定实际停靠情况。"
       ]
     },
     {
@@ -4020,7 +4020,9 @@ export const currentTransitDataset: TransitDataset = {
           "offsetMeters": 5.238714151905164
         }
       ],
-      "warnings": []
+      "warnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ]
     },
     {
       "id": "route_7",
@@ -4474,7 +4476,9 @@ export const currentTransitDataset: TransitDataset = {
           "offsetMeters": 2.854159000330478
         }
       ],
-      "warnings": []
+      "warnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ]
     },
     {
       "id": "route_8",
@@ -4824,7 +4828,9 @@ export const currentTransitDataset: TransitDataset = {
           "offsetMeters": 1.3491830978018786
         }
       ],
-      "warnings": []
+      "warnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ]
     },
     {
       "id": "route_jingguan",

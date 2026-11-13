@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
 import type { TransitDataset } from '../miniprogram/models/current-transit'
-import { buildCurrentTransitDataset, sanitizeCurrentTransitSource, syncCurrentTransitData } from '../scripts/current-transit-data'
+import { analyzePublishedRouteReturn as analyzeReturn, buildCurrentTransitDataset, sanitizeCurrentTransitSource, syncCurrentTransitData } from '../scripts/current-transit-data'
 import safeSource from '../miniprogram/data/current-transit-source.json'
 import publishedData from '../miniprogram/data/current-transit.json'
 import { currentTransitDataset } from '../miniprogram/data/current-transit'
@@ -157,4 +157,85 @@ test('the committed safe source reproduces both runtime mirrors without adding r
     }
   }
   assert.doesNotMatch(JSON.stringify(safeSource), /schoolId|school_id|line_id|sign|account|endpoint|[A-Z]:\\\\/)
+})
+
+test('near-return diagnostics locate the earlier stem anchor without changing a lollipop-shaped published path', () => {
+  const points = [
+    { latitude: 29.82, longitude: 106.42 },
+    { latitude: 29.823, longitude: 106.42 },
+    { latitude: 29.823, longitude: 106.423 },
+    { latitude: 29.826, longitude: 106.423 },
+    { latitude: 29.826, longitude: 106.42 },
+    { latitude: 29.823, longitude: 106.42 },
+  ]
+  const original = structuredClone(points)
+  const evidence = analyzeReturn(points)
+  assert.ok(evidence)
+  assert.equal(evidence.segmentIndex, 0)
+  assert.equal(evidence.ratio, 1)
+  assert.ok(evidence.mileageMeters > 333 && evidence.mileageMeters < 334)
+  assert.equal(evidence.offsetMeters, 0)
+  assert.ok(evidence.remainingMeters > 1000)
+  assert.deepEqual(points, original)
+})
+
+test('near-return diagnostics exclude adjacent endpoint stretches, short excursions and returns to the whole-path start', () => {
+  const paths = [
+    [],
+    [{ latitude: 29.82, longitude: 106.42 }, { latitude: 29.821, longitude: 106.42 }],
+    [
+      { latitude: 29.82, longitude: 106.42 }, { latitude: 29.823, longitude: 106.42 },
+      { latitude: 29.823, longitude: 106.423 }, { latitude: 29.82300001, longitude: 106.42300001 },
+    ],
+    [
+      { latitude: 29.82, longitude: 106.42 }, { latitude: 29.821, longitude: 106.42 },
+      { latitude: 29.821, longitude: 106.4203 }, { latitude: 29.8213, longitude: 106.4203 },
+      { latitude: 29.8213, longitude: 106.42 }, { latitude: 29.821, longitude: 106.42 },
+    ],
+    [
+      { latitude: 29.82, longitude: 106.42 }, { latitude: 29.823, longitude: 106.42 },
+      { latitude: 29.823, longitude: 106.423 }, { latitude: 29.82, longitude: 106.423 },
+      { latitude: 29.82, longitude: 106.42 },
+    ],
+  ]
+  for (const points of paths) assert.equal(analyzeReturn(points), undefined)
+})
+
+test('published 6/7/8 warnings describe only middle near-returns and preserve all original points and visits', () => {
+  const expected = [
+    { id: 'route_6', segmentIndex: 27, ratio: 0.9847264517712059, mileage: 1880.4279741249916 },
+    { id: 'route_7', segmentIndex: 19, ratio: 0.9732362251081329, mileage: 1144.8254889260247 },
+    { id: 'route_8', segmentIndex: 4, ratio: 0.9750293288596082, mileage: 184.53008659404009 },
+  ]
+  const built = buildCurrentTransitDataset(safeSource)
+  for (const route of built.routes) {
+    const original = safeSource.routes.find(({ id }) => id === route.id)!
+    const baseline = publishedData.routes.find(({ id }) => id === route.id)!
+    assert.deepEqual(route.points, original.points)
+    assert.deepEqual(route.visits, baseline.visits)
+    const wanted = expected.find(({ id }) => id === route.id)
+    if (!wanted) {
+      assert.equal(analyzeReturn(route.points), undefined, route.id)
+      assert.ok(route.warnings.every((warning) => !warning.includes('中段近回接')), route.id)
+      continue
+    }
+    const evidence = analyzeReturn(route.points)!
+    assert.equal(evidence.segmentIndex, wanted.segmentIndex)
+    assert.ok(Math.abs(evidence.ratio - wanted.ratio) < 1e-8)
+    assert.ok(Math.abs(evidence.mileageMeters - wanted.mileage) < 0.001)
+    assert.ok(evidence.offsetMeters < 1)
+    assert.ok(evidence.remainingMeters > 2400)
+    assert.ok(route.warnings.some((warning) => /中段近回接/.test(warning) && /循环运营未确认/.test(warning) && /不补边/.test(warning)))
+  }
+})
+
+test('the 3B offset warning quarantines only automatic boarding and transfers without moving or deleting the source node', () => {
+  const built = buildCurrentTransitDataset(safeSource)
+  const route = built.routes.find(({ id }) => id === 'route_3b')!
+  const gate = route.visits.find(({ sourceIndex }) => sourceIndex === 3)!
+  assert.ok(gate.offsetMeters > 83 && gate.offsetMeters < 84)
+  assert.equal(route.visits.length, 19)
+  assert.deepEqual(built.stops.find(({ id }) => id === gate.stopId)?.coordinate, { latitude: 29.813849, longitude: 106.420523 })
+  assert.ok(route.warnings.some((warning) => /2号门/.test(warning) && /偏离发布轨迹/.test(warning) && /待核对/.test(warning) && /暂不作为本线路自动上下车\/换乘点/.test(warning)))
+  assert.deepEqual(route.points, safeSource.routes.find(({ id }) => id === 'route_3b')!.points)
 })

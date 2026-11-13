@@ -10,9 +10,11 @@
 .map-heading { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 8rpx 26rpx; background: #e8f1e9; }
 .map-title { font-size: 23rpx; color: #315e49; }
 .map-fit { margin: 0 0 0 10rpx; line-height: 40rpx; font-size: 21rpx; color: #315e49; background: #fff; }
-.journey-map { flex: 1; width: 100%; min-height: 240rpx; height: 0; }
+.review-status { flex: none; padding: 8rpx 26rpx; color: #876229; background: #fff8e8; font-size: 20rpx; line-height: 1.5; }
+.review-status text { display: block; }
+.journey-map { flex: 1; width: 100%; min-height: 200rpx; height: 0; }
 .stop-message { flex: none; padding: 8rpx 24rpx; font-size: 23rpx; color: #315e49; background: #e8f1e9; }
-.journey-content { flex: none; height: 52%; min-height: 0; }
+.journey-content { flex: 1; height: 0; min-height: 260rpx; }
 .journey-content__inner { padding: 22rpx 24rpx calc(30rpx + env(safe-area-inset-bottom)); }
 .journey-form { padding: 20rpx; background: #fff; border-radius: 18rpx; }
 .field-heading { display: flex; justify-content: space-between; align-items: center; margin: 8rpx 0 12rpx; color: #4b6758; font-size: 25rpx; }

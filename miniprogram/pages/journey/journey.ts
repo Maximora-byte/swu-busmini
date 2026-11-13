@@ -2,6 +2,7 @@ import type { Coordinate } from '../../models/index'
 import type { TransitDataset, TransitStop } from '../../models/current-transit'
 import { currentTransitRepository } from '../../services/repository/current-transit.repository'
 import { transitJourneyService, type TransitJourney, type TransitJourneyLeg } from '../../services/navigation/transit-journey.service'
+import { isAutomaticBoardingVisit } from '../../services/navigation/transit-visit-policy'
 import { locationService } from '../../services/location/location.service'
 import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT } from '../../services/map/map-viewport.service'
 
@@ -41,7 +42,8 @@ Page({
   cameraRequestVersion: 0,
   endpointRequestVersion: 0,
   data: {
-    sourceText: '', routeOptions: [] as { id: string; name: string }[], selectedRouteId: '', routeName: '',
+    sourceText: '', directionStatusText: '实际运营方向尚未独立确认，请现场核对。',
+    routeOptions: [] as { id: string; name: string }[], selectedRouteId: '', routeName: '',
     stopOptions: [] as { id: string; label: string }[], stopNames: [] as string[],
     originIndex: 0, destinationIndex: 0, originMode: 'stop', originCoordinate: null as Coordinate | null,
     locating: false, locationMessage: '', journeyMessage: '选择上、下车参考点，查询直达或一次换乘方案。',
@@ -55,16 +57,18 @@ Page({
   onLoad(query: { routeId?: string } = {}) {
     this.dataset = currentTransitRepository.getDataset()
     const dataset = this.dataset
+    const eligibleStopIds = new Set(dataset.routes.flatMap((route) => route.visits.filter(isAutomaticBoardingVisit).map(({ stopId }) => stopId)))
+    const planningStops = dataset.stops.filter(({ id }) => eligibleStopIds.has(id))
     const nameCounts = new Map<string, number>()
-    dataset.stops.forEach(({ name }) => nameCounts.set(name, (nameCounts.get(name) ?? 0) + 1))
-    const stopOptions = dataset.stops.map((stop) => {
-      const lines = dataset.routes.filter((route) => route.visits.some(({ stopId }) => stopId === stop.id)).map(({ name }) => name)
+    planningStops.forEach(({ name }) => nameCounts.set(name, (nameCounts.get(name) ?? 0) + 1))
+    const stopOptions = planningStops.map((stop) => {
+      const lines = dataset.routes.filter((route) => route.visits.some((visit) => visit.stopId === stop.id && isAutomaticBoardingVisit(visit))).map(({ name }) => name)
       return { id: stop.id, label: nameCounts.get(stop.name)! > 1 ? `${stop.name} · ${lines.join('/')}` : stop.name }
     })
     this.setData({
       sourceText: `${dataset.source} · ${dataset.observedAt}`,
       routeOptions: dataset.routes.map(({ id, name }) => ({ id, name })),
-      stopOptions, stopNames: stopOptions.map(({ label }) => label), destinationIndex: Math.min(1, stopOptions.length - 1),
+      stopOptions, stopNames: stopOptions.map(({ label }) => label), destinationIndex: stopOptions.length > 1 ? 1 : 0,
     })
     this.showRoute(dataset.routes.some(({ id }) => id === query.routeId) ? query.routeId! : dataset.routes[0].id)
   },
@@ -97,11 +101,17 @@ Page({
     if (!dataset || !route) return
     const version = ++this.cameraRequestVersion
     const ids = new Set(route.visits.map(({ stopId }) => stopId))
+    const eligibleIds = new Set(route.visits.filter(isAutomaticBoardingVisit).map(({ stopId }) => stopId))
     this.setData({
       selectedRouteId: route.id, routeName: route.name, selectedJourneyId: '', stopMessage: '',
       mapTitle: `${route.name} · 运营方发布轨迹`, routeWarnings: [...route.warnings],
       mapPolylines: [{ points: route.points, color: route.color, width: 7 }],
-      mapMarkers: dataset.stops.filter(({ id }) => ids.has(id)).map((stop) => marker(dataset, stop)),
+      mapMarkers: dataset.stops.filter(({ id }) => ids.has(id)).map((stop) => {
+        if (eligibleIds.has(stop.id)) return marker(dataset, stop)
+        const reviewMarker = marker(dataset, stop, '待核对 · ')
+        return { ...reviewMarker, title: `${stop.name}（待核对，暂不自动推荐）`,
+          callout: { ...reviewMarker.callout, color: '#956324' } }
+      }),
       mapFitPoints: route.points,
     }, () => { if (fit && version === this.cameraRequestVersion) this.fitMap() })
   },

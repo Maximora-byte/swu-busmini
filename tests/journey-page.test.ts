@@ -13,6 +13,7 @@ interface PageData {
   routeOptions: { id: string; name: string }[]
   selectedRouteId: string
   sourceText: string
+  directionStatusText: string
   stopOptions: { id: string; label: string }[]
   originIndex: number
   destinationIndex: number
@@ -24,7 +25,7 @@ interface PageData {
   locationMessage: string
   locating: boolean
   mapPolylines: { points: Coordinate[] }[]
-  mapMarkers: { stopId: string; latitude: number; longitude: number }[]
+  mapMarkers: { stopId: string; latitude: number; longitude: number; callout: { content: string } }[]
 }
 interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string } } }
 interface JourneyPage {
@@ -312,4 +313,42 @@ test('refreshing location then hiding or changing destination leaves no old fix 
   await pending
   assert.equal(page.data.originCoordinate, null)
   assert.doesNotMatch(page.data.locationMessage, /正在定位/)
+})
+
+test('an off-route source point stays visible for review without advertising that line as boardable', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad({ routeId: 'route_3b' })
+  const dataset = runtime.dataset()
+  const route = dataset.routes.find(({ id }) => id === 'route_3b')!
+  const suspect = route.visits.find(({ offsetMeters }) => offsetMeters > 35)!
+  const stop = dataset.stops.find(({ id }) => id === suspect.stopId)!
+  const marker = page.data.mapMarkers.find(({ stopId }) => stopId === stop.id)!
+  assert.ok(marker, 'published review point must remain on the source map')
+  assert.equal(marker.latitude, stop.coordinate.latitude)
+  assert.equal(marker.longitude, stop.coordinate.longitude)
+  assert.match(marker.callout.content, /待核对/)
+  const option = page.data.stopOptions.find(({ id }) => id === stop.id)!
+  assert.ok(option, 'the same physical record is still served by route 3')
+  assert.doesNotMatch(option.label, /3路B线/)
+  assert.match(option.label, /3号线/)
+  assert.match(page.data.directionStatusText, /运营方向.*未.*确认/)
+})
+
+test('a valid B-line ride passes the source geometry without presenting the offset point as a boarding stop', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad({ routeId: 'route_3b' })
+  const dataset = runtime.dataset()
+  const route = dataset.routes.find(({ id }) => id === 'route_3b')!
+  const suspect = route.visits.find(({ offsetMeters }) => offsetMeters > 35)!
+  const destination = dataset.stops.find(({ name }) => name === '橘园新七舍')!
+  page.handleOriginChange({ detail: { value: String(page.data.stopOptions.findIndex(({ id }) => id === route.visits[0].stopId)) } })
+  page.handleDestinationChange({ detail: { value: String(page.data.stopOptions.findIndex(({ id }) => id === destination.id)) } })
+  page.handlePlanJourney()
+  const direct = page.data.journeys.find((journey) => journey.legs.length === 1 && journey.legs[0].routeId === 'route_3b')!
+  assert.ok(direct)
+  assert.ok(!direct.legs[0].stopIds.includes(suspect.stopId))
+  assert.ok(direct.legs[0].points.length > 2)
+  assert.ok(direct.legs[0].boardingVisitIndex < direct.legs[0].alightingVisitIndex)
 })
