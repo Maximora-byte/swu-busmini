@@ -135,3 +135,12 @@ button::after { border: 0; }
 .form-tools { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; color: #58675f; font-size: 20rpx; } .swap-button { margin: 0; padding: 4px 5px; display: inline-flex; align-items: center; gap: 4px; color: #456f51; background: transparent; font-size: 21rpx; line-height: 1.5; }
 .header-route-legend { display: flex; align-items: center; gap: 10px; margin-top: 4px; overflow: hidden; height: 13px; } .header-route-legend .legend-item { font-size: 19rpx; white-space: nowrap; } .header-route-legend .legend-line { width: 15px; height: 3px; } .compact-actions { margin-top: 8px; }
 .subtle-button, .compact-primary { box-sizing: border-box; } .glass-stage--compact .sheet-content { padding-bottom: 9px; } .glass-stage--compact .compact-empty .quiet-note { display: none; }
+.place-result-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #244536; font-weight: 600; }
+.place-kind { flex: none; color: #65766a; font-size: 19rpx; font-weight: 400; }
+.place-source, .place-attribution { display: block; margin-top: 4px; color: #58675f; font-size: 20rpx; line-height: 1.5; }
+.place-attribution { padding: 6px 9px; font-size: 18rpx; }
+.tencent-place-button { margin: 8px 0 0; padding: 7px 12px; width: 100%; background: #f4f8f5; border: 1px solid #e0e9e3; border-radius: 12px; color: #34694e; font-size: 23rpx; line-height: 1.5; }
+.selected-place-detail { display: block; margin: 7px 3px; color: #58675f; font-size: 21rpx; line-height: 1.6; }
+.selected-nearby { margin-top: 8px; padding: 8px 10px; background: #eef6f0; border-radius: 12px; }
+.nearby-caption { color: #5e7264; font-size: 20rpx; }
+.nearby-stop-row { display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; color: #345642; font-size: 23rpx; }

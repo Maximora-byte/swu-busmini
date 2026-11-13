@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { syncDataAdapters } from './data-adapter'
 import { syncRoutePreviewAdapter } from './route-preview-data'
 import { syncCurrentTransitData } from './current-transit-data'
+import { syncCampusPlaceData } from './campus-place-data'
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2)
@@ -13,6 +14,7 @@ async function main(): Promise<void> {
   const stale = await syncDataAdapters(directory, check)
   await syncRoutePreviewAdapter(check)
   await syncCurrentTransitData(directory, check)
+  await syncCampusPlaceData(directory, check)
   if (check && stale.length > 0) {
     throw new Error(`数据 Adapter 未同步: ${stale.join(', ')}；请运行 npm run sync:data`)
   }

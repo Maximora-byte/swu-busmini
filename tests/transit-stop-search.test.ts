@@ -58,3 +58,11 @@ test('empty, unrelated, oversized queries and broad result sets have bounded det
   assert.ok(result.length > 0 && result.length <= 12)
   assert.deepEqual(search.search('院'), result)
 })
+
+test('reports the actual bounded match rank for composing globally ordered search results', () => {
+  const queries = [
+    ['中心图书馆', 0], ['中图', 1], ['心理', 2], ['图书', 3], ['理学部', 4], ['图书官', 6],
+  ] as const
+  for (const [query, rank] of queries) assert.equal(search.search(query)[0].matchRank, rank, query)
+  assert.deepEqual(search.search('52教学楼'), [], 'score metadata must not loosen numeric protection')
+})

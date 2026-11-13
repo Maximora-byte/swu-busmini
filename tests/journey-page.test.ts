@@ -8,7 +8,7 @@ import ts from 'typescript'
 import type { Coordinate } from '../miniprogram/models/index'
 import type { TransitDataset } from '../miniprogram/models/current-transit'
 import type { TransitJourney } from '../miniprogram/services/navigation/transit-journey.service'
-import type { TransitStopSuggestion } from '../miniprogram/services/navigation/transit-stop-search.service'
+import type { CampusSearchSuggestion } from '../miniprogram/services/navigation/campus-place-search.service'
 import type { CurrentRouteStopView } from '../miniprogram/services/map/current-transit-map.service'
 import type { SheetGeometry, SheetSnap } from '../miniprogram/services/map/map-sheet-layout'
 
@@ -43,7 +43,12 @@ interface PageData {
   destinationCoordinate: Coordinate | null
   originQuery: string
   destinationQuery: string
-  searchResults: TransitStopSuggestion[]
+  searchResults: CampusSearchSuggestion[]
+  placeSelectionMessage: string
+  nativePlacePicking: boolean
+  originPlaceDetails: string
+  destinationPlaceDetails: string
+  destinationNearbyStops: CampusSearchSuggestion['nearbyStops']
   searchVersion: number
   activeSearchField: string
   mapSelectionField: string
@@ -58,7 +63,7 @@ interface PageData {
   mapPolylines: { points: Coordinate[] }[]
   mapMarkers: { stopId: string; latitude: number; longitude: number; callout: { content: string } }[]
 }
-interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; stopId?: string; searchVersion?: number; view?: string; order?: string; visitKey?: string } } }
+interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; suggestionId?: string; stopId?: string; searchVersion?: number; view?: string; order?: string; visitKey?: string } } }
 interface JourneyPage {
   data: PageData
   setData(update: Partial<PageData>, callback?: () => void): void
@@ -77,6 +82,7 @@ interface JourneyPage {
   handleSearchInput(event: Event & { detail: { value: string } }): void
   handleSearchFocus(event: Event): void
   handleSelectSearchResult(event: Event): void
+  handleChooseTencentPlace(event: Event): Promise<void>
   handleStartMapSelection(event: Event): void
   handleCancelMapSelection(): void
   handleMapTap(event: { detail: Coordinate }): void
@@ -104,6 +110,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
   const modules = new Map<string, { exports: unknown }>()
   const pendingRendering: (() => void)[] = []
   const pendingLocation: { success(result: Coordinate & { accuracy: number }): void; fail(error: { errMsg: string }): void }[] = []
+  const pendingPlace: { success(result: Coordinate & { name: string; address: string }): void; fail(error: { errMsg: string }): void }[] = []
   const fitPoints: Coordinate[][] = []
   const cameraMoves: Coordinate[] = []
   const fitPadding: number[][] = []
@@ -134,6 +141,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
       options.success({ authSetting: { 'scope.userLocation': true } })
     },
     getLocation(options: (typeof pendingLocation)[number]) { pendingLocation.push(options) },
+    chooseLocation(options: (typeof pendingPlace)[number]) { pendingPlace.push(options) },
     openLocation(options: Coordinate) { openedStops.push({ latitude: options.latitude, longitude: options.longitude }) },
     navigateTo() {},
     hideKeyboard() {},
@@ -171,6 +179,8 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
   return {
     fitPoints, fitPadding, openedStops, cameraMoves, mapPayloadWrites: () => mapPayloadWrites,
     pendingLocationCount: () => pendingLocation.length,
+    resolvePlace(coordinate: Coordinate, name = '腾讯地图选择位置') { assert.ok(pendingPlace.length); pendingPlace.shift()!.success({ ...coordinate, name, address: '校园参考地址' }) },
+    rejectPlace(message = 'chooseLocation:fail cancel') { assert.ok(pendingPlace.length); pendingPlace.shift()!.fail({ errMsg: message }) },
     flushMapMeasurements(width = 390, height = 294) {
       pendingMapMeasurement.splice(0).forEach((callback) => callback({ width, height }))
     },
@@ -471,6 +481,112 @@ function selectSuggestion(page: JourneyPage, field: string, name: string) {
   page.handleSelectSearchResult({ currentTarget: { dataset: { field, stopId: suggestion.stopId, searchVersion: page.data.searchVersion } } })
   return suggestion
 }
+
+test('campus address aliases select actual POI coordinates and recommend nearby stops', () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad(); page.onReady()
+  page.handleOriginChange({ detail: { value: '0' } })
+  searchInput(page, 'destination', '校园卡服务')
+  const place = page.data.searchResults.find(({ kind, coordinate }) => kind === 'place' && coordinate)!
+  assert.ok(place, 'guide service alias must resolve to its mapped building')
+  page.handleSelectSearchResult({ currentTarget: { dataset: { field: 'destination', suggestionId: place.id, searchVersion: page.data.searchVersion } } })
+  assert.equal(page.data.destinationMode, 'place')
+  assert.equal(page.data.destinationIndex, -1, 'a building must not silently become an exact bus stop')
+  assert.equal(JSON.stringify(page.data.destinationCoordinate), JSON.stringify(place.coordinate))
+  assert.ok(page.data.destinationNearbyStops.length)
+  assert.match(page.data.destinationPlaceDetails, /1楼/)
+  assert.ok(page.data.journeys.length)
+})
+
+test('name-only campus guides cannot invent a location or start GPS planning', () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  searchInput(page, 'destination', '本科生院')
+  const guide = page.data.searchResults.find(({ kind }) => kind === 'place')!
+  assert.ok(guide); assert.equal(guide.coordinate, null)
+  page.handleSelectSearchResult({ currentTarget: { dataset: { field: 'destination', suggestionId: guide.id, searchVersion: page.data.searchVersion } } })
+  assert.equal(page.data.destinationCoordinate, null)
+  assert.equal(page.data.destinationMode, 'search')
+  assert.equal(page.data.journeys.length, 0)
+  assert.equal(runtime.pendingLocationCount(), 0)
+  assert.match(page.data.placeSelectionMessage, /选.*位置|选点/)
+  assert.equal(page.data.focusedSearchField, '', 'show the selected guide without keeping its editable search input focused')
+})
+
+test('Tencent picker cancellation preserves the selected journey and typed endpoints', async () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad(); selectStopPair(page, runtime.dataset()); page.handlePlanJourney()
+  const before = [page.data.originQuery, page.data.destinationQuery, page.data.selectedJourneyId]
+  const request = page.handleChooseTencentPlace({ currentTarget: { dataset: { field: 'destination' } } })
+  runtime.rejectPlace(); await request
+  assert.deepEqual([page.data.originQuery, page.data.destinationQuery, page.data.selectedJourneyId], before)
+  assert.equal(page.data.nativePlacePicking, false)
+})
+
+test('Tencent picker commits a real GCJ02 point on return and manual edits reject stale results', async () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad(); page.handleOriginChange({ detail: { value: '0' } })
+  const point = runtime.dataset().stops[28].coordinate
+  let request = page.handleChooseTencentPlace({ currentTarget: { dataset: { field: 'destination' } } })
+  page.onHide()
+  runtime.resolvePlace(point, '地图选择的办事地点'); await request
+  assert.equal(page.data.destinationCoordinate, null, 'do not update a hidden page')
+  page.onShow()
+  assert.equal(JSON.stringify(page.data.destinationCoordinate), JSON.stringify(point))
+  assert.match(page.data.destinationPlaceDetails, /腾讯地图/)
+  assert.ok(page.data.journeys.length)
+  request = page.handleChooseTencentPlace({ currentTarget: { dataset: { field: 'destination' } } })
+  searchInput(page, 'destination', '新的输入')
+  runtime.resolvePlace(point); await request
+  assert.equal(page.data.destinationCoordinate, null)
+  assert.equal(page.data.destinationQuery, '新的输入')
+})
+
+test('Tencent picker errors and out-of-area results never overwrite a confirmed endpoint', async () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad(); selectStopPair(page, runtime.dataset())
+  let request = page.handleChooseTencentPlace({ currentTarget: { dataset: { field: 'destination' } } })
+  runtime.rejectPlace('chooseLocation:fail no permission'); await request
+  assert.match(page.data.placeSelectionMessage, /未开放|不可用|权限/)
+  const query = page.data.destinationQuery
+  request = page.handleChooseTencentPlace({ currentTarget: { dataset: { field: 'destination' } } })
+  runtime.resolvePlace({ latitude: 39.9, longitude: 116.4 }); await request
+  assert.equal(page.data.destinationQuery, query)
+  assert.match(page.data.placeSelectionMessage, /范围/)
+})
+
+test('choosing an unlocated building guide invalidates an identically named station coordinate', () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad(); page.handleOriginChange({ detail: { value: '0' } })
+  searchInput(page, 'destination', '行署楼')
+  const station = page.data.searchResults.find(({ kind }) => kind === 'stop')!
+  assert.ok(station)
+  page.handleSelectSearchResult({ currentTarget: { dataset: { field: 'destination', suggestionId: station.id, searchVersion: page.data.searchVersion } } })
+  assert.ok(page.data.destinationCoordinate)
+  page.handleSearchFocus({ currentTarget: { dataset: { field: 'destination' } } })
+  const guide = page.data.searchResults.find(({ coordinate }) => coordinate === null)!
+  assert.ok(guide)
+  page.handleSelectSearchResult({ currentTarget: { dataset: { field: 'destination', suggestionId: guide.id, searchVersion: page.data.searchVersion } } })
+  assert.equal(page.data.destinationCoordinate, null)
+  assert.equal(page.data.destinationMode, 'search')
+  assert.equal(page.data.destinationIndex, -1)
+  assert.equal(page.data.selectedJourneyId, '')
+  assert.equal(page.data.journeys.length, 0)
+})
+
+test('opening native picker cancels a pending map-only fix without leaving location disabled', async () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  const mapLocation = page.handleMapLocate()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  const picker = page.handleChooseTencentPlace({ currentTarget: { dataset: { field: 'destination' } } })
+  page.onHide()
+  runtime.resolveLocation(runtime.dataset().stops[0].coordinate); await mapLocation
+  runtime.rejectPlace(); await picker
+  page.onShow()
+  assert.equal(page.data.mapLocating, false)
+  assert.equal(page.data.mapLocation, null)
+})
 
 test('confirmed search locations automatically recommend both ends and retain exact-stop selection', () => {
   const runtime = createRuntime()
