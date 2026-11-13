@@ -34,6 +34,7 @@ export interface RouteStopView {
 
 export interface BusStopMarker {
   id: number
+  stopId: string
   latitude: number
   longitude: number
   title: string
@@ -110,6 +111,16 @@ function directionSummary(direction: RouteNavigationDirection): string {
 export function createRouteMapPresentationService(
   navigation: RouteNavigationService = routeNavigationService,
 ): RouteMapPresentationService {
+  // A station has one native-map identity for this service's lifetime, even
+  // when its position in the selected direction or route changes.
+  const markerIds = new Map<string, number>()
+  const markerIdForStop = (stopId: string): number => {
+    const existing = markerIds.get(stopId)
+    if (existing !== undefined) return existing
+    const id = 1000 + markerIds.size
+    markerIds.set(stopId, id)
+    return id
+  }
   return {
     getRouteOptions(selectedRouteId) {
       return navigation.getRoutes().map((route) => ({
@@ -160,10 +171,11 @@ export function createRouteMapPresentationService(
       // 导航服务只提供 verified 坐标。站序保留重复经过，地图按站点去重。
       const uniqueStops = [...new Map(view.stops.map((stop) => [stop.stopId, stop])).values()]
       const busStopMarkers: BusStopMarker[] = []
-      uniqueStops.forEach((stop, index) => {
+      uniqueStops.forEach((stop) => {
         if (!stop.coordinate) return
         busStopMarkers.push({
-          id: 1000 + index,
+          id: markerIdForStop(stop.stopId),
+          stopId: stop.stopId,
           ...stop.coordinate,
           title: stop.stopName,
           iconPath: '/assets/icons/bus-stop-marker.svg',

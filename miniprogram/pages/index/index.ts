@@ -10,7 +10,8 @@ import {
 import type { RouteMapPolyline } from '../../services/map/route-polyline.service'
 import { navigationPlannerService, type NavigationPlace, type NavigationPlan, type TransferNavigationPlan } from '../../services/navigation/navigation-planner.service'
 import { routeNetworkService, type RouteNetworkLegend } from '../../services/map/route-network.service'
-import type { Coordinate } from '../../models/index'
+import type { Coordinate, OperatorRouteObservation } from '../../models/index'
+import { operatorRouteCatalogRepository } from '../../services/repository/operator-route-catalog.repository'
 import {
   routeMapPresentationService,
   type BusStopMarker,
@@ -39,6 +40,12 @@ Page({
 
   data: {
     activeTab: 'map',
+    operatorRoutes: [] as OperatorRouteObservation[],
+    selectedOperatorRouteId: '',
+    selectedOperatorRoute: null as OperatorRouteObservation | null,
+    mapOptionsExpanded: false,
+    selectedStopId: '',
+    stopSelectionMessage: '',
     navigationPlaces: [] as NavigationPlace[],
     originNames: [] as string[],
     destinationNames: [] as string[],
@@ -84,7 +91,11 @@ Page({
 
   onLoad() {
     const places = navigationPlannerService.getPlaces()
+    const operatorRoutes = operatorRouteCatalogRepository.getAll()
     this.setData({
+      operatorRoutes,
+      selectedOperatorRouteId: operatorRoutes[0]?.id ?? '',
+      selectedOperatorRoute: operatorRoutes[0] ?? null,
       navigationPlaces: places,
       originNames: ['未指定起点（查看途经线路）', ...places.map(({ name }) => name)],
       destinationNames: places.map(({ name }) => name),
@@ -107,10 +118,29 @@ Page({
 
   handleTabChange(event: WechatMiniprogram.TouchEvent) {
     const tab = event.currentTarget.dataset.tab
-    if (tab === 'map' || tab === 'navigation') {
+    if (tab === 'map' || tab === 'navigation' || tab === 'catalog') {
       this.cameraRequestVersion += 1
       this.setData({ activeTab: tab })
     }
+  },
+
+  handleOperatorRouteChange(event: WechatMiniprogram.TouchEvent) {
+    const routeId = event.currentTarget.dataset.routeId
+    if (typeof routeId !== 'string') return
+    const route = operatorRouteCatalogRepository.getById(routeId)
+    if (route) this.setData({ selectedOperatorRouteId: route.id, selectedOperatorRoute: route })
+  },
+
+  toggleMapOptions() {
+    this.setData({ mapOptionsExpanded: !this.data.mapOptionsExpanded })
+  },
+
+  onHide() {
+    this.cameraRequestVersion += 1
+  },
+
+  onUnload() {
+    this.cameraRequestVersion += 1
   },
 
   handleOriginChange(event: WechatMiniprogram.PickerChange) {
@@ -208,6 +238,8 @@ Page({
       const presentation = routeMapPresentationService.getRoutePresentation(routeId, directionId)
       this.setData({
         ...presentation,
+        selectedStopId: '',
+        stopSelectionMessage: '',
         routeOptions: routeMapPresentationService.getRouteOptions(routeId),
       })
       this.refreshNetwork()
@@ -219,6 +251,8 @@ Page({
         routeName: this.data.routeOptions.find((route) => route.id === routeId)?.name ?? routeId,
         routeDirections: [],
         routeStops: [],
+        selectedStopId: '',
+        stopSelectionMessage: '',
         busStopMarkers: [],
         routePolylines: [],
         networkLegend: [],
@@ -302,6 +336,39 @@ Page({
   handleRouteChange(event: WechatMiniprogram.TouchEvent) {
     const routeId = event.currentTarget.dataset.routeId
     if (typeof routeId === 'string') this.selectRoute(routeId)
+  },
+
+  handleStopTap(event: WechatMiniprogram.TouchEvent) {
+    const stopId = event.currentTarget.dataset.stopId
+    if (typeof stopId === 'string') this.selectStop(stopId)
+  },
+
+  handleMarkerTap(event: WechatMiniprogram.MarkerTap) {
+    const marker = this.data.busStopMarkers.find(({ id }) => id === Number(event.detail.markerId))
+    if (marker) this.selectStop(marker.stopId)
+  },
+
+  selectStop(stopId: string) {
+    if (this.data.activeTab !== 'map') return
+    const stop = this.data.routeStops.find(({ id }) => id === stopId)
+    if (!stop) return
+    const marker = this.data.busStopMarkers.find((item) => item.stopId === stopId)
+    const cameraVersion = ++this.cameraRequestVersion
+    this.setData({
+      selectedStopId: stopId,
+      stopSelectionMessage: marker ? `已选中${stop.name}` : `${stop.name ?? '该站点'}坐标待审核，暂不能在地图定位`,
+      busStopMarkers: this.data.busStopMarkers.map((item) => ({
+        ...item,
+        width: item.stopId === stopId ? 36 : 30,
+        height: item.stopId === stopId ? 42 : 36,
+        label: { ...item.label, bgColor: item.stopId === stopId ? '#d9f1e3' : '#ffffff' },
+      })),
+    }, () => {
+      if (!marker || cameraVersion !== this.cameraRequestVersion || this.data.activeTab !== 'map') return
+      wx.createMapContext('campus-map', this).moveToLocation({
+        latitude: marker.latitude, longitude: marker.longitude,
+      })
+    })
   },
 
   toggleRouteDetails() {

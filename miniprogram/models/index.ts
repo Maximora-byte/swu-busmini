@@ -128,6 +128,19 @@ export interface BusRoute {
   directions: BusDirection[]
 }
 
+/** 运营方地图首页的线路与参考标签观察；不表示有向站序或已审核坐标。 */
+export interface OperatorRouteObservation {
+  id: string
+  name: string
+  source: string
+  /** 观察日期，ISO 8601 日历日期 YYYY-MM-DD。 */
+  observedAt: string
+  /** 用户确认的事实范围，仅覆盖线路名称与地图参考点。 */
+  confirmation: string
+  /** 保留原文复合标签，不能据此构造导航边或候车位置。 */
+  referencePointNames: string[]
+}
+
 /** 线路导航返回的单个方向，不包含页面展示字段。 */
 export interface RouteNavigationDirection {
   directionId: string

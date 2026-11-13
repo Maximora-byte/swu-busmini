@@ -36,6 +36,13 @@ interface RuntimePageData {
   routeStops: { id: string }[]
   routeDataErrorText: string
   routeDetailsExpanded: boolean
+  selectedStopId: string
+  stopSelectionMessage: string
+  mapOptionsExpanded: boolean
+  busStopMarkers: { id: number; stopId: string; latitude: number; longitude: number; width: number; height: number; label: { bgColor: string } }[]
+  operatorRoutes: { id: string; name: string; referencePointNames: string[] }[]
+  selectedOperatorRouteId: string
+  selectedOperatorRoute: { id: string; referencePointNames: string[] } | null
 }
 
 interface SelectionEvent {
@@ -64,6 +71,11 @@ interface RuntimePage {
   handleRouteChange(event: SelectionEvent): void
   handleDirectionChange(event: SelectionEvent): void
   toggleRouteDetails(): void
+  handleStopTap(event: { currentTarget: { dataset: { stopId: string } } }): void
+  handleMarkerTap(event: { detail: { markerId: number } }): void
+  handleOperatorRouteChange(event: { currentTarget: { dataset: { routeId: string } } }): void
+  toggleMapOptions(): void
+  onHide(): void
 }
 
 function createRuntime(location?: RawLocation, deferLocation = false, deferRendering = false) {
@@ -409,4 +421,77 @@ test('deferred route fitting ignores older choices, hidden maps, and newer locat
   await locating
   assert.equal(runtime.cameraMoves.length, 1)
   assert.equal(page.data.hasLocation, true)
+})
+
+test('stop taps use verified markers, preserve repeated row identity, and explain missing positions', () => {
+  const runtime = createRuntime({ latitude: 29.82, longitude: 106.42, accuracy: 10 })
+  runtime.load('pages/index/index.ts')
+  const page = runtime.getPage()
+  page.data.routeStops = [{ id: 'known' }, { id: 'missing' }, { id: 'known' }]
+  page.data.busStopMarkers = [{ id: 1000, stopId: 'known', latitude: 29.81, longitude: 106.41, width: 30, height: 36, label: { bgColor: '#ffffff' } }]
+  page.handleStopTap({ currentTarget: { dataset: { stopId: 'known' } } })
+  assert.equal(page.data.selectedStopId, 'known')
+  assert.deepEqual(runtime.cameraMoves, [{ latitude: 29.81, longitude: 106.41 }])
+  assert.ok(page.data.busStopMarkers[0].width > 30)
+  page.handleStopTap({ currentTarget: { dataset: { stopId: 'missing' } } })
+  assert.match(page.data.stopSelectionMessage, /坐标.*核对|坐标.*审核/)
+  assert.equal(runtime.cameraMoves.length, 1)
+  assert.equal(page.data.busStopMarkers[0].width, 30)
+  page.handleStopTap({ currentTarget: { dataset: { stopId: 'unknown' } } })
+  page.handleMarkerTap({ detail: { markerId: -1 } })
+  assert.equal(runtime.cameraMoves.length, 1)
+  page.handleMarkerTap({ detail: { markerId: 1000 } })
+  assert.equal(page.data.selectedStopId, 'known')
+  assert.equal(runtime.cameraMoves.length, 2)
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_2' } } })
+  assert.equal(page.data.selectedStopId, '')
+  assert.equal(page.data.stopSelectionMessage, '')
+})
+
+test('stop camera callbacks cannot override a newer route, hidden map, or page hide', () => {
+  const runtime = createRuntime({ latitude: 29.82, longitude: 106.42, accuracy: 10 }, false, true)
+  runtime.load('pages/index/index.ts')
+  const page = runtime.getPage()
+  const tap = () => {
+    page.data.routeStops = [{ id: 'known' }]
+    page.data.busStopMarkers = [{ id: 1000, stopId: 'known', latitude: 29.81, longitude: 106.41, width: 30, height: 36, label: { bgColor: '#ffffff' } }]
+    page.handleStopTap({ currentTarget: { dataset: { stopId: 'known' } } })
+  }
+  tap()
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_3' } } })
+  runtime.flushRendering()
+  assert.equal(runtime.cameraMoves.length, 0)
+  tap()
+  page.handleTabChange({ currentTarget: { dataset: { tab: 'catalog' } } })
+  runtime.flushRendering()
+  assert.equal(page.data.activeTab, 'catalog')
+  assert.equal(runtime.cameraMoves.length, 0)
+  page.handleTabChange({ currentTarget: { dataset: { tab: 'map' } } })
+  tap()
+  page.onHide()
+  runtime.flushRendering()
+  assert.equal(runtime.cameraMoves.length, 0)
+})
+
+test('operator-only catalog selection stays separate from historical navigation and map geometry', () => {
+  const runtime = createRuntime({ latitude: 29.82, longitude: 106.42, accuracy: 10 }, false, true)
+  runtime.load('pages/index/index.ts')
+  const page = runtime.getPage()
+  page.onLoad()
+  assert.equal(page.data.operatorRoutes?.length, 10)
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_4' } } })
+  const geometry = JSON.stringify(page.data.routePolylines)
+  page.handleTabChange({ currentTarget: { dataset: { tab: 'catalog' } } })
+  page.handleOperatorRouteChange({ currentTarget: { dataset: { routeId: 'route_3b' } } })
+  assert.equal(page.data.selectedOperatorRouteId, 'route_3b')
+  assert.equal(page.data.selectedOperatorRoute?.id, 'route_3b')
+  assert.ok(page.data.selectedOperatorRoute?.referencePointNames.includes('四新村博士生公寓'))
+  assert.equal(page.data.selectedRouteId, 'route_4')
+  assert.equal(JSON.stringify(page.data.routePolylines), geometry)
+  runtime.flushRendering()
+  assert.equal(runtime.includedPoints.length, 0)
+  page.handleOperatorRouteChange({ currentTarget: { dataset: { routeId: 'unknown' } } })
+  assert.equal(page.data.selectedOperatorRouteId, 'route_3b')
+  page.toggleMapOptions()
+  assert.equal(page.data.mapOptionsExpanded, true)
 })

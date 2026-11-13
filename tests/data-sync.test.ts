@@ -15,7 +15,9 @@ async function fixture(): Promise<string> {
 
 test('check detects missing/stale adapters without writing and sync repairs them', async () => {
   const directory = await fixture()
-  assert.equal((await syncDataAdapters(directory, true)).length, 5)
+  assert.deepEqual(await syncDataAdapters(directory, true), [
+    'stops.ts', 'routes.ts', 'pois.ts', 'coordinate-reviews.ts', 'route-geometries.ts', 'operator-routes.ts',
+  ])
   await assert.rejects(readFile(join(directory, 'stops.ts')), { code: 'ENOENT' })
   await syncDataAdapters(directory, false)
   assert.deepEqual(await syncDataAdapters(directory, true), [])
