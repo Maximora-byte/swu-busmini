@@ -1,12 +1,15 @@
 import type { TransitDataset } from '../../models/current-transit'
 import { currentTransitRepository } from '../repository/current-transit.repository'
 import { isAutomaticBoardingVisit } from './transit-visit-policy'
+import { hasConflictingCampusIdentity } from './campus-search-identity'
 
 export interface TransitStopSuggestion {
   stopId: string
   name: string
   label: string
   routeNames: string[]
+  /** Lower is stronger: canonical/alias exact, prefix, substring, then one edit. */
+  matchRank?: number
 }
 
 const ALIASES: readonly (readonly string[])[] = [
@@ -81,8 +84,10 @@ export function createTransitStopSearchService(dataset: TransitDataset) {
       if (!query) return []
       const queryNumbers: string[] = query.match(/\d+/g) ?? []
       const ranked = entries.flatMap((entry) => {
+        if (hasConflictingCampusIdentity(query, entry.normalizedName)) return []
         let rank = Infinity
         for (const term of entry.terms) {
+          if (hasConflictingCampusIdentity(query, term)) continue
           const termNumbers: string[] = term.match(/\d+/g) ?? []
           if (queryNumbers.some((number) => !termNumbers.includes(number))) continue
           const canonical = term === entry.normalizedName
@@ -94,7 +99,7 @@ export function createTransitStopSearchService(dataset: TransitDataset) {
         return Number.isFinite(rank) ? [{ entry, rank }] : []
       })
       return ranked.sort((a, b) => a.rank - b.rank || a.entry.order - b.entry.order).slice(0, 12)
-        .map(({ entry: { stopId, name, label, routeNames } }) => ({ stopId, name, label, routeNames: [...routeNames] }))
+        .map(({ rank, entry: { stopId, name, label, routeNames } }) => ({ stopId, name, label, routeNames: [...routeNames], matchRank: rank }))
     },
   }
 }

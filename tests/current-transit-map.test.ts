@@ -3,6 +3,15 @@ import test from 'node:test'
 import { currentTransitDataset } from '../miniprogram/data/current-transit'
 import { getCurrentMapPresentation } from '../miniprogram/services/map/current-transit-map.service'
 
+test('automatic overview has no selected route or highlighted first line', () => {
+  const view = getCurrentMapPresentation(currentTransitDataset, '', { network: true })
+  assert.equal(view.routeId, '')
+  assert.equal(view.stops.length, 0)
+  assert.equal(view.polylines.length, 10)
+  assert.ok(view.polylines.every(({ width }) => width === 4))
+  assert.throws(() => getCurrentMapPresentation(currentTransitDataset, ''))
+})
+
 test('campus network uses all ten current routes with exact source colors and no old route9', () => {
   const view = getCurrentMapPresentation(currentTransitDataset, 'route_8', { network: true })
   assert.equal(view.legend.length, 10)

@@ -3,10 +3,14 @@ import type { TransitDataset, TransitStop } from '../../models/current-transit'
 import { currentTransitRepository } from '../../services/repository/current-transit.repository'
 import { transitJourneyService, type TransitJourney, type TransitJourneyLeg } from '../../services/navigation/transit-journey.service'
 import { isAutomaticBoardingVisit } from '../../services/navigation/transit-visit-policy'
-import { transitStopSearchService, type TransitStopSuggestion } from '../../services/navigation/transit-stop-search.service'
+import { createCampusPlaceSearchService, type CampusSearchSuggestion } from '../../services/navigation/campus-place-search.service'
+import { campusMapPlaces } from '../../data/campus-map-places'
 import { locationService } from '../../services/location/location.service'
 import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT, getLocationViewport } from '../../services/map/map-viewport.service'
 import { getCurrentMapPresentation, type CurrentRouteStopView } from '../../services/map/current-transit-map.service'
+import { createSheetLayout, getSheetGeometry, getOverlayMapPadding, type SheetSnap } from '../../services/map/map-sheet-layout'
+
+const INITIAL_SHEET = createSheetLayout()
 
 interface JourneyLegView extends TransitJourneyLeg {
   boardingName: string
@@ -23,6 +27,9 @@ interface JourneyView extends TransitJourney {
 }
 type EndpointField = 'origin' | 'destination'
 interface ReferenceCircle extends Coordinate { color: string; fillColor: string; radius: number; strokeWidth: number }
+function nearbyStopViews(stops: CampusSearchSuggestion['nearbyStops']) {
+  return stops.map((stop) => ({ ...stop, distanceMeters: Math.round(stop.distanceMeters) }))
+}
 function endpointField(value: unknown): EndpointField | undefined {
   return value === 'origin' || value === 'destination' ? value : undefined
 }
@@ -33,14 +40,14 @@ interface JourneyMarker extends Coordinate {
   iconPath: string
   width: number
   height: number
-  callout: { content: string; color: string; bgColor: string; padding: number; borderRadius: number; display: 'ALWAYS' | 'BYCLICK' }
+  callout: { content: string; color: string; bgColor: string; padding: number; borderRadius: number; fontSize: number; display: 'ALWAYS' | 'BYCLICK' }
 }
 
 function marker(dataset: TransitDataset, stop: TransitStop, prefix = ''): JourneyMarker {
   return {
     id: 1000 + dataset.stops.findIndex(({ id }) => id === stop.id), stopId: stop.id,
     ...stop.coordinate, title: stop.name, iconPath: '/assets/icons/bus-stop-marker.png', width: 24, height: 32,
-    callout: { content: prefix + stop.name, color: '#174231', bgColor: '#ffffff', padding: 6, borderRadius: 4, display: prefix ? 'ALWAYS' : 'BYCLICK' },
+    callout: { content: prefix + stop.name, color: '#174231', bgColor: '#ffffff', padding: 6, borderRadius: 8, fontSize: 13, display: prefix ? 'ALWAYS' : 'BYCLICK' },
   }
 }
 
@@ -52,19 +59,31 @@ Page({
   endpointRequestVersion: 0,
   mapLocationRequestVersion: 0,
   rememberedJourneyId: '',
+  confirmedOriginStopId: '',
+  placeSearch: null as ReturnType<typeof createCampusPlaceSearchService> | null,
+  nativePlaceRequestVersion: 0,
+  pendingTencentPlace: null as { field: EndpointField; point: Coordinate; name: string; details: string; version: number } | null,
+  sheetLayout: INITIAL_SHEET,
+  sheetTapSuppressedUntil: 0,
   data: {
-    viewMode: 'map', showAllRoutes: false, referenceReverse: false,
+    sheetSnap: 'peek' as SheetSnap, sheetGeometry: getSheetGeometry(INITIAL_SHEET, 'peek', 0),
+    focusedSearchField: '', keyboardHeight: 0, sheetScrollTarget: '', planMessageVisible: false,
+    journeyPreview: null as { title: string; boardingName: string; alightingName: string; routeText: string; distanceText: string; connectionText: string } | null,
+    viewMode: 'map', showAllRoutes: true, referenceReverse: false,
     routeStops: [] as CurrentRouteStopView[], routeSummary: '', routeColor: '#126b47', selectedVisitKey: '',
     routeDetailsExpanded: false, dataNotesExpanded: false,
     mapLegend: [] as { routeId: string; name: string; color: string }[],
     mapLocation: null as Coordinate | null, mapLocating: false, mapLocationMessage: '',
     sourceText: '', directionStatusText: '实际运营方向尚未独立确认，请现场核对。',
     routeOptions: [] as { id: string; name: string; color: string }[], selectedRouteId: '', routeName: '',
-    stopOptions: [] as { id: string; label: string }[], stopNames: [] as string[],
-    originIndex: 0, destinationIndex: 0, originMode: 'stop', originCoordinate: null as Coordinate | null,
-    destinationMode: 'stop', destinationCoordinate: null as Coordinate | null,
-    originQuery: '', destinationQuery: '', activeSearchField: '', searchVersion: 0,
-    searchResults: [] as TransitStopSuggestion[], searchMessage: '',
+    stopOptions: [] as { id: string; label: string }[], stopNames: [] as string[], stopPickerNames: [] as string[],
+    originIndex: 0, destinationIndex: 0, originMode: 'location', originCoordinate: null as Coordinate | null,
+    destinationMode: 'search', destinationCoordinate: null as Coordinate | null,
+    originQuery: '当前位置', destinationQuery: '', activeSearchField: '', searchVersion: 0,
+    searchResults: [] as CampusSearchSuggestion[], searchMessage: '',
+    nativePlacePicking: false, placeSelectionMessage: '', placeMessageField: '',
+    originPlaceDetails: '', destinationPlaceDetails: '',
+    originNearbyStops: [] as CampusSearchSuggestion['nearbyStops'], destinationNearbyStops: [] as CampusSearchSuggestion['nearbyStops'],
     mapSelectionField: '', mapSelectionMessage: '', mapCircles: [] as ReferenceCircle[],
     locating: false, locationMessage: '', journeyMessage: '选择上、下车参考点，查询直达或一次换乘方案。',
     journeys: [] as JourneyView[], selectedJourneyId: '',
@@ -75,8 +94,12 @@ Page({
   },
 
   onLoad(query: { routeId?: string; view?: string } = {}) {
+    this.sheetLayout = createSheetLayout(wx.getWindowInfo?.() ?? {})
+    const sheetSnap = query.view === 'journey' ? 'half' : 'peek'
     this.dataset = currentTransitRepository.getDataset()
     const dataset = this.dataset
+    this.placeSearch = createCampusPlaceSearchService(dataset, campusMapPlaces)
+    const initialRouteId = dataset.routes.some(({ id }) => id === query.routeId) ? query.routeId! : ''
     const eligibleStopIds = new Set(dataset.routes.flatMap((route) => route.visits.filter(isAutomaticBoardingVisit).map(({ stopId }) => stopId)))
     const planningStops = dataset.stops.filter(({ id }) => eligibleStopIds.has(id))
     const nameCounts = new Map<string, number>()
@@ -90,9 +113,11 @@ Page({
       routeOptions: dataset.routes.map(({ id, name, color }) => ({ id, name, color })),
       viewMode: query.view === 'journey' ? 'journey' : 'map',
       stopOptions, stopNames: stopOptions.map(({ label }) => label), destinationIndex: stopOptions.length > 1 ? 1 : 0,
-      originQuery: planningStops[0]?.name ?? '', destinationQuery: planningStops[1]?.name ?? planningStops[0]?.name ?? '',
+      stopPickerNames: ['请选择候车参考站', ...stopOptions.map(({ label }) => label)],
+      originMode: 'location', originQuery: '当前位置', destinationQuery: '', showAllRoutes: !initialRouteId,
+      sheetSnap, sheetGeometry: getSheetGeometry(this.sheetLayout, sheetSnap, 1),
     })
-    this.showRoute(dataset.routes.some(({ id }) => id === query.routeId) ? query.routeId! : dataset.routes[0].id)
+    this.showRoute(initialRouteId)
   },
 
   onReady() {
@@ -100,19 +125,29 @@ Page({
     wx.createMapContext('journey-map', this).setBoundary({ southwest: BEIBEI_VIEWPORT.southwest, northeast: BEIBEI_VIEWPORT.northeast })
     this.fitMap()
   },
-  onShow() { this.pageVisible = true },
+  onShow() { this.pageVisible = true; this.applyPendingTencentPlace() },
+  onResize(event: { size: { windowWidth: number; windowHeight: number } }) {
+    if ((this.data.focusedSearchField || this.data.keyboardHeight) && event.size.windowWidth === this.sheetLayout.width && event.size.windowHeight < this.sheetLayout.height) return
+    this.sheetLayout = createSheetLayout({ ...(wx.getWindowInfo?.() ?? {}), ...event.size })
+    this.setSheetSnap(this.data.sheetSnap)
+  },
   onHide() { this.cancelPendingActions() },
   onUnload() { this.cancelPendingActions(false); this.mapReady = false },
   cancelPendingActions(updateView = true) {
     this.pageVisible = false
     this.cameraRequestVersion += 1
-    this.endpointRequestVersion += 1
     this.mapLocationRequestVersion += 1
+    // The native location picker can temporarily hide this page; commit its result only on return.
+    if (updateView && this.data.nativePlacePicking) return
+    this.endpointRequestVersion += 1
+    this.pendingTencentPlace = null
     if (updateView) this.setData({
       locating: false, mapLocating: false,
       ...(this.data.mapLocating ? { mapLocationMessage: '定位已取消，可重新定位。' } : {}),
       activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1,
       mapSelectionField: '', mapSelectionMessage: '',
+      focusedSearchField: '', keyboardHeight: 0,
+      sheetGeometry: getSheetGeometry(this.sheetLayout, this.data.sheetSnap, this.data.sheetGeometry.epoch + 1),
       ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
     })
   },
@@ -124,28 +159,109 @@ Page({
     wx.createSelectorQuery().in(this).select('#journey-map').boundingClientRect((rect) => {
       if (!rect || !Number.isFinite(rect.width) || !Number.isFinite(rect.height) || rect.width <= 0 || rect.height <= 0 ||
         version !== this.cameraRequestVersion || !this.pageVisible || !this.mapReady) return
-      // Native callouts extend above their anchors. Bound the inset by the measured
-      // map size so short screens still have room for the riding segment.
-      const side = Math.min(80, rect.width * 0.2)
-      wx.createMapContext('journey-map', this).includePoints({
-        points, padding: [Math.min(120, rect.height * 0.4), side, Math.min(80, rect.height * 0.2), side],
-      })
+      const calloutInset = Math.max(80, ...this.data.mapMarkers.filter(({ callout }) => callout.display === 'ALWAYS').map(({ callout }) => callout.content.length * 6.5 + 14))
+      const padding = getOverlayMapPadding(rect.width, rect.height, this.sheetLayout, this.data.sheetGeometry, calloutInset)
+      if (padding) wx.createMapContext('journey-map', this).includePoints({ points, padding })
     }).exec()
+  },
+  setSheetSnap(snap: SheetSnap, fit = true, afterRender?: () => void) {
+    if (!['peek', 'half', 'full'].includes(snap)) return
+    const version = ++this.cameraRequestVersion
+    this.setData({ sheetSnap: snap, sheetGeometry: getSheetGeometry(this.sheetLayout, snap, this.data.sheetGeometry.epoch + 1, this.data.keyboardHeight),
+      routeDetailsExpanded: this.data.viewMode === 'map' && snap !== 'peek' && !this.data.dataNotesExpanded,
+      ...(snap !== 'full' ? { dataNotesExpanded: false } : {}),
+    }, () => {
+      if (version !== this.cameraRequestVersion || !this.pageVisible) return
+      afterRender?.()
+      if (fit) this.fitMap()
+    })
+  },
+  handleSheetGestureEnd(value: { snap: string; epoch: number }) {
+    if (!this.pageVisible || value.epoch !== this.data.sheetGeometry.epoch || !['peek', 'half', 'full'].includes(value.snap)) return
+    this.sheetTapSuppressedUntil = Date.now() + 300
+    wx.hideKeyboard()
+    this.setData({ focusedSearchField: '', keyboardHeight: 0 })
+    this.setSheetSnap(value.snap as SheetSnap)
+  },
+  handleToggleSheet() {
+    if (Date.now() < this.sheetTapSuppressedUntil) return
+    this.handleDismissKeyboard()
+    this.setSheetSnap(this.data.sheetSnap === 'peek' ? 'half' : 'peek')
+  },
+  handleDismissKeyboard() {
+    wx.hideKeyboard()
+    this.setData({ focusedSearchField: '', keyboardHeight: 0 })
+    this.setSheetSnap(this.data.sheetSnap, false)
+  },
+  handleOpenPlanner() {
+    this.switchView('journey')
+    const field = this.data.originMode === 'search' && this.data.destinationMode !== 'search' ? 'origin' : 'destination'
+    this.setData({ dataNotesExpanded: false, focusedSearchField: '', sheetScrollTarget: '' })
+    this.setSheetSnap('full', false, () => { this.setData({ focusedSearchField: field, sheetScrollTarget: `${field}-field` }) })
+  },
+  handleRestorePlan() { this.switchView('journey'); this.setSheetSnap('peek') },
+  handleFitCurrentMap() { this.handleDismissKeyboard(); this.setSheetSnap('peek', false); this.fitMap() },
+  handleSwapEndpoints() {
+    this.handleDismissKeyboard()
+    const d = this.data
+    const originIndex = d.destinationIndex, destinationIndex = d.originIndex
+    const originMode = d.destinationMode, destinationMode = d.originMode === 'coordinate' ? 'map' : d.originMode === 'location' ? 'search' : d.originMode
+    const originCoordinate = d.destinationCoordinate ? { ...d.destinationCoordinate } : null
+    const destinationCoordinate = d.originCoordinate ? { ...d.originCoordinate } : null
+    const originQuery = originMode === 'map' ? '地图所选起点' : d.destinationQuery
+    const destinationQuery = d.originMode === 'location' ? '' : d.originMode === 'coordinate' ? '原定位位置' : destinationMode === 'map' ? '地图所选终点' : d.originQuery
+    this.clearJourneys()
+    this.confirmedOriginStopId = ['stop', 'place'].includes(originMode) ? this.data.stopOptions[originIndex]?.id ?? '' : ''
+    this.setData({ viewMode: 'journey', originIndex, destinationIndex, originMode, destinationMode, originCoordinate, destinationCoordinate,
+      originQuery, destinationQuery, locationMessage: '',
+      originPlaceDetails: d.destinationPlaceDetails, destinationPlaceDetails: d.originPlaceDetails,
+      originNearbyStops: d.destinationNearbyStops, destinationNearbyStops: d.originNearbyStops })
+    this.replanIfReady()
+  },
+  handleBrowseRoutes() {
+    this.handleDismissKeyboard()
+    this.switchView('map')
+    this.setData({ dataNotesExpanded: false })
+    this.setSheetSnap('peek')
+  },
+  handleShowJourneyDetails() {
+    this.setData({ dataNotesExpanded: false, focusedSearchField: '', sheetScrollTarget: '' })
+    this.setSheetSnap('full', false, () => { this.setData({ sheetScrollTarget: 'journey-results' }) })
+  },
+  handleClearEndpoint(event: WechatMiniprogram.TouchEvent) {
+    const field = endpointField(event.currentTarget.dataset.field)
+    if (!field) return
+    this.handleSearchInput({ currentTarget: { dataset: { field } }, detail: { value: '' } })
+    this.setData({ focusedSearchField: field, sheetScrollTarget: `${field}-field` })
+    this.setSheetSnap('full')
+  },
+  handleKeyboardHeightChange(event: WechatMiniprogram.CustomEvent<{ height: number }>) {
+    if (!this.pageVisible) return
+    const height = event.detail.height
+    if (!Number.isFinite(height) || height < 0 || (height > 0 && !this.data.focusedSearchField)) return
+    const field = endpointField(event.currentTarget.dataset.field)
+    if (field && this.data.focusedSearchField && field !== this.data.focusedSearchField) return
+    if (height === this.data.keyboardHeight) return
+    this.setData({ keyboardHeight: height, ...(height === 0 ? { focusedSearchField: '' } : {}) })
+    this.setSheetSnap(height > 0 ? 'full' : this.data.sheetSnap, false)
+  },
+  handleToggleNetwork() {
+    this.handleBrowseRoutes()
+    this.handleNetworkChange({ detail: { value: !this.data.showAllRoutes } } as WechatMiniprogram.SwitchChange)
   },
   showRoute(routeId: string, fit = true) {
     const dataset = this.dataset
-    const route = dataset?.routes.find(({ id }) => id === routeId)
-    if (!dataset || !route) return
+    if (!dataset || (!dataset.routes.some(({ id }) => id === routeId) && !(routeId === '' && this.data.showAllRoutes))) return
     const version = ++this.cameraRequestVersion
-    const view = getCurrentMapPresentation(dataset, route.id, {
-      network: this.data.viewMode === 'map' && this.data.showAllRoutes, reverse: this.data.referenceReverse,
+    const view = getCurrentMapPresentation(dataset, routeId, {
+      network: this.data.showAllRoutes, reverse: this.data.referenceReverse,
     })
     const ids = new Set(view.stopIds)
     const eligibleIds = new Set(view.eligibleStopIds)
     this.setData({
-      selectedRouteId: route.id, routeName: route.name, routeColor: route.color, selectedJourneyId: '', stopMessage: '', selectedVisitKey: '',
+      selectedRouteId: view.routeId, routeName: view.name, routeColor: view.color, selectedJourneyId: '', stopMessage: '', selectedVisitKey: '',
       routeStops: view.stops, routeSummary: view.summary, mapLegend: view.legend,
-      mapTitle: this.data.viewMode === 'map' && this.data.showAllRoutes ? '十条现行线路总览' : `${route.name} · 运营方发布轨迹`,
+      mapTitle: this.data.showAllRoutes ? '自动匹配 · 十条现行线路总览' : `${view.name} · 运营方发布轨迹`,
       routeWarnings: view.warnings, mapPolylines: view.polylines,
       mapMarkers: dataset.stops.filter(({ id }) => ids.has(id)).map((stop) => {
         if (eligibleIds.has(stop.id)) return marker(dataset, stop)
@@ -161,17 +277,21 @@ Page({
     if (typeof routeId !== 'string' || !this.dataset?.routes.some(({ id }) => id === routeId)) return
     if (this.data.selectedJourneyId) this.rememberedJourneyId = this.data.selectedJourneyId
     this.setData({ viewMode: 'map', showAllRoutes: false, referenceReverse: false })
+    this.setSheetSnap('peek', false)
     this.showRoute(routeId)
   },
   handleViewChange(event: WechatMiniprogram.TouchEvent) {
     const view = event.currentTarget.dataset.view
-    if (!['map', 'journey'].includes(view) || view === this.data.viewMode) return
+    if (view === 'map' || view === 'journey') this.switchView(view)
+  },
+  switchView(view: 'map' | 'journey') {
+    if (view === this.data.viewMode) return
     if (this.data.selectedJourneyId) this.rememberedJourneyId = this.data.selectedJourneyId
     this.endpointRequestVersion += 1
     this.mapLocationRequestVersion += 1
     this.cameraRequestVersion += 1
     this.setData({ viewMode: view, locating: false, mapLocating: false,
-      activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1, mapSelectionField: '', mapSelectionMessage: '',
+      activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1, mapSelectionField: '', mapSelectionMessage: '', focusedSearchField: '', keyboardHeight: 0,
       ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
       ...(this.data.mapLocating ? { mapLocationMessage: '定位已取消，可重新定位。' } : {}),
     })
@@ -181,7 +301,7 @@ Page({
     else this.showRoute(this.data.selectedRouteId)
   },
   handleNetworkChange(event: WechatMiniprogram.SwitchChange) {
-    this.setData({ showAllRoutes: !!event.detail.value, viewMode: 'map' })
+    this.setData({ showAllRoutes: !!event.detail.value || !this.data.selectedRouteId, viewMode: 'map' })
     this.showRoute(this.data.selectedRouteId)
   },
   handleReferenceOrderChange(event: WechatMiniprogram.TouchEvent) {
@@ -191,16 +311,15 @@ Page({
     this.showRoute(this.data.selectedRouteId, false)
   },
   toggleRouteDetails() {
-    const version = ++this.cameraRequestVersion
-    this.setData({ routeDetailsExpanded: !this.data.routeDetailsExpanded, dataNotesExpanded: false }, () => {
-      if (version === this.cameraRequestVersion) this.fitMap()
-    })
+    const open = !this.data.routeDetailsExpanded
+    this.setData({ dataNotesExpanded: false })
+    this.setSheetSnap(open ? 'half' : 'peek')
   },
   toggleDataNotes() {
-    const version = ++this.cameraRequestVersion
-    this.setData({ dataNotesExpanded: !this.data.dataNotesExpanded, routeDetailsExpanded: false }, () => {
-      if (version === this.cameraRequestVersion) this.fitMap()
-    })
+    const open = !this.data.dataNotesExpanded
+    this.handleDismissKeyboard()
+    this.setData({ dataNotesExpanded: open, routeDetailsExpanded: false })
+    this.setSheetSnap(open ? 'full' : 'peek')
   },
   moveViewport(coordinate: Coordinate, scale: number) {
     const version = ++this.cameraRequestVersion
@@ -210,9 +329,10 @@ Page({
       }
     })
   },
-  handleCampusOverview() { this.moveViewport(CAMPUS_VIEWPORT.center, CAMPUS_VIEWPORT.scale) },
-  handleBeibeiOverview() { this.moveViewport(BEIBEI_VIEWPORT.center, BEIBEI_VIEWPORT.scale) },
+  handleCampusOverview() { this.setSheetSnap('peek', false); this.moveViewport(CAMPUS_VIEWPORT.center, CAMPUS_VIEWPORT.scale) },
+  handleBeibeiOverview() { this.setSheetSnap('peek', false); this.moveViewport(BEIBEI_VIEWPORT.center, BEIBEI_VIEWPORT.scale) },
   async handleMapLocate() {
+    this.setSheetSnap('peek', false)
     const version = ++this.mapLocationRequestVersion
     const cameraVersion = this.cameraRequestVersion
     this.setData({ mapLocating: true, mapLocation: null, mapLocationMessage: '正在定位…' })
@@ -223,7 +343,7 @@ Page({
       this.setData({ mapLocation: viewport.isWithinArea ? location.coordinate : null,
         mapLocationMessage: viewport.isWithinArea ?
           `已取得本次位置${location.isApproximate ? '，精度较低，请核对现场' : ''}。` : '当前位置不在北碚浏览范围，可继续手动选站或地图选点。' })
-      if (viewport.isWithinArea && cameraVersion === this.cameraRequestVersion && this.data.viewMode === 'map') this.moveViewport(viewport.center, viewport.scale)
+      if (viewport.isWithinArea && cameraVersion === this.cameraRequestVersion) this.moveViewport(viewport.center, viewport.scale)
     } catch (error: unknown) {
       if (version === this.mapLocationRequestVersion && this.pageVisible) this.setData({
         mapLocationMessage: error instanceof Error ? error.message : '定位失败，可继续浏览线路。',
@@ -236,6 +356,7 @@ Page({
     const stop = this.data.routeStops.find(({ key }) => key === event.currentTarget.dataset.visitKey)
     if (!stop) return
     this.setData({ showAllRoutes: false })
+    this.setSheetSnap('peek', false)
     this.showRoute(this.data.selectedRouteId, false)
     this.setData({ selectedVisitKey: stop.key, stopMessage: `${stop.name} · ${stop.canBoard ? '公布候车参考点' : stop.reviewText}`,
       mapMarkers: this.data.mapMarkers.map((item) => item.stopId === stop.stopId ?
@@ -258,21 +379,25 @@ Page({
   },
 
   clearJourneys() {
+    const redraw = !!this.data.selectedJourneyId || this.data.mapCircles.length > 0 || this.data.journeys.length > 0
     this.rememberedJourneyId = ''
     this.endpointRequestVersion += 1
+    this.cameraRequestVersion += 1
     this.setData({
-      journeys: [], selectedJourneyId: '', locating: false, journeyMessage: '选择已更新，请重新查询。',
+      journeys: [], selectedJourneyId: '', journeyPreview: null, planMessageVisible: false, locating: false, journeyMessage: '选择已更新，请重新查询。',
       activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1,
-      mapSelectionField: '', mapSelectionMessage: '',
+      mapSelectionField: '', mapSelectionMessage: '', placeSelectionMessage: '', placeMessageField: '',
       ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
     })
-    this.showRoute(this.data.selectedRouteId, false)
+    if (redraw) this.showRoute(this.data.selectedRouteId, false)
   },
   handleOriginChange(event: WechatMiniprogram.PickerChange) {
     const index = Number(event.detail.value)
     if (!Number.isInteger(index) || !this.data.stopOptions[index]) return
     this.clearJourneys()
+    this.confirmedOriginStopId = this.data.stopOptions[index].id
     this.setData({ originIndex: index, originMode: 'stop', originCoordinate: null, locationMessage: '',
+      originPlaceDetails: '', originNearbyStops: [],
       originQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
   },
   handleDestinationChange(event: WechatMiniprogram.PickerChange) {
@@ -280,47 +405,121 @@ Page({
     if (!Number.isInteger(index) || !this.data.stopOptions[index]) return
     this.clearJourneys()
     this.setData({ destinationIndex: index, destinationMode: 'stop', destinationCoordinate: null,
+      destinationPlaceDetails: '', destinationNearbyStops: [],
       destinationQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
+  },
+  handleExactStopChange(event: WechatMiniprogram.PickerChange) {
+    const index = Number(event.detail.value) - 1
+    if (!Number.isInteger(index) || index < 0 || !this.data.stopOptions[index]) return
+    const change = { detail: { value: String(index) } } as WechatMiniprogram.PickerChange
+    if (event.currentTarget.dataset.field === 'origin') this.handleOriginChange(change)
+    else if (event.currentTarget.dataset.field === 'destination') this.handleDestinationChange(change)
+    else return
+    this.replanIfReady()
   },
   handleSearchFocus(event: WechatMiniprogram.TouchEvent) {
     const field = endpointField(event.currentTarget.dataset.field)
     if (!field || !this.pageVisible) return
+    if (field === 'origin' && this.data.originMode === 'location') {
+      this.clearJourneys()
+      this.setData({ originMode: 'search', originQuery: '', locationMessage: '', originPlaceDetails: '', originNearbyStops: [] })
+    }
     this.setData({ viewMode: 'journey' })
+    this.setData({ focusedSearchField: field, sheetScrollTarget: `${field}-field`, dataNotesExpanded: false })
+    if (this.data.sheetSnap !== 'full') this.setSheetSnap('full', false)
     this.showSearchResults(field)
   },
   showSearchResults(field: EndpointField) {
     const query = field === 'origin' ? this.data.originQuery : this.data.destinationQuery
-    const searchResults = transitStopSearchService.search(query)
+    const searchResults = (this.placeSearch?.search(query) ?? []).map((item) => ({ ...item, nearbyStops: nearbyStopViews(item.nearbyStops) }))
     this.setData({ activeSearchField: field, searchResults, searchVersion: this.data.searchVersion + 1,
       mapSelectionField: '', mapSelectionMessage: '',
-      searchMessage: !query.trim() ? '输入站名、简称或门号，点选参考位置。' :
-        searchResults.length ? '点选参考位置，再自动比较附近上下车点。' : '没有匹配的当前站点，可换个关键词或在地图选点。',
+      searchMessage: !query.trim() ? '输入校内地址、办事用途、楼号或站名。' :
+        searchResults.length ? '点选地点后自动比较附近上下车点；距离为直线参考。' : '没有匹配的校内地点，可换关键词或用腾讯地图选点。',
     })
   },
-  handleSearchInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
+  handleSearchInput(event: { currentTarget: { dataset: { field?: unknown } }; detail: { value: string } }) {
     const field = endpointField(event.currentTarget.dataset.field)
     if (!field || typeof event.detail.value !== 'string' || !this.pageVisible) return
     const query = event.detail.value.slice(0, 64)
     this.setData({ viewMode: 'journey' })
     this.clearJourneys()
-    this.setData(field === 'origin' ? { originQuery: query, originMode: 'search', originCoordinate: null, locationMessage: '' } :
-      { destinationQuery: query, destinationMode: 'search', destinationCoordinate: null })
+    if (field === 'origin') this.confirmedOriginStopId = ''
+    this.setData(field === 'origin' ? { originQuery: query, originMode: 'search', originCoordinate: null, locationMessage: '', originPlaceDetails: '', originNearbyStops: [] } :
+      { destinationQuery: query, destinationMode: 'search', destinationCoordinate: null, destinationPlaceDetails: '', destinationNearbyStops: [] })
+    this.setData({ focusedSearchField: field, sheetScrollTarget: `${field}-field`, dataNotesExpanded: false })
+    if (this.data.sheetSnap !== 'full') this.setSheetSnap('full', false)
     this.showSearchResults(field)
   },
   handleSelectSearchResult(event: WechatMiniprogram.TouchEvent) {
-    const { field: rawField, stopId, searchVersion } = event.currentTarget.dataset
+    const { field: rawField, suggestionId, stopId, searchVersion } = event.currentTarget.dataset
     const field = endpointField(rawField)
     if (!field || !this.pageVisible || field !== this.data.activeSearchField || Number(searchVersion) !== this.data.searchVersion) return
-    const suggestion = this.data.searchResults.find((item) => item.stopId === stopId)
-    const index = this.data.stopOptions.findIndex((item) => item.id === suggestion?.stopId)
-    const stop = this.dataset?.stops.find((item) => item.id === suggestion?.stopId)
-    if (!stop || index < 0) return
+    const suggestion = this.data.searchResults.find((item) => suggestionId ? item.id === suggestionId : typeof stopId === 'string' && item.stopId === stopId)
+    if (!suggestion) return
+    if (!suggestion.coordinate) {
+      wx.hideKeyboard()
+      this.setData({ focusedSearchField: '', keyboardHeight: 0 })
+      this.clearJourneys()
+      if (field === 'origin') this.confirmedOriginStopId = ''
+      this.setData({ placeMessageField: field, placeSelectionMessage: `${suggestion.name}：名称和用途已收录，请用腾讯地图或地图选点确认具体位置后推荐站点。`,
+        ...(field === 'origin' ? { originQuery: suggestion.name, originMode: 'search', originCoordinate: null, originIndex: -1,
+          originPlaceDetails: suggestion.details ?? '', originNearbyStops: [], locationMessage: '' } : { destinationQuery: suggestion.name, destinationMode: 'search', destinationCoordinate: null,
+          destinationIndex: -1, destinationPlaceDetails: suggestion.details ?? '', destinationNearbyStops: [] }) })
+      this.setSheetSnap('full', false)
+      return
+    }
+    this.commitCampusPlace(field, suggestion.coordinate, suggestion.name,
+      `${suggestion.sourceLabel}。${suggestion.details ?? ''}`, suggestion.kind === 'stop' ? suggestion.stopId : undefined)
+  },
+  commitCampusPlace(field: EndpointField, point: Coordinate, name: string, details: string, stopId?: string) {
+    const index = stopId ? this.data.stopOptions.findIndex((item) => item.id === stopId) : -1
+    const nearbyStops = nearbyStopViews(this.placeSearch?.nearby(point) ?? [])
     wx.hideKeyboard()
+    this.setData({ focusedSearchField: '', keyboardHeight: 0 })
+    if (field === 'origin') this.confirmedOriginStopId = stopId ?? ''
     this.clearJourneys()
     this.setData(field === 'origin' ? {
-      originQuery: stop.name, originMode: 'place', originCoordinate: { ...stop.coordinate }, originIndex: index, locationMessage: '',
-    } : { destinationQuery: stop.name, destinationMode: 'place', destinationCoordinate: { ...stop.coordinate }, destinationIndex: index })
+      originQuery: name, originMode: 'place', originCoordinate: { ...point }, originIndex: index, locationMessage: '', originPlaceDetails: details, originNearbyStops: nearbyStops,
+    } : { destinationQuery: name, destinationMode: 'place', destinationCoordinate: { ...point }, destinationIndex: index, destinationPlaceDetails: details, destinationNearbyStops: nearbyStops })
     this.replanIfReady()
+  },
+  async handleChooseTencentPlace(event: WechatMiniprogram.TouchEvent) {
+    const field = endpointField(event.currentTarget.dataset.field)
+    if (!field || !this.pageVisible || this.data.nativePlacePicking) return
+    this.handleDismissKeyboard()
+    const version = ++this.endpointRequestVersion, request = ++this.nativePlaceRequestVersion
+    this.mapLocationRequestVersion += 1
+    this.pendingTencentPlace = null
+    this.setData({ nativePlacePicking: true, locating: false, mapLocating: false, placeSelectionMessage: '', placeMessageField: field,
+      ...(this.data.locating ? { locationMessage: '本次定位已取消，可重新定位或选择起点。' } : {}),
+      ...(this.data.mapLocating ? { mapLocationMessage: '定位已取消，可重新定位。' } : {}) })
+    try {
+      const result = await new Promise<WechatMiniprogram.ChooseLocationSuccessCallbackResult>((resolve, reject) => {
+        wx.chooseLocation({ ...CAMPUS_VIEWPORT.center, success: resolve, fail: reject })
+      })
+      if (version !== this.endpointRequestVersion) return
+      const point = { latitude: result.latitude, longitude: result.longitude }
+      if (!getLocationViewport(point).isWithinArea || typeof result.name !== 'string' || !result.name.trim()) {
+        this.setData({ placeSelectionMessage: '未取得有效的校区周边位置，请在校园范围重新选点。' }); return
+      }
+      this.pendingTencentPlace = { field, point, name: result.name.trim().slice(0, 64),
+        details: `腾讯地图选择位置。${typeof result.address === 'string' ? result.address.slice(0, 200) : ''}`, version }
+      this.applyPendingTencentPlace()
+    } catch (error: unknown) {
+      const message = typeof error === 'object' && error !== null && 'errMsg' in error ? String(error.errMsg) : ''
+      if (version === this.endpointRequestVersion && !/cancel(?:led)?\b/i.test(message)) this.setData({
+        placeSelectionMessage: '腾讯地图选点暂不可用，可能尚未开放接口或获得位置权限；可继续搜索校内地点或手动点图。',
+      })
+    } finally {
+      if (request === this.nativePlaceRequestVersion) this.setData({ nativePlacePicking: false })
+    }
+  },
+  applyPendingTencentPlace() {
+    const selected = this.pendingTencentPlace
+    if (!selected || !this.pageVisible) return
+    this.pendingTencentPlace = null
+    if (selected.version === this.endpointRequestVersion) this.commitCampusPlace(selected.field, selected.point, selected.name, selected.details)
   },
   handleStartMapSelection(event: WechatMiniprogram.TouchEvent) {
     const field = endpointField(event.currentTarget.dataset.field)
@@ -329,8 +528,10 @@ Page({
     this.setData({ viewMode: 'journey' })
     this.clearJourneys()
     this.setData({ mapSelectionField: field, mapSelectionMessage: `请点击地图空白处选择${field === 'origin' ? '出发' : '到达'}位置，可先拖动／缩放。` })
+    this.setData({ focusedSearchField: '', keyboardHeight: 0 })
+    this.setSheetSnap('peek', false)
   },
-  handleCancelMapSelection() { this.setData({ mapSelectionField: '', mapSelectionMessage: '' }) },
+  handleCancelMapSelection() { this.setData({ mapSelectionField: '', mapSelectionMessage: '' }); this.setSheetSnap('half') },
   handleMapTap(event: WechatMiniprogram.MapTap) {
     const field = endpointField(this.data.mapSelectionField)
     if (!field || !this.pageVisible) return
@@ -340,13 +541,19 @@ Page({
     }
     const coordinate = { latitude, longitude }
     this.clearJourneys()
-    this.setData(field === 'origin' ? { originMode: 'map', originCoordinate: coordinate, originQuery: '地图所选起点', locationMessage: '' } :
-      { destinationMode: 'map', destinationCoordinate: coordinate, destinationQuery: '地图所选终点' })
+    if (field === 'origin') this.confirmedOriginStopId = ''
+    const nearbyStops = nearbyStopViews(this.placeSearch?.nearby(coordinate) ?? [])
+    this.setData(field === 'origin' ? { originMode: 'map', originCoordinate: coordinate, originQuery: '地图所选起点', locationMessage: '', originPlaceDetails: '手动地图参考点。', originNearbyStops: nearbyStops } :
+      { destinationMode: 'map', destinationCoordinate: coordinate, destinationQuery: '地图所选终点', destinationPlaceDetails: '手动地图参考点。', destinationNearbyStops: nearbyStops })
     this.replanIfReady()
   },
   replanIfReady() {
     if (this.data.originMode !== 'search' && this.data.destinationMode !== 'search' && !this.data.locating) this.handlePlanJourney()
-    else this.setData({ journeyMessage: '请从搜索结果或地图选择完整的起点和终点。' })
+    else {
+      this.setData({ journeyMessage: '请从搜索结果或地图选择完整的起点和终点。' })
+      this.setSheetSnap('half', false)
+      this.showPlanningOverview(true)
+    }
   },
   referenceCircles(): ReferenceCircle[] {
     const circles: ReferenceCircle[] = []
@@ -359,6 +566,7 @@ Page({
     return circles
   },
   showPlanningOverview(fit = false) {
+    this.setData({ showAllRoutes: true })
     this.showRoute(this.data.selectedRouteId, false)
     const mapCircles = this.referenceCircles()
     const version = this.cameraRequestVersion
@@ -367,16 +575,19 @@ Page({
     ] }, () => { if (fit && version === this.cameraRequestVersion) this.fitMap() })
   },
   async handleUseLocation() {
+    this.handleDismissKeyboard()
     this.setData({ viewMode: 'journey' })
     this.clearJourneys()
     const version = this.endpointRequestVersion
-    this.setData({ locating: true, originMode: 'stop', originCoordinate: null, locationMessage: '正在定位…',
-      originQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[this.data.originIndex]?.id)?.name ?? '' })
+    const fallback = this.data.stopOptions.findIndex(({ id }) => id === this.confirmedOriginStopId)
+    this.setData({ locating: true, originMode: fallback >= 0 ? 'stop' : 'location', originCoordinate: null, locationMessage: '正在定位…', originPlaceDetails: '', originNearbyStops: [],
+      originQuery: fallback >= 0 ? this.dataset?.stops.find(({ id }) => id === this.confirmedOriginStopId)?.name ?? '' : '当前位置' })
     try {
       const location = await locationService.getCurrentLocation()
       if (version !== this.endpointRequestVersion || !this.pageVisible) return
       this.setData({
-        originMode: 'coordinate', originCoordinate: location.coordinate, originQuery: '我的位置',
+        originMode: 'coordinate', originCoordinate: location.coordinate, originQuery: '当前位置', originPlaceDetails: '',
+        originNearbyStops: nearbyStopViews(this.placeSearch?.nearby(location.coordinate) ?? []),
         locationMessage: `已使用本次定位结果${location.isApproximate ? '，定位精度较低，请核对候车位置' : ''}；接驳距离按直线估算。`,
       })
     } catch (error: unknown) {
@@ -392,11 +603,13 @@ Page({
   },
 
   handlePlanJourney() {
-    this.setData({ viewMode: 'journey' })
+    this.setData({ viewMode: 'journey', planMessageVisible: true })
     if (this.data.locating) { this.setData({ journeyMessage: '请等待定位完成，或手动选择上车站。' }); return }
     if (this.data.originMode === 'search' || this.data.destinationMode === 'search') {
+      this.setSheetSnap('full', false)
       this.setData({ journeyMessage: `请从搜索结果或地图选择${this.data.originMode === 'search' ? '起点' : '终点'}，输入文字尚未确认。` }); return
     }
+    if (this.data.originMode === 'location') { void this.handleUseLocation(); return }
     try {
       const origin = this.data.originMode !== 'stop' && this.data.originCoordinate
         ? { kind: 'coordinate' as const, coordinate: this.data.originCoordinate }
@@ -419,11 +632,11 @@ Page({
         })),
       }))
       this.cameraRequestVersion += 1
-      this.setData({ journeys, selectedJourneyId: '', journeyMessage: result.message })
+      this.setData({ journeys, selectedJourneyId: '', journeyPreview: null, journeyMessage: result.message })
       if (journeys[0]) this.showJourney(journeys[0])
-      else this.showPlanningOverview()
+      else { this.setSheetSnap('half', false); this.showPlanningOverview(true) }
     } catch (error: unknown) {
-      this.setData({ journeys: [], selectedJourneyId: '', journeyMessage: error instanceof Error ? error.message : '暂不能生成乘车方案。' })
+      this.setData({ journeys: [], selectedJourneyId: '', journeyPreview: null, journeyMessage: error instanceof Error ? error.message : '暂不能生成乘车方案。' })
       this.showRoute(this.data.selectedRouteId, false)
     }
   },
@@ -440,11 +653,20 @@ Page({
       markers.set(boarding.id, marker(dataset, boarding, index === 0 ? '上车 · ' : '换乘 · '))
       markers.set(alighting.id, marker(dataset, alighting, index === journey.legs.length - 1 ? '下车 · ' : '换乘 · '))
     })
+    if (this.data.focusedSearchField || this.data.keyboardHeight) {
+      wx.hideKeyboard()
+      this.setData({ focusedSearchField: '', keyboardHeight: 0 })
+    }
+    this.setSheetSnap('peek', false)
     const version = ++this.cameraRequestVersion
     const points = journey.legs.flatMap((leg) => leg.points)
     const mapCircles = this.referenceCircles()
     this.rememberedJourneyId = journey.id
     this.setData({
+      focusedSearchField: '', keyboardHeight: 0,
+      journeyPreview: { title: journey.title, boardingName: journey.legs[0].boardingName,
+        alightingName: journey.legs[journey.legs.length - 1].alightingName, routeText: journey.legs.map(({ routeName }) => routeName).join(' → '),
+        distanceText: journey.distanceText, connectionText: journey.connectionText },
       viewMode: 'journey', mapLegend: journey.legs.map(({ routeId, routeName: name, color }) => ({ routeId, name, color })),
       selectedJourneyId: journey.id, mapTitle: '所选乘车区间', stopMessage: '', routeWarnings: [...journey.warnings],
       mapPolylines: journey.legs.map((leg) => ({ points: leg.points, color: leg.color, width: 8, arrowLine: true })),
