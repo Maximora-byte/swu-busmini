@@ -22,6 +22,7 @@ interface PageData {
   selectedJourneyId: string
   journeyMessage: string
   locationMessage: string
+  locating: boolean
   mapPolylines: { points: Coordinate[] }[]
   mapMarkers: { stopId: string; latitude: number; longitude: number }[]
 }
@@ -265,4 +266,50 @@ test('a hidden page discards a pending location instead of resurrecting old orig
   page.onShow()
   assert.equal(page.data.originMode, 'stop')
   assert.equal(page.data.originCoordinate, null)
+})
+
+test('a failed location refresh cannot silently reuse a previous successful GPS fix', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  const first = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await first
+  assert.equal(page.data.originMode, 'coordinate')
+  const retry = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  assert.equal(page.data.originCoordinate, null, 'refresh must invalidate the old fix before completion')
+  runtime.rejectLocation()
+  await retry
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(page.data.locating, false)
+})
+
+test('refreshing location then hiding or changing destination leaves no old fix or pending status', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  const first = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await first
+  const refresh = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.onHide()
+  runtime.resolveLocation({ latitude: 29.821, longitude: 106.421 })
+  await refresh
+  page.onShow()
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.locating, false)
+  assert.doesNotMatch(page.data.locationMessage, /正在定位/)
+  const pending = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.handleDestinationChange({ detail: { value: '3' } })
+  runtime.resolveLocation({ latitude: 29.822, longitude: 106.422 })
+  await pending
+  assert.equal(page.data.originCoordinate, null)
+  assert.doesNotMatch(page.data.locationMessage, /正在定位/)
 })

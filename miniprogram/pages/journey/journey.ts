@@ -76,12 +76,15 @@ Page({
   },
   onShow() { this.pageVisible = true },
   onHide() { this.cancelPendingActions() },
-  onUnload() { this.cancelPendingActions() },
-  cancelPendingActions() {
+  onUnload() { this.cancelPendingActions(false); this.mapReady = false },
+  cancelPendingActions(updateView = true) {
     this.pageVisible = false
     this.cameraRequestVersion += 1
     this.endpointRequestVersion += 1
-    this.setData({ locating: false })
+    if (updateView) this.setData({
+      locating: false,
+      ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
+    })
   },
 
   fitMap() {
@@ -109,7 +112,10 @@ Page({
 
   clearJourneys() {
     this.endpointRequestVersion += 1
-    this.setData({ journeys: [], selectedJourneyId: '', locating: false, journeyMessage: '选择已更新，请重新查询。' })
+    this.setData({
+      journeys: [], selectedJourneyId: '', locating: false, journeyMessage: '选择已更新，请重新查询。',
+      ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
+    })
     this.showRoute(this.data.selectedRouteId, false)
   },
   handleOriginChange(event: WechatMiniprogram.PickerChange) {
@@ -127,13 +133,13 @@ Page({
   async handleUseLocation() {
     this.clearJourneys()
     const version = this.endpointRequestVersion
-    this.setData({ locating: true, locationMessage: '正在定位…' })
+    this.setData({ locating: true, originMode: 'stop', originCoordinate: null, locationMessage: '正在定位…' })
     try {
       const location = await locationService.getCurrentLocation()
       if (version !== this.endpointRequestVersion || !this.pageVisible) return
       this.setData({
         originMode: 'coordinate', originCoordinate: location.coordinate,
-        locationMessage: `已使用当前位置${location.isApproximate ? '，定位精度较低，请核对候车位置' : ''}；接驳距离按直线估算。`,
+        locationMessage: `已使用本次定位结果${location.isApproximate ? '，定位精度较低，请核对候车位置' : ''}；接驳距离按直线估算。`,
       })
     } catch (error: unknown) {
       if (version === this.endpointRequestVersion && this.pageVisible) {

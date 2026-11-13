@@ -16,7 +16,7 @@
     <view class="journey-content__inner">
       <view class="journey-form">
         <view class="field-heading"><text>从哪里上车</text><button size="mini" class="location-button" loading="{{locating}}" disabled="{{locating}}" bindtap="handleUseLocation">从我的位置出发</button></view>
-        <picker range="{{stopNames}}" value="{{originIndex}}" bindchange="handleOriginChange"><view class="stop-picker">{{originMode === 'coordinate' ? '当前位置（可点此改选站点）' : stopNames[originIndex]}}<text>⌄</text></view></picker>
+        <picker range="{{stopNames}}" value="{{originIndex}}" bindchange="handleOriginChange"><view class="stop-picker">{{originMode === 'coordinate' ? '本次定位起点（可点此改选站点）' : stopNames[originIndex]}}<text>⌄</text></view></picker>
         <text wx:if="{{locationMessage}}" class="location-message">{{locationMessage}}</text>
         <text class="field-heading">到哪里下车</text>
         <picker range="{{stopNames}}" value="{{destinationIndex}}" bindchange="handleDestinationChange"><view class="stop-picker">{{stopNames[destinationIndex]}}<text>⌄</text></view></picker>
