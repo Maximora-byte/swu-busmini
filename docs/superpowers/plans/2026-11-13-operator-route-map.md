@@ -57,5 +57,4 @@ Interfaces: third `catalog` tab, catalog selection state, map options expanded s
 
 - [x] Run check:data-sync, validate:data, typecheck and test:coverage; inspect results.
 - [x] Request independent whole-branch review; resolve consequential findings with regression tests.
-- [ ] Commit only task files, push codex/operator-route-map and open one focused PR; inspect CI and report actual status. Do not merge.
-
+- [x] Commit only task files, push codex/operator-route-map and open one focused PR; inspect CI and report actual status. Do not merge.
