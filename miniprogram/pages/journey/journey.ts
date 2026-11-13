@@ -93,7 +93,18 @@ Page({
 
   fitMap() {
     if (!this.pageVisible || !this.mapReady || this.data.mapFitPoints.length < 2) return
-    wx.createMapContext('journey-map', this).includePoints({ points: this.data.mapFitPoints, padding: [38, 38, 38, 38] })
+    const version = this.cameraRequestVersion
+    const points = this.data.mapFitPoints
+    wx.createSelectorQuery().in(this).select('#journey-map').boundingClientRect((rect) => {
+      if (!rect || !Number.isFinite(rect.width) || !Number.isFinite(rect.height) || rect.width <= 0 || rect.height <= 0 ||
+        version !== this.cameraRequestVersion || !this.pageVisible || !this.mapReady) return
+      // Native callouts extend above their anchors. Bound the inset by the measured
+      // map size so short screens still have room for the riding segment.
+      const side = Math.min(80, rect.width * 0.2)
+      wx.createMapContext('journey-map', this).includePoints({
+        points, padding: [Math.min(120, rect.height * 0.4), side, Math.min(80, rect.height * 0.2), side],
+      })
+    }).exec()
   },
   showRoute(routeId: string, fit = true) {
     const dataset = this.dataset

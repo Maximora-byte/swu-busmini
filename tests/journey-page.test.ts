@@ -44,17 +44,33 @@ interface JourneyPage {
   handleUseLocation(): Promise<void>
 }
 
-function createRuntime(deferRendering = false) {
+function createRuntime(deferRendering = false, deferMapMeasurement = false) {
   const root = fileURLToPath(new URL('../miniprogram/', import.meta.url))
   const modules = new Map<string, { exports: unknown }>()
   const pendingRendering: (() => void)[] = []
   const pendingLocation: { success(result: Coordinate & { accuracy: number }): void; fail(error: { errMsg: string }): void }[] = []
   const fitPoints: Coordinate[][] = []
+  const fitPadding: number[][] = []
+  const pendingMapMeasurement: ((rect: { width: number; height: number }) => void)[] = []
   const openedStops: Coordinate[] = []
   let page: JourneyPage | undefined
   const wx = {
     createMapContext() {
-      return { setBoundary() {}, includePoints(options: { points: Coordinate[] }) { fitPoints.push(options.points) } }
+      return { setBoundary() {}, includePoints(options: { points: Coordinate[]; padding: number[] }) {
+        fitPoints.push(options.points)
+        fitPadding.push(options.padding)
+      } }
+    },
+    createSelectorQuery() {
+      const query = {
+        in() { return query }, select() { return query },
+        boundingClientRect(callback: (rect: { width: number; height: number }) => void) {
+          if (deferMapMeasurement) pendingMapMeasurement.push(callback)
+          else callback({ width: 390, height: 294 })
+          return query
+        }, exec() {},
+      }
+      return query
     },
     getSetting(options: { success(result: { authSetting: Record<string, boolean> }): void }) {
       options.success({ authSetting: { 'scope.userLocation': true } })
@@ -93,7 +109,10 @@ function createRuntime(deferRendering = false) {
     return module.exports
   }
   return {
-    fitPoints, openedStops,
+    fitPoints, fitPadding, openedStops,
+    flushMapMeasurements(width = 390, height = 294) {
+      pendingMapMeasurement.splice(0).forEach((callback) => callback({ width, height }))
+    },
     page() {
       const path = resolve(root, 'pages/journey/journey.ts')
       assert.ok(existsSync(path), 'offline journey page must be implemented')
@@ -144,6 +163,34 @@ test('new default journey entry shows ten operator routes and published geometry
   assert.ok(runtime.fitPoints.length > 0)
   const route = runtime.dataset().routes.find(({ id }) => id === page.data.selectedRouteId)!
   assert.equal(JSON.stringify(page.data.mapPolylines[0].points), JSON.stringify(route.points))
+})
+
+test('a delayed map measurement cannot restore the previous route or move a hidden page', () => {
+  const runtime = createRuntime(false, true)
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_4' } } })
+  assert.equal(runtime.fitPoints.length, 0, 'fit must wait for the actual map dimensions')
+  runtime.flushMapMeasurements()
+  assert.equal(runtime.fitPoints.length, 1)
+  assert.equal(JSON.stringify(runtime.fitPoints[0]), JSON.stringify(page.data.mapPolylines[0].points))
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_2' } } })
+  page.onHide()
+  runtime.flushMapMeasurements()
+  assert.equal(runtime.fitPoints.length, 1, 'a hidden page must not receive a delayed camera update')
+})
+
+test('fitting a compact map leaves a usable viewport after reserving marker label space', () => {
+  const runtime = createRuntime(false, true)
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  runtime.flushMapMeasurements(280, 100)
+  const [top, right, bottom, left] = runtime.fitPadding[0]
+  assert.ok(top > bottom, 'above-marker callouts need more space than the bottom edge')
+  assert.ok(top + bottom < 100)
+  assert.ok(left + right < 280)
 })
 
 test('a station journey displays the actual riding segment and opens only a published stop coordinate', () => {
