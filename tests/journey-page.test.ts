@@ -8,6 +8,7 @@ import ts from 'typescript'
 import type { Coordinate } from '../miniprogram/models/index'
 import type { TransitDataset } from '../miniprogram/models/current-transit'
 import type { TransitJourney } from '../miniprogram/services/navigation/transit-journey.service'
+import type { TransitStopSuggestion } from '../miniprogram/services/navigation/transit-stop-search.service'
 
 interface PageData {
   routeOptions: { id: string; name: string }[]
@@ -19,7 +20,18 @@ interface PageData {
   destinationIndex: number
   originMode: string
   originCoordinate: Coordinate | null
-  journeys: TransitJourney[]
+  destinationMode: string
+  destinationCoordinate: Coordinate | null
+  originQuery: string
+  destinationQuery: string
+  searchResults: TransitStopSuggestion[]
+  searchVersion: number
+  activeSearchField: string
+  mapSelectionField: string
+  mapSelectionMessage: string
+  mapCircles: (Coordinate & { color: string })[]
+  mapFitPoints: Coordinate[]
+  journeys: (TransitJourney & { isRecommended: boolean; connectionText: string })[]
   selectedJourneyId: string
   journeyMessage: string
   locationMessage: string
@@ -27,7 +39,7 @@ interface PageData {
   mapPolylines: { points: Coordinate[] }[]
   mapMarkers: { stopId: string; latitude: number; longitude: number; callout: { content: string } }[]
 }
-interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string } } }
+interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; stopId?: string; searchVersion?: number } } }
 interface JourneyPage {
   data: PageData
   setData(update: Partial<PageData>, callback?: () => void): void
@@ -42,6 +54,12 @@ interface JourneyPage {
   handleShowJourney(event: Event): void
   handleOpenStop(event: Event): void
   handleUseLocation(): Promise<void>
+  handleSearchInput(event: Event & { detail: { value: string } }): void
+  handleSearchFocus(event: Event): void
+  handleSelectSearchResult(event: Event): void
+  handleStartMapSelection(event: Event): void
+  handleCancelMapSelection(): void
+  handleMapTap(event: { detail: Coordinate }): void
 }
 
 function createRuntime(deferRendering = false, deferMapMeasurement = false) {
@@ -78,6 +96,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
     getLocation(options: (typeof pendingLocation)[number]) { pendingLocation.push(options) },
     openLocation(options: Coordinate) { openedStops.push({ latitude: options.latitude, longitude: options.longitude }) },
     navigateTo() {},
+    hideKeyboard() {},
   }
   function load(path: string): unknown {
     assert.ok(path.startsWith(root + sep) || path.startsWith(root))
@@ -398,4 +417,156 @@ test('a valid B-line ride passes the source geometry without presenting the offs
   assert.ok(!direct.legs[0].stopIds.includes(suspect.stopId))
   assert.ok(direct.legs[0].points.length > 2)
   assert.ok(direct.legs[0].boardingVisitIndex < direct.legs[0].alightingVisitIndex)
+})
+
+function searchInput(page: JourneyPage, field: string, value: string) {
+  page.handleSearchInput({ currentTarget: { dataset: { field } }, detail: { value } })
+}
+function selectSuggestion(page: JourneyPage, field: string, name: string) {
+  const suggestion = page.data.searchResults.find((result) => result.name === name)!
+  assert.ok(suggestion, `expected a search result for ${name}`)
+  page.handleSelectSearchResult({ currentTarget: { dataset: { field, stopId: suggestion.stopId, searchVersion: page.data.searchVersion } } })
+  return suggestion
+}
+
+test('confirmed search locations automatically recommend both ends and retain exact-stop selection', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  searchInput(page, 'origin', '经济管理学院')
+  const source = selectSuggestion(page, 'origin', '经管院')
+  searchInput(page, 'destination', '医院')
+  selectSuggestion(page, 'destination', '校医院')
+  assert.equal(page.data.originMode, 'place')
+  assert.equal(page.data.destinationMode, 'place')
+  const reference = runtime.dataset().stops.find(({ id }) => id === source.stopId)!.coordinate
+  assert.equal(JSON.stringify(page.data.originCoordinate), JSON.stringify(reference))
+  assert.ok(page.data.journeys.length)
+  assert.equal(page.data.selectedJourneyId, page.data.journeys[0].id)
+  assert.equal(page.data.journeys[0].isRecommended, true)
+  assert.ok(page.data.journeys.slice(1).every((journey) => !journey.isRecommended))
+  assert.match(page.data.journeys[0].connectionText, /上车.*下车/)
+  assert.equal(page.data.mapCircles.length, 2)
+  assert.ok(page.data.mapFitPoints.some(({ latitude, longitude }) => latitude === reference.latitude && longitude === reference.longitude))
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  page.handlePlanJourney()
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.destinationMode, 'stop')
+  assert.equal(page.data.journeys[0].legs.length, 2, 'explicit 经管院·1号线 still needs the exact gate5 transfer')
+  assert.equal(page.data.mapCircles.length, 0)
+})
+
+test('editing or clearing a selected place cannot silently plan from its old coordinate', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  searchInput(page, 'origin', '中图')
+  selectSuggestion(page, 'origin', '中心图书馆')
+  searchInput(page, 'origin', '完全不存在的地点')
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(page.data.journeys.length, 0)
+  assert.equal(page.data.searchResults.length, 0)
+  page.handlePlanJourney()
+  assert.equal(page.data.journeys.length, 0)
+  assert.match(page.data.journeyMessage, /起点.*选择|选择.*起点/)
+  searchInput(page, 'origin', '')
+  page.handlePlanJourney()
+  assert.equal(page.data.journeys.length, 0)
+  assert.equal(page.data.originQuery, '')
+})
+
+test('stale search clicks from an earlier query or field cannot commit a place', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  searchInput(page, 'origin', '经管')
+  const old = { field: 'origin', stopId: page.data.searchResults[0].stopId, searchVersion: page.data.searchVersion }
+  searchInput(page, 'origin', '经管院')
+  page.handleSelectSearchResult({ currentTarget: { dataset: old } })
+  assert.equal(page.data.originCoordinate, null)
+  page.handleSearchFocus({ currentTarget: { dataset: { field: 'destination' } } })
+  page.handleSelectSearchResult({ currentTarget: { dataset: { ...old, searchVersion: page.data.searchVersion } } })
+  assert.equal(page.data.originCoordinate, null)
+})
+
+test('typing while GPS is pending cancels that request and preserves the search text', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  const request = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  searchInput(page, 'origin', '中图')
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await request
+  assert.equal(page.data.originQuery, '中图')
+  assert.equal(page.data.originMode, 'search')
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(page.data.locating, false)
+})
+
+test('map selection requires an explicit field, validates coordinates and supports cancellation', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  const point = { ...runtime.dataset().stops[0].coordinate }
+  page.handleMapTap({ detail: point })
+  assert.equal(page.data.originMode, 'stop')
+  page.handleStartMapSelection({ currentTarget: { dataset: { field: 'destination' } } })
+  page.handleCancelMapSelection()
+  page.handleMapTap({ detail: point })
+  assert.equal(page.data.destinationCoordinate, null)
+  page.handleStartMapSelection({ currentTarget: { dataset: { field: 'origin' } } })
+  page.handleMapTap({ detail: { latitude: 91, longitude: 106.42 } })
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(page.data.mapSelectionField, 'origin')
+  page.handleMapTap({ detail: point })
+  assert.equal(page.data.originMode, 'map')
+  assert.equal(JSON.stringify(page.data.originCoordinate), JSON.stringify(point))
+  assert.equal(page.data.mapSelectionField, '')
+  assert.ok(page.data.journeys.length)
+  assert.ok(page.data.mapCircles.some(({ latitude }) => latitude === point.latitude))
+  page.handleStartMapSelection({ currentTarget: { dataset: { field: 'destination' } } })
+  page.onHide()
+  page.onShow()
+  page.handleMapTap({ detail: point })
+  assert.equal(page.data.destinationCoordinate, null, 'leaving the page cancels the map selection session')
+})
+
+test('map points on both ends auto-plan and a far point keeps its reference without an old journey', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  const select = (field: string, coordinate: Coordinate) => {
+    page.handleStartMapSelection({ currentTarget: { dataset: { field } } })
+    page.handleMapTap({ detail: coordinate })
+  }
+  select('origin', runtime.dataset().stops[0].coordinate)
+  select('destination', runtime.dataset().stops[28].coordinate)
+  assert.equal(page.data.destinationMode, 'map')
+  assert.ok(page.data.journeys.length)
+  assert.equal(page.data.mapCircles.length, 2)
+  select('destination', { latitude: 29.9, longitude: 106.5 })
+  assert.equal(page.data.journeys.length, 0)
+  assert.match(page.data.journeyMessage, /800|范围/)
+  assert.ok(page.data.mapCircles.some(({ longitude }) => longitude === 106.5))
+  assert.ok(page.data.mapFitPoints.some(({ latitude, longitude }) => latitude === 29.9 && longitude === 106.5),
+    'look-at-all must retain the selected reference even when no journey is available')
+})
+
+test('a successful location request automatically refreshes the recommendation for a selected destination', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  searchInput(page, 'destination', '校医院')
+  selectSuggestion(page, 'destination', '校医院')
+  const locating = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  runtime.resolveLocation(runtime.dataset().stops[0].coordinate)
+  await locating
+  assert.equal(page.data.originMode, 'coordinate')
+  assert.ok(page.data.journeys.length, 'the user should not need a second query action after GPS completes')
 })

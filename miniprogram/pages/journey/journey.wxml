@@ -11,21 +11,42 @@
   </scroll-view>
   <view class="map-heading"><text class="map-title">{{mapTitle}}</text><button size="mini" class="map-fit" bindtap="fitMap">看全图</button></view>
   <view class="review-status"><text>{{directionStatusText}}</text><text wx:if="{{routeWarnings.length}}">本线含待核对项；偏移点不自动推荐，详见下方说明。</text></view>
-  <map id="journey-map" class="journey-map" latitude="{{latitude}}" longitude="{{longitude}}" scale="{{scale}}" min-scale="{{minScale}}" max-scale="{{maxScale}}" markers="{{mapMarkers}}" polyline="{{mapPolylines}}" bindmarkertap="handleMarkerTap" bindcallouttap="handleMarkerTap" show-location="{{originMode === 'coordinate'}}" show-scale></map>
+  <view wx:if="{{mapSelectionField}}" class="map-selection"><text>{{mapSelectionMessage}}</text><button size="mini" bindtap="handleCancelMapSelection">取消选点</button></view>
+  <map id="journey-map" class="journey-map" latitude="{{latitude}}" longitude="{{longitude}}" scale="{{scale}}" min-scale="{{minScale}}" max-scale="{{maxScale}}" markers="{{mapMarkers}}" polyline="{{mapPolylines}}" circles="{{mapCircles}}" bindtap="handleMapTap" bindmarkertap="handleMarkerTap" bindcallouttap="handleMarkerTap" show-location="{{originMode === 'coordinate'}}" show-scale></map>
+  <view wx:if="{{mapCircles.length}}" class="reference-legend"><text wx:if="{{originCoordinate}}" class="reference-origin">● 出发参考位置</text><text wx:if="{{destinationCoordinate}}" class="reference-destination">● 到达参考位置</text><text>图标为实际乘降点</text></view>
   <text wx:if="{{stopMessage}}" class="stop-message">{{stopMessage}}</text>
   <scroll-view class="journey-content" scroll-y>
     <view class="journey-content__inner">
       <view class="journey-form">
-        <view class="field-heading"><text>从哪里上车</text><button size="mini" class="location-button" loading="{{locating}}" disabled="{{locating}}" bindtap="handleUseLocation">从我的位置出发</button></view>
-        <picker range="{{stopNames}}" value="{{originIndex}}" disabled="{{!stopNames.length}}" bindchange="handleOriginChange"><view class="stop-picker">{{originMode === 'coordinate' ? '本次定位起点（可点此改选站点）' : (stopNames[originIndex] || '暂无可自动推荐的站点')}}<text>⌄</text></view></picker>
+        <view class="field-heading"><text>从哪里出发</text><button size="mini" class="location-button" loading="{{locating}}" disabled="{{locating}}" bindtap="handleUseLocation">从我的位置出发</button></view>
+        <input class="place-input" value="{{originQuery}}" maxlength="64" placeholder="搜站名、简称，如中图、五号门" confirm-type="search" data-field="origin" bindinput="handleSearchInput" bindfocus="handleSearchFocus" bindconfirm="handlePlanJourney" />
+        <view wx:if="{{activeSearchField === 'origin'}}" class="search-panel">
+          <text class="search-hint">{{searchMessage}}</text>
+          <scroll-view wx:if="{{searchResults.length}}" class="search-results" scroll-y style="height: {{searchResults.length > 3 ? 264 : searchResults.length * 88}}rpx">
+            <button wx:for="{{searchResults}}" wx:key="stopId" class="search-result" data-field="origin" data-stop-id="{{item.stopId}}" data-search-version="{{searchVersion}}" bindtap="handleSelectSearchResult">{{item.label}}</button>
+          </scroll-view>
+        </view>
+        <text class="endpoint-mode">{{originMode === 'stop' ? '指定上车站：' + stopNames[originIndex] : originMode === 'search' ? '请确认出发位置' : '自动比较附近上车点'}}</text>
+        <view class="endpoint-actions"><button size="mini" data-field="origin" bindtap="handleStartMapSelection">地图选起点</button><picker class="exact-picker" range="{{stopNames}}" value="{{originIndex}}" disabled="{{!stopNames.length}}" bindchange="handleOriginChange"><view class="exact-picker__button">指定上车站 ⌄</view></picker></view>
         <text wx:if="{{locationMessage}}" class="location-message">{{locationMessage}}</text>
-        <text class="field-heading">到哪里下车</text>
-        <picker range="{{stopNames}}" value="{{destinationIndex}}" disabled="{{!stopNames.length}}" bindchange="handleDestinationChange"><view class="stop-picker">{{stopNames[destinationIndex] || '暂无可自动推荐的站点'}}<text>⌄</text></view></picker>
+        <text class="field-heading destination-heading">到哪里去</text>
+        <input class="place-input" value="{{destinationQuery}}" maxlength="64" placeholder="输入目的地，自动推荐下车点" confirm-type="search" data-field="destination" bindinput="handleSearchInput" bindfocus="handleSearchFocus" bindconfirm="handlePlanJourney" />
+        <view wx:if="{{activeSearchField === 'destination'}}" class="search-panel">
+          <text class="search-hint">{{searchMessage}}</text>
+          <scroll-view wx:if="{{searchResults.length}}" class="search-results" scroll-y style="height: {{searchResults.length > 3 ? 264 : searchResults.length * 88}}rpx">
+            <button wx:for="{{searchResults}}" wx:key="stopId" class="search-result" data-field="destination" data-stop-id="{{item.stopId}}" data-search-version="{{searchVersion}}" bindtap="handleSelectSearchResult">{{item.label}}</button>
+          </scroll-view>
+        </view>
+        <text class="endpoint-mode">{{destinationMode === 'stop' ? '指定下车站：' + stopNames[destinationIndex] : destinationMode === 'search' ? '请确认到达位置' : '自动比较附近下车点'}}</text>
+        <view class="endpoint-actions"><button size="mini" data-field="destination" bindtap="handleStartMapSelection">地图选终点</button><picker class="exact-picker" range="{{stopNames}}" value="{{destinationIndex}}" disabled="{{!stopNames.length}}" bindchange="handleDestinationChange"><view class="exact-picker__button">指定下车站 ⌄</view></picker></view>
         <button class="plan-button" disabled="{{!stopNames.length}}" bindtap="handlePlanJourney">查询直达 / 一次换乘</button>
+        <text class="search-hint">搜索结果是位置参考，推荐乘降点可能不同；起终点各比较800米内最多六站。</text>
       </view>
       <text class="journey-message">{{journeyMessage}}</text>
       <view wx:for="{{journeys}}" wx:key="id" wx:for-item="journey" class="journey-card {{selectedJourneyId === journey.id ? 'journey-card--selected' : ''}}">
-        <view class="journey-card__heading"><text>{{journey.title}}</text><text class="journey-card__distance">{{journey.distanceText}}</text></view>
+        <view class="journey-card__heading"><view><text wx:if="{{journey.isRecommended}}" class="recommendation-badge">推荐</text><text>{{journey.title}}</text></view><text class="journey-card__distance">{{journey.distanceText}}</text></view>
+        <text class="journey-connection">{{journey.connectionText}}</text>
+        <text wx:if="{{journey.isRecommended}}" class="recommendation-reason">优先少换乘，再比较接驳直线距离和乘车里程。</text>
         <view wx:for="{{journey.legs}}" wx:key="routeId" wx:for-item="leg" wx:for-index="legIndex" class="ride-leg">
           <text class="ride-leg__line" style="border-left-color: {{leg.color}}">{{leg.routeName}} · {{leg.directionText}}</text>
           <text class="ride-leg__station">上车：{{leg.boardingName}}　→　下车：{{leg.alightingName}}</text>

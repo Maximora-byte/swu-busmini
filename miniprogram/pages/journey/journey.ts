@@ -3,6 +3,7 @@ import type { TransitDataset, TransitStop } from '../../models/current-transit'
 import { currentTransitRepository } from '../../services/repository/current-transit.repository'
 import { transitJourneyService, type TransitJourney, type TransitJourneyLeg } from '../../services/navigation/transit-journey.service'
 import { isAutomaticBoardingVisit } from '../../services/navigation/transit-visit-policy'
+import { transitStopSearchService, type TransitStopSuggestion } from '../../services/navigation/transit-stop-search.service'
 import { locationService } from '../../services/location/location.service'
 import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT } from '../../services/map/map-viewport.service'
 
@@ -15,7 +16,14 @@ interface JourneyLegView extends TransitJourneyLeg {
 interface JourneyView extends TransitJourney {
   title: string
   distanceText: string
+  connectionText: string
+  isRecommended: boolean
   legs: JourneyLegView[]
+}
+type EndpointField = 'origin' | 'destination'
+interface ReferenceCircle extends Coordinate { color: string; fillColor: string; radius: number; strokeWidth: number }
+function endpointField(value: unknown): EndpointField | undefined {
+  return value === 'origin' || value === 'destination' ? value : undefined
 }
 interface JourneyMarker extends Coordinate {
   id: number
@@ -46,6 +54,10 @@ Page({
     routeOptions: [] as { id: string; name: string }[], selectedRouteId: '', routeName: '',
     stopOptions: [] as { id: string; label: string }[], stopNames: [] as string[],
     originIndex: 0, destinationIndex: 0, originMode: 'stop', originCoordinate: null as Coordinate | null,
+    destinationMode: 'stop', destinationCoordinate: null as Coordinate | null,
+    originQuery: '', destinationQuery: '', activeSearchField: '', searchVersion: 0,
+    searchResults: [] as TransitStopSuggestion[], searchMessage: '',
+    mapSelectionField: '', mapSelectionMessage: '', mapCircles: [] as ReferenceCircle[],
     locating: false, locationMessage: '', journeyMessage: '选择上、下车参考点，查询直达或一次换乘方案。',
     journeys: [] as JourneyView[], selectedJourneyId: '',
     latitude: CAMPUS_VIEWPORT.center.latitude as number, longitude: CAMPUS_VIEWPORT.center.longitude as number,
@@ -69,6 +81,7 @@ Page({
       sourceText: `${dataset.source} · ${dataset.observedAt}`,
       routeOptions: dataset.routes.map(({ id, name }) => ({ id, name })),
       stopOptions, stopNames: stopOptions.map(({ label }) => label), destinationIndex: stopOptions.length > 1 ? 1 : 0,
+      originQuery: planningStops[0]?.name ?? '', destinationQuery: planningStops[1]?.name ?? planningStops[0]?.name ?? '',
     })
     this.showRoute(dataset.routes.some(({ id }) => id === query.routeId) ? query.routeId! : dataset.routes[0].id)
   },
@@ -87,6 +100,8 @@ Page({
     this.endpointRequestVersion += 1
     if (updateView) this.setData({
       locating: false,
+      activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1,
+      mapSelectionField: '', mapSelectionMessage: '',
       ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
     })
   },
@@ -123,7 +138,7 @@ Page({
         return { ...reviewMarker, title: `${stop.name}（待核对，暂不自动推荐）`,
           callout: { ...reviewMarker.callout, color: '#956324' } }
       }),
-      mapFitPoints: route.points,
+      mapFitPoints: route.points, mapCircles: [],
     }, () => { if (fit && version === this.cameraRequestVersion) this.fitMap() })
   },
   handleRouteChange(event: WechatMiniprogram.TouchEvent) {
@@ -135,6 +150,8 @@ Page({
     this.endpointRequestVersion += 1
     this.setData({
       journeys: [], selectedJourneyId: '', locating: false, journeyMessage: '选择已更新，请重新查询。',
+      activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1,
+      mapSelectionField: '', mapSelectionMessage: '',
       ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
     })
     this.showRoute(this.data.selectedRouteId, false)
@@ -143,23 +160,99 @@ Page({
     const index = Number(event.detail.value)
     if (!Number.isInteger(index) || !this.data.stopOptions[index]) return
     this.clearJourneys()
-    this.setData({ originIndex: index, originMode: 'stop', originCoordinate: null, locationMessage: '' })
+    this.setData({ originIndex: index, originMode: 'stop', originCoordinate: null, locationMessage: '',
+      originQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
   },
   handleDestinationChange(event: WechatMiniprogram.PickerChange) {
     const index = Number(event.detail.value)
     if (!Number.isInteger(index) || !this.data.stopOptions[index]) return
     this.clearJourneys()
-    this.setData({ destinationIndex: index })
+    this.setData({ destinationIndex: index, destinationMode: 'stop', destinationCoordinate: null,
+      destinationQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
+  },
+  handleSearchFocus(event: WechatMiniprogram.TouchEvent) {
+    const field = endpointField(event.currentTarget.dataset.field)
+    if (!field || !this.pageVisible) return
+    this.showSearchResults(field)
+  },
+  showSearchResults(field: EndpointField) {
+    const query = field === 'origin' ? this.data.originQuery : this.data.destinationQuery
+    const searchResults = transitStopSearchService.search(query)
+    this.setData({ activeSearchField: field, searchResults, searchVersion: this.data.searchVersion + 1,
+      mapSelectionField: '', mapSelectionMessage: '',
+      searchMessage: !query.trim() ? '输入站名、简称或门号，点选参考位置。' :
+        searchResults.length ? '点选参考位置，再自动比较附近上下车点。' : '没有匹配的当前站点，可换个关键词或在地图选点。',
+    })
+  },
+  handleSearchInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
+    const field = endpointField(event.currentTarget.dataset.field)
+    if (!field || typeof event.detail.value !== 'string' || !this.pageVisible) return
+    const query = event.detail.value.slice(0, 64)
+    this.clearJourneys()
+    this.setData(field === 'origin' ? { originQuery: query, originMode: 'search', originCoordinate: null, locationMessage: '' } :
+      { destinationQuery: query, destinationMode: 'search', destinationCoordinate: null })
+    this.showSearchResults(field)
+  },
+  handleSelectSearchResult(event: WechatMiniprogram.TouchEvent) {
+    const { field: rawField, stopId, searchVersion } = event.currentTarget.dataset
+    const field = endpointField(rawField)
+    if (!field || !this.pageVisible || field !== this.data.activeSearchField || Number(searchVersion) !== this.data.searchVersion) return
+    const suggestion = this.data.searchResults.find((item) => item.stopId === stopId)
+    const index = this.data.stopOptions.findIndex((item) => item.id === suggestion?.stopId)
+    const stop = this.dataset?.stops.find((item) => item.id === suggestion?.stopId)
+    if (!stop || index < 0) return
+    wx.hideKeyboard()
+    this.clearJourneys()
+    this.setData(field === 'origin' ? {
+      originQuery: stop.name, originMode: 'place', originCoordinate: { ...stop.coordinate }, originIndex: index, locationMessage: '',
+    } : { destinationQuery: stop.name, destinationMode: 'place', destinationCoordinate: { ...stop.coordinate }, destinationIndex: index })
+    this.replanIfReady()
+  },
+  handleStartMapSelection(event: WechatMiniprogram.TouchEvent) {
+    const field = endpointField(event.currentTarget.dataset.field)
+    if (!field || !this.pageVisible || !this.mapReady) return
+    wx.hideKeyboard()
+    this.clearJourneys()
+    this.setData({ mapSelectionField: field, mapSelectionMessage: `请点击地图空白处选择${field === 'origin' ? '出发' : '到达'}位置，可先拖动／缩放。` })
+  },
+  handleCancelMapSelection() { this.setData({ mapSelectionField: '', mapSelectionMessage: '' }) },
+  handleMapTap(event: WechatMiniprogram.MapTap) {
+    const field = endpointField(this.data.mapSelectionField)
+    if (!field || !this.pageVisible) return
+    const { latitude, longitude } = event.detail
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+      this.setData({ mapSelectionMessage: '未取得有效地图位置，请重新点选。' }); return
+    }
+    const coordinate = { latitude, longitude }
+    this.clearJourneys()
+    this.setData(field === 'origin' ? { originMode: 'map', originCoordinate: coordinate, originQuery: '地图所选起点', locationMessage: '' } :
+      { destinationMode: 'map', destinationCoordinate: coordinate, destinationQuery: '地图所选终点' })
+    this.replanIfReady()
+  },
+  replanIfReady() {
+    if (this.data.originMode !== 'search' && this.data.destinationMode !== 'search' && !this.data.locating) this.handlePlanJourney()
+    else this.setData({ journeyMessage: '请从搜索结果或地图选择完整的起点和终点。' })
+  },
+  referenceCircles(): ReferenceCircle[] {
+    const circles: ReferenceCircle[] = []
+    if (['place', 'map', 'coordinate'].includes(this.data.originMode) && this.data.originCoordinate) {
+      circles.push({ ...this.data.originCoordinate, color: '#2869d8', fillColor: '#2869d844', radius: 18, strokeWidth: 3 })
+    }
+    if (['place', 'map'].includes(this.data.destinationMode) && this.data.destinationCoordinate) {
+      circles.push({ ...this.data.destinationCoordinate, color: '#854cc5', fillColor: '#854cc544', radius: 18, strokeWidth: 3 })
+    }
+    return circles
   },
   async handleUseLocation() {
     this.clearJourneys()
     const version = this.endpointRequestVersion
-    this.setData({ locating: true, originMode: 'stop', originCoordinate: null, locationMessage: '正在定位…' })
+    this.setData({ locating: true, originMode: 'stop', originCoordinate: null, locationMessage: '正在定位…',
+      originQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[this.data.originIndex]?.id)?.name ?? '' })
     try {
       const location = await locationService.getCurrentLocation()
       if (version !== this.endpointRequestVersion || !this.pageVisible) return
       this.setData({
-        originMode: 'coordinate', originCoordinate: location.coordinate,
+        originMode: 'coordinate', originCoordinate: location.coordinate, originQuery: '我的位置',
         locationMessage: `已使用本次定位结果${location.isApproximate ? '，定位精度较低，请核对候车位置' : ''}；接驳距离按直线估算。`,
       })
     } catch (error: unknown) {
@@ -167,23 +260,33 @@ Page({
         this.setData({ locationMessage: error instanceof Error ? error.message : '定位失败，可继续选择上车站。' })
       }
     } finally {
-      if (version === this.endpointRequestVersion && this.pageVisible) this.setData({ locating: false })
+      if (version === this.endpointRequestVersion && this.pageVisible) {
+        this.setData({ locating: false })
+        if (this.data.originMode === 'coordinate') this.replanIfReady()
+      }
     }
   },
 
   handlePlanJourney() {
     if (this.data.locating) { this.setData({ journeyMessage: '请等待定位完成，或手动选择上车站。' }); return }
+    if (this.data.originMode === 'search' || this.data.destinationMode === 'search') {
+      this.setData({ journeyMessage: `请从搜索结果或地图选择${this.data.originMode === 'search' ? '起点' : '终点'}，输入文字尚未确认。` }); return
+    }
     try {
-      const origin = this.data.originMode === 'coordinate' && this.data.originCoordinate
+      const origin = this.data.originMode !== 'stop' && this.data.originCoordinate
         ? { kind: 'coordinate' as const, coordinate: this.data.originCoordinate }
         : { kind: 'stop' as const, stopId: this.data.stopOptions[this.data.originIndex]?.id }
-      const destination = { kind: 'stop' as const, stopId: this.data.stopOptions[this.data.destinationIndex]?.id }
+      const destination = this.data.destinationMode !== 'stop' && this.data.destinationCoordinate
+        ? { kind: 'coordinate' as const, coordinate: this.data.destinationCoordinate }
+        : { kind: 'stop' as const, stopId: this.data.stopOptions[this.data.destinationIndex]?.id }
       const result = transitJourneyService.plan(origin, destination)
       const dataset = this.dataset!
       const name = (id: string) => dataset.stops.find((stop) => stop.id === id)?.name ?? '未知站点'
-      const journeys: JourneyView[] = result.journeys.map((journey) => ({
+      const journeys: JourneyView[] = result.journeys.map((journey, index) => ({
         ...journey, title: journey.legs.length === 1 ? '直达' : '换乘一次',
-        distanceText: `乘车约 ${Math.round(journey.rideDistanceMeters)} 米 · 接驳直线约 ${Math.round(journey.accessDistanceMeters + journey.egressDistanceMeters)} 米`,
+        isRecommended: index === 0,
+        distanceText: `乘车约 ${Math.round(journey.rideDistanceMeters)} 米`,
+        connectionText: `接驳直线：上车前约 ${Math.round(journey.accessDistanceMeters)} 米 · 下车后约 ${Math.round(journey.egressDistanceMeters)} 米`,
         legs: journey.legs.map((leg) => ({
           ...leg, boardingName: name(leg.boardingStopId), alightingName: name(leg.alightingStopId),
           directionText: `先经${name(leg.stopIds[1] ?? leg.alightingStopId)}`,
@@ -193,7 +296,13 @@ Page({
       this.cameraRequestVersion += 1
       this.setData({ journeys, selectedJourneyId: '', journeyMessage: result.message })
       if (journeys[0]) this.showJourney(journeys[0])
-      else this.showRoute(this.data.selectedRouteId, false)
+      else {
+        this.showRoute(this.data.selectedRouteId, false)
+        const mapCircles = this.referenceCircles()
+        this.setData({ mapCircles, mapFitPoints: [
+          ...this.data.mapFitPoints, ...mapCircles.map(({ latitude, longitude }) => ({ latitude, longitude })),
+        ] })
+      }
     } catch (error: unknown) {
       this.setData({ journeys: [], selectedJourneyId: '', journeyMessage: error instanceof Error ? error.message : '暂不能生成乘车方案。' })
       this.showRoute(this.data.selectedRouteId, false)
@@ -214,11 +323,13 @@ Page({
     })
     const version = ++this.cameraRequestVersion
     const points = journey.legs.flatMap((leg) => leg.points)
+    const mapCircles = this.referenceCircles()
     this.setData({
       selectedJourneyId: journey.id, mapTitle: '所选乘车区间', stopMessage: '', routeWarnings: [...journey.warnings],
       mapPolylines: journey.legs.map((leg) => ({ points: leg.points, color: leg.color, width: 8, arrowLine: true })),
-      mapMarkers: [...markers.values()], mapFitPoints: [
+      mapMarkers: [...markers.values()], mapCircles, mapFitPoints: [
         ...points, ...[...markers.values()].map(({ latitude, longitude }) => ({ latitude, longitude })),
+        ...mapCircles.map(({ latitude, longitude }) => ({ latitude, longitude })),
       ],
     }, () => { if (version === this.cameraRequestVersion) this.fitMap() })
   },

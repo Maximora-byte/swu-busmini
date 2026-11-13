@@ -142,6 +142,25 @@ test('coordinate selection is bounded to the nearest six active stops', () => {
   assert.deepEqual(createTransitJourneyService(data).plan({ kind: 'coordinate', coordinate: p(106.420) }, endpoint('d')).journeys, [])
 })
 
+test('two reference locations jointly choose reachable non-nearest boarding and alighting stops', () => {
+  const a = p(106.420), b = p(106.440)
+  const data = dataset([
+    stop('near-origin', a), stop('board', p(106.4205)),
+    stop('near-destination', b), stop('alight', p(106.4395)),
+  ], [
+    route('isolated-origin', [a, p(106.4201)], [visit('near-origin', 0, 0, 0)]),
+    route('isolated-destination', [b, p(106.4401)], [visit('near-destination', 0, 0, 0)]),
+    route('connected', [p(106.4205), p(106.4395)], [visit('board', 0, 0, 0), visit('alight', 0, 1, 1800)]),
+  ])
+  const service = createTransitJourneyService(data)
+  const best = service.plan({ kind: 'coordinate', coordinate: a }, { kind: 'coordinate', coordinate: b }).journeys[0]
+  assert.equal(best.legs[0].boardingStopId, 'board')
+  assert.equal(best.legs[0].alightingStopId, 'alight')
+  assert.ok(best.accessDistanceMeters > 40 && best.accessDistanceMeters < 60)
+  assert.ok(best.egressDistanceMeters > 40 && best.egressDistanceMeters < 60)
+  assert.deepEqual(service.plan(endpoint('near-origin'), endpoint('near-destination')).journeys, [], 'explicit stations remain exact')
+})
+
 test('zero-length and at-most-one-meter rides are excluded along with same-route transfers', () => {
   const data = dataset([stop('a', p(106.420)), stop('x', p(106.420)), stop('d', p(106.421))], [
     route('r', [p(106.420), p(106.421)], [visit('a', 0, 0, 0), visit('x', 0, 0, 0), visit('d', 0, .01, 1)]),

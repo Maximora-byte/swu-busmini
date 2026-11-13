@@ -12,6 +12,12 @@
 .map-fit { margin: 0 0 0 10rpx; line-height: 40rpx; font-size: 21rpx; color: #315e49; background: #fff; }
 .review-status { flex: none; padding: 8rpx 26rpx; color: #876229; background: #fff8e8; font-size: 20rpx; line-height: 1.5; }
 .review-status text { display: block; }
+.map-selection { flex: none; display: flex; align-items: center; gap: 12rpx; padding: 10rpx 24rpx; color: #205394; background: #eaf2ff; font-size: 23rpx; line-height: 1.5; }
+.map-selection text { flex: 1; }
+.map-selection button { flex: none; margin: 0; font-size: 22rpx; color: #205394; background: #fff; }
+.reference-legend { flex: none; display: flex; flex-wrap: wrap; gap: 8rpx 18rpx; padding: 8rpx 24rpx; color: #647568; background: #fff; font-size: 20rpx; }
+.reference-origin { color: #2869d8; }
+.reference-destination { color: #854cc5; }
 .journey-map { flex: 1; width: 100%; min-height: 200rpx; height: 0; }
 .stop-message { flex: none; padding: 8rpx 24rpx; font-size: 23rpx; color: #315e49; background: #e8f1e9; }
 .journey-content { flex: 1; height: 0; min-height: 260rpx; }
@@ -19,7 +25,17 @@
 .journey-form { padding: 20rpx; background: #fff; border-radius: 18rpx; }
 .field-heading { display: flex; justify-content: space-between; align-items: center; margin: 8rpx 0 12rpx; color: #4b6758; font-size: 25rpx; }
 .location-button { flex: none; margin: 0 0 0 12rpx; font-size: 22rpx; color: #126b47; background: #edf5ee; }
-.stop-picker { display: flex; justify-content: space-between; padding: 20rpx; font-size: 27rpx; line-height: 1.5; background: #f0f5f1; border-radius: 12rpx; }
+.place-input { box-sizing: border-box; width: 100%; height: 88rpx; padding: 16rpx 20rpx; font-size: 27rpx; color: #244333; background: #f0f5f1; border: 2rpx solid #dbe8df; border-radius: 12rpx; }
+.endpoint-mode { display: block; margin: 12rpx 2rpx; color: #637968; font-size: 22rpx; line-height: 1.5; }
+.endpoint-actions { display: flex; align-items: stretch; gap: 16rpx; }
+.endpoint-actions button, .exact-picker { flex: 1; min-width: 0; }
+.endpoint-actions button { margin: 0; font-size: 23rpx; color: #245e45; background: #eaf3ec; }
+.exact-picker__button { padding: 8rpx; border-radius: 8rpx; color: #627468; background: #f1f3ee; font-size: 23rpx; line-height: 1.8; text-align: center; }
+.destination-heading { margin-top: 26rpx; }
+.search-panel { margin: 8rpx 0 14rpx; padding: 10rpx; background: #f7faf6; border: 1rpx solid #d6e4d7; border-radius: 10rpx; }
+.search-hint { display: block; margin: 12rpx 2rpx; color: #6a7c6e; font-size: 21rpx; line-height: 1.6; }
+.search-results { width: 100%; }
+.search-result { display: block; margin: 0; min-height: 88rpx; padding: 20rpx 12rpx; color: #24573e; background: #fff; border-bottom: 1rpx solid #e5ece5; border-radius: 0; font-size: 23rpx; line-height: 1.7; text-align: left; white-space: normal; }
 .location-message { display: block; margin: 12rpx 0; font-size: 23rpx; line-height: 1.5; color: #826523; }
 .plan-button { margin-top: 24rpx; font-size: 28rpx; color: #fff; background: #126b47; border-radius: 12rpx; }
 .journey-message { display: block; margin: 22rpx 4rpx; color: #596f61; font-size: 25rpx; line-height: 1.6; }
@@ -27,6 +43,9 @@
 .journey-card--selected { border-color: #126b47; }
 .journey-card__heading { display: flex; flex-direction: column; gap: 8rpx; color: #174231; font-size: 30rpx; font-weight: 700; }
 .journey-card__distance { color: #738175; font-size: 22rpx; font-weight: 400; }
+.recommendation-badge { display: inline-block; margin-right: 12rpx; padding: 3rpx 12rpx; border-radius: 8rpx; color: #fff; background: #126b47; font-size: 23rpx; font-weight: 500; }
+.journey-connection { display: block; margin-top: 12rpx; color: #3b6751; font-size: 22rpx; line-height: 1.6; }
+.recommendation-reason { display: block; margin-top: 8rpx; color: #738175; font-size: 21rpx; line-height: 1.6; }
 .ride-leg { padding-top: 20rpx; }
 .ride-leg + .ride-leg { margin-top: 16rpx; border-top: 1rpx dashed #c4d4c9; }
 .ride-leg__line { display: block; margin-bottom: 10rpx; padding-left: 12rpx; border-left: 6rpx solid; color: #174231; font-size: 27rpx; font-weight: 600; }
