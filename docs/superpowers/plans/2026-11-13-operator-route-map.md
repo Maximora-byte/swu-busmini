@@ -31,8 +31,8 @@ Files: new `miniprogram/data/operator-routes.json` and generated `.ts`; model/re
 
 Interfaces: `operatorRouteCatalogRepository.getAll(): OperatorRouteObservation[]`, `getById(id): OperatorRouteObservation | undefined`; each observation has `id`, `name`, `source`, `observedAt`, `confirmation`, `referencePointNames`. Confirmation applies only to names/reference-label sets. IDs use existing route_1..route_8 plus route_3b and route_jingguan.
 
-- [ ] Write tests for ten exact line names, original composite labels, dates, defensive copies, duplicate IDs and bad records; observe RED.
-- [ ] Implement minimal validated repository and offline data adapter; verify GREEN and sync check.
+- [x] Write tests for ten exact line names, original composite labels, dates, defensive copies, duplicate IDs and bad records; observe RED.
+- [x] Implement minimal validated repository and offline data adapter; verify GREEN and sync check.
 
 ## Task 2: Stable map-stop selection
 
@@ -40,8 +40,8 @@ Files: `route-map-presentation.service.ts`, `pages/index/index.ts`, related pres
 
 Interfaces: marker exposes stable ID and stopId; page `handleStopTap` / `handleMarkerTap` select a verified stop, update highlight and camera using cameraRequestVersion. Missing positions provide feedback without setting coordinates.
 
-- [ ] Add failing behavioral tests for identity across direction change, repeated visits, invalid taps, missing coordinate and stale selection callbacks.
-- [ ] Implement stable mapping and page selection with cleanup on route/direction changes; verify tests.
+- [x] Add failing behavioral tests for identity across direction change, repeated visits, invalid taps, missing coordinate and stale selection callbacks.
+- [x] Implement stable mapping and page selection with cleanup on route/direction changes; verify tests.
 
 ## Task 3: Catalog and concise map controls
 
@@ -49,12 +49,13 @@ Files: index WXML/WXSS/TS, runtime tests, README and data source notes.
 
 Interfaces: third `catalog` tab, catalog selection state, map options expanded state; direction buttons reuse summary. Catalog is independent of navigation route selection.
 
-- [ ] Add failing runtime checks for catalog selection and hidden-map camera cancellation.
-- [ ] Add ten-line offline catalog, source/date/scope text, compact direction summaries, folded auxiliary controls and selectable stop rows; remove duplicate direction controls.
-- [ ] Document current versus 2025 navigation data without inferring operation status.
+- [x] Add failing runtime checks for catalog selection and hidden-map camera cancellation.
+- [x] Add ten-line offline catalog, source/date/scope text, compact direction summaries, folded auxiliary controls and selectable stop rows; remove duplicate direction controls.
+- [x] Document current versus 2025 navigation data without inferring operation status.
 
 ## Task 4: Verification, review and PR
 
-- [ ] Run check:data-sync, validate:data, typecheck and test:coverage; inspect results.
-- [ ] Request independent whole-branch review; resolve consequential findings with regression tests.
+- [x] Run check:data-sync, validate:data, typecheck and test:coverage; inspect results.
+- [x] Request independent whole-branch review; resolve consequential findings with regression tests.
 - [ ] Commit only task files, push codex/operator-route-map and open one focused PR; inspect CI and report actual status. Do not merge.
+
