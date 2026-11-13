@@ -76,4 +76,5 @@
       </view>
     </scroll-view>
   </view>
+  <privacy-consent id="privacy-consent" />
 </view>

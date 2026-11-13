@@ -135,6 +135,9 @@ Page({
   onUnload() { this.cancelPendingActions(false); this.mapReady = false },
   cancelPendingActions(updateView = true) {
     this.pageVisible = false
+    // Reading the privacy contract can hide the page while a location API is
+    // awaiting the user's decision. Keep that request alive until return.
+    if (updateView && this.selectComponent?.('#privacy-consent')?.hasPendingPrivacy?.()) return
     this.cameraRequestVersion += 1
     this.mapLocationRequestVersion += 1
     // The native location picker can temporarily hide this page; commit its result only on return.

@@ -66,11 +66,13 @@ interface PageData {
 interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; suggestionId?: string; stopId?: string; searchVersion?: number; view?: string; order?: string; visitKey?: string } } }
 interface JourneyPage {
   data: PageData
+  selectComponent?(selector: string): { hasPendingPrivacy?(): boolean } | null
   setData(update: Partial<PageData>, callback?: () => void): void
   onLoad(query?: { routeId?: string }): void
   onReady(): void
   onHide(): void
   onShow(): void
+  onUnload(): void
   handleRouteChange(event: Event): void
   handleOriginChange(event: { detail: { value: string } }): void
   handleDestinationChange(event: { detail: { value: string } }): void
@@ -384,6 +386,65 @@ test('a hidden page discards a pending location instead of resurrecting old orig
   runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
   await locating
   page.onShow()
+  assert.equal(page.data.originMode, 'location')
+  assert.equal(page.data.originCoordinate, null)
+})
+
+test('reading the privacy contract preserves pending origin GPS until return and explicit agreement', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  let privacyPending = true
+  page.selectComponent = selector => selector === '#privacy-consent' ? { hasPendingPrivacy: () => privacyPending } : null
+  const locating = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.onHide()
+  assert.equal(page.data.locating, true)
+  assert.equal(page.data.originCoordinate, null)
+  page.onShow()
+  privacyPending = false
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await locating
+  assert.equal(page.data.originMode, 'coordinate')
+  assert.equal((page.data.originCoordinate as Coordinate | null)?.latitude, 29.82)
+  assert.equal(page.data.locating, false)
+})
+
+test('reading the privacy contract preserves pending map GPS without changing planner origin', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  let privacyPending = true
+  page.selectComponent = () => ({ hasPendingPrivacy: () => privacyPending })
+  const locating = page.handleMapLocate()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.onHide()
+  assert.equal(page.data.mapLocating, true)
+  assert.equal(page.data.mapLocation, null)
+  page.onShow()
+  privacyPending = false
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await locating
+  assert.equal((page.data.mapLocation as Coordinate | null)?.latitude, 29.82)
+  assert.equal(page.data.mapLocating, false)
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(runtime.cameraMoves.length, 1)
+  assert.equal(runtime.cameraMoves[0].latitude, 29.82)
+  assert.equal(runtime.cameraMoves[0].longitude, 106.42)
+})
+
+test('unloading still invalidates an origin fix while privacy agreement is pending', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.selectComponent = () => ({ hasPendingPrivacy: () => true })
+  const locating = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.onUnload()
+  page.onShow()
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await locating
   assert.equal(page.data.originMode, 'location')
   assert.equal(page.data.originCoordinate, null)
 })
