@@ -1,0 +1,57 @@
+{
+  "observedAt": "2026-11-13",
+  "scope": "loaded-PC-mini-program-static-data",
+  "operatingDirections": "not-independently-confirmed",
+  "schoolConfiguration": {
+    "directionPairing": "not-provided",
+    "arrivalDirectionSettings": "not-provided",
+    "lineDiagramLink": "empty"
+  },
+  "geometryReview": [
+    {
+      "routeId": "route_6",
+      "endToStartMeters": 984.82,
+      "nearReturnSegmentIndex": 27,
+      "nearReturnOffsetMeters": 0.293,
+      "introductoryPathMeters": 1880.428,
+      "remainingNearLoopMeters": 2406.01,
+      "decision": "preserve-published-path-no-operating-closure-inferred"
+    },
+    {
+      "routeId": "route_7",
+      "endToStartMeters": 924.516,
+      "nearReturnSegmentIndex": 19,
+      "nearReturnOffsetMeters": 0.25,
+      "introductoryPathMeters": 1144.825,
+      "remainingNearLoopMeters": 2410.882,
+      "decision": "preserve-published-path-no-operating-closure-inferred"
+    },
+    {
+      "routeId": "route_8",
+      "endToStartMeters": 151.738,
+      "nearReturnSegmentIndex": 4,
+      "nearReturnOffsetMeters": 0.505,
+      "introductoryPathMeters": 184.53,
+      "remainingNearLoopMeters": 2448.59,
+      "decision": "preserve-published-path-no-operating-closure-inferred"
+    }
+  ],
+  "offsetReview": {
+    "routeId": "route_3b",
+    "referencePointName": "2号门",
+    "offsetMeters": 83.436,
+    "comparisonRouteId": "route_3",
+    "comparisonOffsetMeters": 0.044,
+    "comparisonBranchMeters": 168.423,
+    "decision": "retain-original-position-and-path-quarantine-automatic-boarding-for-this-route-only",
+    "quarantinedVisitCount": 1
+  },
+  "sourceIntegrity": {
+    "publishedPointsChanged": 0,
+    "publishedStopCoordinatesChanged": 0,
+    "routes": 10,
+    "sourceVisits": 162,
+    "eligibleAutomaticVisits": 161,
+    "publishedGeometryPoints": 682
+  }
+}

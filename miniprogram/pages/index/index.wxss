@@ -7,7 +7,7 @@
   background: #fafbf8;
 }
 
-.top-navigation { display: flex; flex: none; padding: 12rpx 24rpx; gap: 16rpx; background: #ffffff; border-bottom: 1rpx solid #e1e8e1; }
+.top-navigation { display: flex; flex: none; padding: 12rpx 24rpx; gap: 12rpx; background: #ffffff; border-bottom: 1rpx solid #e1e8e1; }
 .top-navigation__tab { flex: 1; margin: 0; font-size: 28rpx; line-height: 68rpx; background: #f0f4f1; color: #59746a; border-radius: 12rpx; }
 .top-navigation__tab::after { border: none; }
 .top-navigation__tab--active { color: #ffffff; background: #126b47; font-weight: 600; }
@@ -42,7 +42,9 @@
 .selected-route-heading { display: flex; flex-direction: column; gap: 4rpx; margin-bottom: 10rpx; font-size: 25rpx; font-weight: 600; }
 .selected-route-heading__coverage { font-size: 21rpx; font-weight: 400; color: #826523; }
 .direction-tabs { display: flex; gap: 10rpx; margin: 6rpx 0 10rpx; flex: none; }
-.direction-tabs__button { flex: 1; margin: 0; padding: 0 12rpx; font-size: 23rpx; line-height: 48rpx; }
+.direction-tabs__button { flex: 1; min-width: 0; margin: 0; padding: 10rpx 12rpx; font-size: 23rpx; line-height: 1.4; text-align: left; }
+.direction-tabs__name { display: block; font-weight: 600; }
+.direction-tabs__caption { display: block; margin-top: 4rpx; font-size: 19rpx; opacity: 0.85; }
 .direction-tabs__button::after { border: none; }
 
 .campus-header { flex: none; padding: 22rpx 28rpx 12rpx; background: #ffffff; }
@@ -84,14 +86,12 @@
 .route-details__content { padding: 12rpx 4rpx 24rpx; }
 .route-details__label { display: block; margin: 8rpx 0 14rpx; color: #718078; font-size: 23rpx; }
 .route-details__error { padding: 24rpx; color: #a93830; font-size: 26rpx; line-height: 1.5; background: #fff2f0; border-radius: 12rpx; }
-.direction-switch { display: flex; flex-wrap: wrap; gap: 12rpx; }
-.direction-switch__button { display: flex; flex: 1; flex-direction: column; align-items: flex-start; min-width: 240rpx; margin: 0; padding: 14rpx 18rpx; text-align: left; line-height: 1.45; border-radius: 12rpx; }
-.direction-switch__button::after { border: none; }
-.direction-switch__name { font-size: 25rpx; font-weight: 600; }
-.direction-switch__summary { margin-top: 6rpx; font-size: 22rpx; white-space: normal; }
 .reference-notice { margin: 18rpx 0; padding: 16rpx 20rpx; color: #506159; font-size: 23rpx; line-height: 1.6; background: #f3f6f0; border-radius: 12rpx; }
 .route-stops__track { margin-top: 20rpx; }
 .route-stop { display: flex; align-items: flex-start; min-height: 66rpx; }
+.route-stop--selected { background: #eaf5ec; border-radius: 10rpx; }
+.route-stop__availability { flex: none; margin: 0 0 0 auto; font-size: 20rpx; line-height: 1.5; color: #718078; }
+.stop-selection-message { display: block; margin: 12rpx 0; font-size: 23rpx; color: #31574a; }
 .route-stop__rail { display: flex; flex: none; flex-direction: column; align-items: center; width: 34rpx; }
 .route-stop__dot { width: 24rpx; height: 24rpx; border: 4rpx solid; border-radius: 50%; box-sizing: border-box; }
 .route-stop__line { width: 3rpx; height: 42rpx; opacity: 0.5; }
@@ -100,3 +100,12 @@
 .route-data-notes { padding: 18rpx 20rpx; background: #faf8f0; border-radius: 12rpx; }
 .route-panel__note { display: block; color: #826523; font-size: 22rpx; line-height: 1.6; }
 .route-panel__source { display: block; margin-top: 10rpx; color: #718078; font-size: 21rpx; line-height: 1.5; }
+.catalog-selector { display: flex; flex-wrap: wrap; gap: 14rpx; margin: 24rpx 0; }
+.catalog-selector__button { margin: 0; padding: 0 22rpx; font-size: 26rpx; color: #31574a; background: #edf4ee; border-radius: 12rpx; }
+.catalog-selector__button::after { border: none; }
+.catalog-selector__button--active { color: #ffffff; background: #126b47; }
+.catalog-card { padding: 26rpx; border-radius: 18rpx; background: #ffffff; }
+.catalog-confirmation { display: block; margin: 14rpx 0 24rpx; font-size: 23rpx; line-height: 1.6; color: #59746a; }
+.catalog-reference-points { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 20rpx; }
+.catalog-reference-point { padding: 12rpx 16rpx; font-size: 25rpx; color: #31574a; background: #f0f5f0; border-radius: 10rpx; }
+.catalog-history-note { display: block; margin-top: 26rpx; color: #826523; font-size: 24rpx; line-height: 1.7; }

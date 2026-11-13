@@ -11,6 +11,8 @@ import routeJson from '../miniprogram/data/routes.json'
 import { routes } from '../miniprogram/data/routes'
 import stopJson from '../miniprogram/data/stops.json'
 import { stops } from '../miniprogram/data/stops'
+import operatorRouteJson from '../miniprogram/data/operator-routes.json'
+import { operatorRoutes } from '../miniprogram/data/operator-routes'
 
 test('微信运行时 TypeScript Data Adapter 与离线 JSON 镜像一致', () => {
   assert.deepEqual(coordinateReviews, coordinateReviewJson)
@@ -18,4 +20,5 @@ test('微信运行时 TypeScript Data Adapter 与离线 JSON 镜像一致', () =
   assert.deepEqual(routeGeometries, routeGeometryJson)
   assert.deepEqual(routes, routeJson)
   assert.deepEqual(stops, stopJson)
+  assert.deepEqual(operatorRoutes, operatorRouteJson)
 })

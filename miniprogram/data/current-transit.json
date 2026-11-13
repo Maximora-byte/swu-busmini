@@ -1,0 +1,4967 @@
+{
+  "id": "swu-operator-2026-11-13",
+  "source": "享坐车 · 西南大学地图首页",
+  "observedAt": "2026-11-13",
+  "coordinateSystem": "GCJ-02",
+  "quality": "operator_published",
+  "stops": [
+    {
+      "id": "stop_6f8c6b0adc4465e4",
+      "name": "经管院",
+      "coordinate": {
+        "latitude": 29.811299,
+        "longitude": 106.413538
+      }
+    },
+    {
+      "id": "stop_26ae68a62573ef76",
+      "name": "资环院",
+      "coordinate": {
+        "latitude": 29.811331,
+        "longitude": 106.416119
+      }
+    },
+    {
+      "id": "stop_9a5f77f1a5dbcd63",
+      "name": "32教",
+      "coordinate": {
+        "latitude": 29.813845,
+        "longitude": 106.417696
+      }
+    },
+    {
+      "id": "stop_a364e88b44da5a66",
+      "name": "楠园",
+      "coordinate": {
+        "latitude": 29.816516,
+        "longitude": 106.420496
+      }
+    },
+    {
+      "id": "stop_8e25c6e07ebb187e",
+      "name": "共青团花园2号门",
+      "coordinate": {
+        "latitude": 29.814045,
+        "longitude": 106.419691
+      }
+    },
+    {
+      "id": "stop_bd8657d2e9c19d6b",
+      "name": "校史馆",
+      "coordinate": {
+        "latitude": 29.817661,
+        "longitude": 106.421853
+      }
+    },
+    {
+      "id": "stop_55927eb0bcaf5302",
+      "name": "大礼堂",
+      "coordinate": {
+        "latitude": 29.818806,
+        "longitude": 106.422588
+      }
+    },
+    {
+      "id": "stop_c8adab1ad6c4c071",
+      "name": "研究生院",
+      "coordinate": {
+        "latitude": 29.819467,
+        "longitude": 106.423146
+      }
+    },
+    {
+      "id": "stop_dc34d932925b31b9",
+      "name": "中心图书馆地科院",
+      "coordinate": {
+        "latitude": 29.821184,
+        "longitude": 106.424047
+      }
+    },
+    {
+      "id": "stop_bd402671a181757f",
+      "name": "8教学楼",
+      "coordinate": {
+        "latitude": 29.82265,
+        "longitude": 106.42593
+      }
+    },
+    {
+      "id": "stop_49254bcf6cd32d27",
+      "name": "行署楼1号门",
+      "coordinate": {
+        "latitude": 29.823577,
+        "longitude": 106.42769
+      }
+    },
+    {
+      "id": "stop_84c52fad6491105a",
+      "name": "文学院",
+      "coordinate": {
+        "latitude": 29.824689,
+        "longitude": 106.428929
+      }
+    },
+    {
+      "id": "stop_ee61e2af9010cb31",
+      "name": "田家炳",
+      "coordinate": {
+        "latitude": 29.824037,
+        "longitude": 106.429439
+      }
+    },
+    {
+      "id": "stop_0e99f4f34774b41b",
+      "name": "圆顶",
+      "coordinate": {
+        "latitude": 29.826132,
+        "longitude": 106.430619
+      }
+    },
+    {
+      "id": "stop_f1e4de32040366a6",
+      "name": "外办",
+      "coordinate": {
+        "latitude": 29.827867,
+        "longitude": 106.430935
+      }
+    },
+    {
+      "id": "stop_afc38ff511a402d6",
+      "name": "5号门",
+      "coordinate": {
+        "latitude": 29.828924,
+        "longitude": 106.43277
+      }
+    },
+    {
+      "id": "stop_eb35fe18296c8deb",
+      "name": "经管院",
+      "coordinate": {
+        "latitude": 29.811303,
+        "longitude": 106.413528
+      }
+    },
+    {
+      "id": "stop_595ebcca87dadd8b",
+      "name": "资环院",
+      "coordinate": {
+        "latitude": 29.811336,
+        "longitude": 106.416124
+      }
+    },
+    {
+      "id": "stop_515ee659a1f8e07f",
+      "name": "32教",
+      "coordinate": {
+        "latitude": 29.813859,
+        "longitude": 106.41768
+      }
+    },
+    {
+      "id": "stop_888e4c0494b12420",
+      "name": "共青花园2号门",
+      "coordinate": {
+        "latitude": 29.814636,
+        "longitude": 106.419852
+      }
+    },
+    {
+      "id": "stop_d2614b46646a0515",
+      "name": "楠园",
+      "coordinate": {
+        "latitude": 29.81646,
+        "longitude": 106.420469
+      }
+    },
+    {
+      "id": "stop_26c811d76e0e64fc",
+      "name": "校史馆",
+      "coordinate": {
+        "latitude": 29.817694,
+        "longitude": 106.42188
+      }
+    },
+    {
+      "id": "stop_dc6d79672edc6d24",
+      "name": "大礼堂",
+      "coordinate": {
+        "latitude": 29.818871,
+        "longitude": 106.422642
+      }
+    },
+    {
+      "id": "stop_72648518c8fd9cbe",
+      "name": "研究生院",
+      "coordinate": {
+        "latitude": 29.819467,
+        "longitude": 106.423157
+      }
+    },
+    {
+      "id": "stop_d940fe5793399682",
+      "name": "中心图书馆地科院",
+      "coordinate": {
+        "latitude": 29.821194,
+        "longitude": 106.424042
+      }
+    },
+    {
+      "id": "stop_61da21ba346237d2",
+      "name": "8教李园",
+      "coordinate": {
+        "latitude": 29.82259,
+        "longitude": 106.425624
+      }
+    },
+    {
+      "id": "stop_445e67839c3cf6b3",
+      "name": "行署楼1号门",
+      "coordinate": {
+        "latitude": 29.823577,
+        "longitude": 106.427706
+      }
+    },
+    {
+      "id": "stop_690f20ea6d323028",
+      "name": "田家炳",
+      "coordinate": {
+        "latitude": 29.824028,
+        "longitude": 106.429455
+      }
+    },
+    {
+      "id": "stop_ef36349a72a82bbd",
+      "name": "校医院",
+      "coordinate": {
+        "latitude": 29.825166,
+        "longitude": 106.431883
+      }
+    },
+    {
+      "id": "stop_89a18a92bac03153",
+      "name": "西师街",
+      "coordinate": {
+        "latitude": 29.82582,
+        "longitude": 106.432679
+      }
+    },
+    {
+      "id": "stop_c786fb5faf44edf1",
+      "name": "后山竹园",
+      "coordinate": {
+        "latitude": 29.816209,
+        "longitude": 106.415867
+      }
+    },
+    {
+      "id": "stop_a5b66bc04c63e33e",
+      "name": "32教",
+      "coordinate": {
+        "latitude": 29.813863,
+        "longitude": 106.417674
+      }
+    },
+    {
+      "id": "stop_846cb02f3ecc476e",
+      "name": "共青花园2号门",
+      "coordinate": {
+        "latitude": 29.814082,
+        "longitude": 106.419691
+      }
+    },
+    {
+      "id": "stop_d10213da43f348b4",
+      "name": "2号门",
+      "coordinate": {
+        "latitude": 29.813849,
+        "longitude": 106.420523
+      }
+    },
+    {
+      "id": "stop_be9fa9c6c9e2282a",
+      "name": "楠园",
+      "coordinate": {
+        "latitude": 29.816502,
+        "longitude": 106.420475
+      }
+    },
+    {
+      "id": "stop_d359781952a897dc",
+      "name": "校史馆",
+      "coordinate": {
+        "latitude": 29.817689,
+        "longitude": 106.421875
+      }
+    },
+    {
+      "id": "stop_afa6a4aae1578ab3",
+      "name": "大礼堂",
+      "coordinate": {
+        "latitude": 29.818829,
+        "longitude": 106.422599
+      }
+    },
+    {
+      "id": "stop_474c82b6bcc469d0",
+      "name": "研究生院",
+      "coordinate": {
+        "latitude": 29.819462,
+        "longitude": 106.423151
+      }
+    },
+    {
+      "id": "stop_5d277861d3b28f79",
+      "name": "中心图书馆地科院",
+      "coordinate": {
+        "latitude": 29.821194,
+        "longitude": 106.424037
+      }
+    },
+    {
+      "id": "stop_c6ef97c6f0f6d6e9",
+      "name": "地科院",
+      "coordinate": {
+        "latitude": 29.821655,
+        "longitude": 106.42386
+      }
+    },
+    {
+      "id": "stop_8e6922276d07fcbf",
+      "name": "心理学部",
+      "coordinate": {
+        "latitude": 29.820742,
+        "longitude": 106.421569
+      }
+    },
+    {
+      "id": "stop_8a5e3af3625808e5",
+      "name": "外国语学院",
+      "coordinate": {
+        "latitude": 29.82131,
+        "longitude": 106.420957
+      }
+    },
+    {
+      "id": "stop_bb62f18d991e6ef9",
+      "name": "药学院",
+      "coordinate": {
+        "latitude": 29.822506,
+        "longitude": 106.421258
+      }
+    },
+    {
+      "id": "stop_03da67e19fabdb68",
+      "name": "梅园",
+      "coordinate": {
+        "latitude": 29.823544,
+        "longitude": 106.422277
+      }
+    },
+    {
+      "id": "stop_1b8aeaa80f9f2f29",
+      "name": "梅园食堂",
+      "coordinate": {
+        "latitude": 29.824261,
+        "longitude": 106.423463
+      }
+    },
+    {
+      "id": "stop_e5e24f40b282b8d7",
+      "name": "橘园",
+      "coordinate": {
+        "latitude": 29.826001,
+        "longitude": 106.425984
+      }
+    },
+    {
+      "id": "stop_f3392fa38af4c283",
+      "name": "田家炳文学院",
+      "coordinate": {
+        "latitude": 29.824838,
+        "longitude": 106.428854
+      }
+    },
+    {
+      "id": "stop_303888fcc2579cea",
+      "name": "桃园",
+      "coordinate": {
+        "latitude": 29.826513,
+        "longitude": 106.42857
+      }
+    },
+    {
+      "id": "stop_2c131a2e3ad5aa74",
+      "name": "荟文楼",
+      "coordinate": {
+        "latitude": 29.826113,
+        "longitude": 106.429369
+      }
+    },
+    {
+      "id": "stop_c110bf3fe7c30323",
+      "name": "圆顶",
+      "coordinate": {
+        "latitude": 29.826569,
+        "longitude": 106.431026
+      }
+    },
+    {
+      "id": "stop_283127fa51578223",
+      "name": "外办",
+      "coordinate": {
+        "latitude": 29.827826,
+        "longitude": 106.430914
+      }
+    },
+    {
+      "id": "stop_01fdb87c6d18d113",
+      "name": "5号门",
+      "coordinate": {
+        "latitude": 29.828929,
+        "longitude": 106.432775
+      }
+    },
+    {
+      "id": "stop_dc2ac0953d86f877",
+      "name": "橘园新七舍",
+      "coordinate": {
+        "latitude": 29.826232,
+        "longitude": 106.424861
+      }
+    },
+    {
+      "id": "stop_ce61f1a750a9320c",
+      "name": "四新村博士生公寓",
+      "coordinate": {
+        "latitude": 29.82808,
+        "longitude": 106.428627
+      }
+    },
+    {
+      "id": "stop_e7b9941b2e553f53",
+      "name": "2号门",
+      "coordinate": {
+        "latitude": 29.813854,
+        "longitude": 106.420571
+      }
+    },
+    {
+      "id": "stop_bfd831bb5e1c4e72",
+      "name": "共青花园2号门",
+      "coordinate": {
+        "latitude": 29.814068,
+        "longitude": 106.419691
+      }
+    },
+    {
+      "id": "stop_6ca9aedf704f5f54",
+      "name": "楠园",
+      "coordinate": {
+        "latitude": 29.816521,
+        "longitude": 106.420485
+      }
+    },
+    {
+      "id": "stop_f0b84bbd5c0923e0",
+      "name": "大礼堂",
+      "coordinate": {
+        "latitude": 29.818857,
+        "longitude": 106.42262
+      }
+    },
+    {
+      "id": "stop_e4903debb7b846f6",
+      "name": "校史馆",
+      "coordinate": {
+        "latitude": 29.817699,
+        "longitude": 106.421869
+      }
+    },
+    {
+      "id": "stop_b15f16020eff2794",
+      "name": "研究生院",
+      "coordinate": {
+        "latitude": 29.819481,
+        "longitude": 106.423135
+      }
+    },
+    {
+      "id": "stop_5a8e2333f33e5b2a",
+      "name": "中心图书馆地科院",
+      "coordinate": {
+        "latitude": 29.821208,
+        "longitude": 106.424031
+      }
+    },
+    {
+      "id": "stop_e69dc2ee3b0dcf17",
+      "name": "地科院",
+      "coordinate": {
+        "latitude": 29.821668,
+        "longitude": 106.423844
+      }
+    },
+    {
+      "id": "stop_01d3f63a099b9517",
+      "name": "心理学部",
+      "coordinate": {
+        "latitude": 29.820728,
+        "longitude": 106.42159
+      }
+    },
+    {
+      "id": "stop_f7e42e80e4a6ce66",
+      "name": "外国语学院",
+      "coordinate": {
+        "latitude": 29.821301,
+        "longitude": 106.420963
+      }
+    },
+    {
+      "id": "stop_1653f1b95f3c213c",
+      "name": "药学院",
+      "coordinate": {
+        "latitude": 29.822529,
+        "longitude": 106.421258
+      }
+    },
+    {
+      "id": "stop_b300f8f2dd519be9",
+      "name": "梅园",
+      "coordinate": {
+        "latitude": 29.823553,
+        "longitude": 106.422309
+      }
+    },
+    {
+      "id": "stop_6aef059fded98ff7",
+      "name": "梅园食堂",
+      "coordinate": {
+        "latitude": 29.824037,
+        "longitude": 106.423307
+      }
+    },
+    {
+      "id": "stop_3bd58c6ef947dca8",
+      "name": "橘11",
+      "coordinate": {
+        "latitude": 29.824037,
+        "longitude": 106.423307
+      }
+    },
+    {
+      "id": "stop_cf4a995c275ecb84",
+      "name": "橘园",
+      "coordinate": {
+        "latitude": 29.825997,
+        "longitude": 106.426016
+      }
+    },
+    {
+      "id": "stop_1951e3684ee52c89",
+      "name": "2号门",
+      "coordinate": {
+        "latitude": 29.813882,
+        "longitude": 106.420453
+      }
+    },
+    {
+      "id": "stop_54a25ea311d47688",
+      "name": "共青团花园2号门",
+      "coordinate": {
+        "latitude": 29.814082,
+        "longitude": 106.419708
+      }
+    },
+    {
+      "id": "stop_5cb8bc2bacfa4936",
+      "name": "楠园",
+      "coordinate": {
+        "latitude": 29.816377,
+        "longitude": 106.420453
+      }
+    },
+    {
+      "id": "stop_8e44c9cc979f8b01",
+      "name": "校史馆",
+      "coordinate": {
+        "latitude": 29.817694,
+        "longitude": 106.421869
+      }
+    },
+    {
+      "id": "stop_e412ffbc912c1037",
+      "name": "大礼堂",
+      "coordinate": {
+        "latitude": 29.818816,
+        "longitude": 106.422578
+      }
+    },
+    {
+      "id": "stop_45ca6ec2a31f3999",
+      "name": "8教李园",
+      "coordinate": {
+        "latitude": 29.822599,
+        "longitude": 106.425614
+      }
+    },
+    {
+      "id": "stop_dad733d476c09ab9",
+      "name": "行署楼1号门",
+      "coordinate": {
+        "latitude": 29.823572,
+        "longitude": 106.427695
+      }
+    },
+    {
+      "id": "stop_38d2b37453b7549d",
+      "name": "田家炳",
+      "coordinate": {
+        "latitude": 29.824037,
+        "longitude": 106.429455
+      }
+    },
+    {
+      "id": "stop_1660a6bbba867754",
+      "name": "圆顶",
+      "coordinate": {
+        "latitude": 29.826141,
+        "longitude": 106.430646
+      }
+    },
+    {
+      "id": "stop_f0c1c29dfb556fac",
+      "name": "竹园",
+      "coordinate": {
+        "latitude": 29.816207,
+        "longitude": 106.415886
+      }
+    },
+    {
+      "id": "stop_820c2cf469a2f887",
+      "name": "32教",
+      "coordinate": {
+        "latitude": 29.813782,
+        "longitude": 106.417694
+      }
+    },
+    {
+      "id": "stop_4c0ff1ff364120a9",
+      "name": "2号门",
+      "coordinate": {
+        "latitude": 29.813782,
+        "longitude": 106.420789
+      }
+    },
+    {
+      "id": "stop_22e2d0eb6df2237a",
+      "name": "楠园",
+      "coordinate": {
+        "latitude": 29.816463,
+        "longitude": 106.420468
+      }
+    },
+    {
+      "id": "stop_438f01e1a25a0958",
+      "name": "校史馆",
+      "coordinate": {
+        "latitude": 29.818055,
+        "longitude": 106.42205
+      }
+    },
+    {
+      "id": "stop_196f9d5b5cda40c4",
+      "name": "大礼堂",
+      "coordinate": {
+        "latitude": 29.81872,
+        "longitude": 106.42257
+      }
+    },
+    {
+      "id": "stop_bd58e09a9f8777c3",
+      "name": "研究生院",
+      "coordinate": {
+        "latitude": 29.819433,
+        "longitude": 106.423059
+      }
+    },
+    {
+      "id": "stop_5328d65e501d26ac",
+      "name": "中心图书馆",
+      "coordinate": {
+        "latitude": 29.821164,
+        "longitude": 106.424035
+      }
+    },
+    {
+      "id": "stop_df0e627fc79ac5c4",
+      "name": "地科院",
+      "coordinate": {
+        "latitude": 29.821671,
+        "longitude": 106.423777
+      }
+    },
+    {
+      "id": "stop_0892623bece7b53e",
+      "name": "心理学部",
+      "coordinate": {
+        "latitude": 29.820722,
+        "longitude": 106.421632
+      }
+    },
+    {
+      "id": "stop_dd077e73bde81cb1",
+      "name": "外语学院",
+      "coordinate": {
+        "latitude": 29.821438,
+        "longitude": 106.420956
+      }
+    },
+    {
+      "id": "stop_52365ed96ee16399",
+      "name": "26教",
+      "coordinate": {
+        "latitude": 29.823398,
+        "longitude": 106.421948
+      }
+    },
+    {
+      "id": "stop_6da16239cfd9efb1",
+      "name": "梅园1舍",
+      "coordinate": {
+        "latitude": 29.823896,
+        "longitude": 106.423177
+      }
+    },
+    {
+      "id": "stop_fb6d8c14df4d016d",
+      "name": "橘园12舍",
+      "coordinate": {
+        "latitude": 29.825231,
+        "longitude": 106.424035
+      }
+    },
+    {
+      "id": "stop_47f91bd058dcb375",
+      "name": "橘园10舍",
+      "coordinate": {
+        "latitude": 29.825525,
+        "longitude": 106.424888
+      }
+    },
+    {
+      "id": "stop_6b2876490b14eaba",
+      "name": "橘园",
+      "coordinate": {
+        "latitude": 29.825971,
+        "longitude": 106.426154
+      }
+    },
+    {
+      "id": "stop_c17acfb1967faa1e",
+      "name": "桃园",
+      "coordinate": {
+        "latitude": 29.826488,
+        "longitude": 106.42845
+      }
+    },
+    {
+      "id": "stop_30998191572dd84d",
+      "name": "文学院",
+      "coordinate": {
+        "latitude": 29.824938,
+        "longitude": 106.428922
+      }
+    },
+    {
+      "id": "stop_79ec87a7d8cabf02",
+      "name": "田家炳",
+      "coordinate": {
+        "latitude": 29.824021,
+        "longitude": 106.429448
+      }
+    },
+    {
+      "id": "stop_bccde1b7c256c2f6",
+      "name": "行署楼",
+      "coordinate": {
+        "latitude": 29.823514,
+        "longitude": 106.427683
+      }
+    },
+    {
+      "id": "stop_fa8fcda81741db62",
+      "name": "八教",
+      "coordinate": {
+        "latitude": 29.822644,
+        "longitude": 106.4258
+      }
+    },
+    {
+      "id": "stop_8b7d711f06983be7",
+      "name": "共青团花园",
+      "coordinate": {
+        "latitude": 29.814068,
+        "longitude": 106.419691
+      }
+    },
+    {
+      "id": "stop_62c0c3d156ddebd2",
+      "name": "荟文楼",
+      "coordinate": {
+        "latitude": 29.826083,
+        "longitude": 106.429346
+      }
+    },
+    {
+      "id": "stop_b9becb079771729e",
+      "name": "音乐学院",
+      "coordinate": {
+        "latitude": 29.82149,
+        "longitude": 106.426701
+      }
+    },
+    {
+      "id": "stop_dc7a18809a56ec7b",
+      "name": "共青花园、2号门",
+      "coordinate": {
+        "latitude": 29.814636,
+        "longitude": 106.419852
+      }
+    }
+  ],
+  "routes": [
+    {
+      "id": "route_1",
+      "name": "1号线",
+      "color": "#1699e2",
+      "points": [
+        {
+          "latitude": 29.8112987405,
+          "longitude": 106.4135384559
+        },
+        {
+          "latitude": 29.8112428861,
+          "longitude": 106.4139139652
+        },
+        {
+          "latitude": 29.8113359767,
+          "longitude": 106.4139568806
+        },
+        {
+          "latitude": 29.8112847769,
+          "longitude": 106.4145201444
+        },
+        {
+          "latitude": 29.8112708133,
+          "longitude": 106.4146864414
+        },
+        {
+          "latitude": 29.8112894314,
+          "longitude": 106.4148205518
+        },
+        {
+          "latitude": 29.8110101591,
+          "longitude": 106.4147937298
+        },
+        {
+          "latitude": 29.810940341,
+          "longitude": 106.4153462648
+        },
+        {
+          "latitude": 29.811470958,
+          "longitude": 106.4154267311
+        },
+        {
+          "latitude": 29.811331322,
+          "longitude": 106.4161187411
+        },
+        {
+          "latitude": 29.8112615041,
+          "longitude": 106.4164084197
+        },
+        {
+          "latitude": 29.811121868,
+          "longitude": 106.4168697596
+        },
+        {
+          "latitude": 29.8122901508,
+          "longitude": 106.4172613621
+        },
+        {
+          "latitude": 29.8129603943,
+          "longitude": 106.4174813033
+        },
+        {
+          "latitude": 29.8136957953,
+          "longitude": 106.4177173375
+        },
+        {
+          "latitude": 29.8138447365,
+          "longitude": 106.4176958798
+        },
+        {
+          "latitude": 29.8139192071,
+          "longitude": 106.4177817105
+        },
+        {
+          "latitude": 29.8140355672,
+          "longitude": 106.4178353548
+        },
+        {
+          "latitude": 29.8139005895,
+          "longitude": 106.4184361697
+        },
+        {
+          "latitude": 29.8137097585,
+          "longitude": 106.4193105698
+        },
+        {
+          "latitude": 29.8137795748,
+          "longitude": 106.4195895194
+        },
+        {
+          "latitude": 29.8140448761,
+          "longitude": 106.4196914437
+        },
+        {
+          "latitude": 29.8144265364,
+          "longitude": 106.4197719099
+        },
+        {
+          "latitude": 29.8149990242,
+          "longitude": 106.4199864867
+        },
+        {
+          "latitude": 29.8153015573,
+          "longitude": 106.4200562241
+        },
+        {
+          "latitude": 29.8165163339,
+          "longitude": 106.4204961064
+        },
+        {
+          "latitude": 29.8172889426,
+          "longitude": 106.4207321407
+        },
+        {
+          "latitude": 29.8174239158,
+          "longitude": 106.4207965138
+        },
+        {
+          "latitude": 29.8171027718,
+          "longitude": 106.4213651421
+        },
+        {
+          "latitude": 29.8171260431,
+          "longitude": 106.4214348795
+        },
+        {
+          "latitude": 29.8176612821,
+          "longitude": 106.4218533041
+        },
+        {
+          "latitude": 29.8180801618,
+          "longitude": 106.4220356943
+        },
+        {
+          "latitude": 29.8184106105,
+          "longitude": 106.4222717287
+        },
+        {
+          "latitude": 29.8186572828,
+          "longitude": 106.4224594834
+        },
+        {
+          "latitude": 29.8188062167,
+          "longitude": 106.4225882294
+        },
+        {
+          "latitude": 29.8192250927,
+          "longitude": 106.4229530099
+        },
+        {
+          "latitude": 29.819290251,
+          "longitude": 106.423237324
+        },
+        {
+          "latitude": 29.8193600633,
+          "longitude": 106.4233124258
+        },
+        {
+          "latitude": 29.8194671088,
+          "longitude": 106.4231461289
+        },
+        {
+          "latitude": 29.8195415752,
+          "longitude": 106.4230334761
+        },
+        {
+          "latitude": 29.8192297468,
+          "longitude": 106.4229530098
+        },
+        {
+          "latitude": 29.8195369211,
+          "longitude": 106.4230388405
+        },
+        {
+          "latitude": 29.8197417033,
+          "longitude": 106.4229691031
+        },
+        {
+          "latitude": 29.8199325228,
+          "longitude": 106.4230817559
+        },
+        {
+          "latitude": 29.8206306397,
+          "longitude": 106.4235967393
+        },
+        {
+          "latitude": 29.8211844756,
+          "longitude": 106.4240473504
+        },
+        {
+          "latitude": 29.8213380598,
+          "longitude": 106.4240956302
+        },
+        {
+          "latitude": 29.8214171789,
+          "longitude": 106.4240634437
+        },
+        {
+          "latitude": 29.8216079952,
+          "longitude": 106.4239400621
+        },
+        {
+          "latitude": 29.8216778059,
+          "longitude": 106.4238756891
+        },
+        {
+          "latitude": 29.8218918907,
+          "longitude": 106.4240419867
+        },
+        {
+          "latitude": 29.8223479854,
+          "longitude": 106.4248573782
+        },
+        {
+          "latitude": 29.8225015678,
+          "longitude": 106.4251416924
+        },
+        {
+          "latitude": 29.82263188,
+          "longitude": 106.4258176091
+        },
+        {
+          "latitude": 29.8226504971,
+          "longitude": 106.4259302625
+        },
+        {
+          "latitude": 29.8226598051,
+          "longitude": 106.4260482797
+        },
+        {
+          "latitude": 29.8233439399,
+          "longitude": 106.4269924173
+        },
+        {
+          "latitude": 29.8235300986,
+          "longitude": 106.4273089179
+        },
+        {
+          "latitude": 29.8235673303,
+          "longitude": 106.427437664
+        },
+        {
+          "latitude": 29.8235766382,
+          "longitude": 106.4276897916
+        },
+        {
+          "latitude": 29.8235626774,
+          "longitude": 106.4280170211
+        },
+        {
+          "latitude": 29.8236790264,
+          "longitude": 106.4285051831
+        },
+        {
+          "latitude": 29.8237953751,
+          "longitude": 106.4289826163
+        },
+        {
+          "latitude": 29.824037379,
+          "longitude": 106.4294385918
+        },
+        {
+          "latitude": 29.8243538463,
+          "longitude": 106.4292132863
+        },
+        {
+          "latitude": 29.8246889282,
+          "longitude": 106.4289289722
+        },
+        {
+          "latitude": 29.8248238915,
+          "longitude": 106.4288538704
+        },
+        {
+          "latitude": 29.8252846266,
+          "longitude": 106.4295351514
+        },
+        {
+          "latitude": 29.8258244763,
+          "longitude": 106.4302808055
+        },
+        {
+          "latitude": 29.8261316303,
+          "longitude": 106.4306187625
+        },
+        {
+          "latitude": 29.8265365135,
+          "longitude": 106.4309942718
+        },
+        {
+          "latitude": 29.8268110886,
+          "longitude": 106.4310693736
+        },
+        {
+          "latitude": 29.8275091575,
+          "longitude": 106.4308708902
+        },
+        {
+          "latitude": 29.827723231,
+          "longitude": 106.4308708902
+        },
+        {
+          "latitude": 29.8278674976,
+          "longitude": 106.4309352632
+        },
+        {
+          "latitude": 29.8283468337,
+          "longitude": 106.4314663406
+        },
+        {
+          "latitude": 29.8285702128,
+          "longitude": 106.4317882057
+        },
+        {
+          "latitude": 29.8287237857,
+          "longitude": 106.4321959014
+        },
+        {
+          "latitude": 29.8289238954,
+          "longitude": 106.4327698955
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_6f8c6b0adc4465e4",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0,
+          "mileageMeters": 0,
+          "offsetMeters": 0.052605444178752674
+        },
+        {
+          "stopId": "stop_26ae68a62573ef76",
+          "sourceIndex": 1,
+          "segmentIndex": 9,
+          "ratio": 0.0011600988972469701,
+          "mileageMeters": 344.89440572750914,
+          "offsetMeters": 0.02781317668614308
+        },
+        {
+          "stopId": "stop_9a5f77f1a5dbcd63",
+          "sourceIndex": 2,
+          "segmentIndex": 15,
+          "ratio": 0.0024693704558451275,
+          "mileageMeters": 735.3916403729855,
+          "offsetMeters": 0.012518096379190916
+        },
+        {
+          "stopId": "stop_8e25c6e07ebb187e",
+          "sourceIndex": 4,
+          "segmentIndex": 21,
+          "ratio": 0.00013558280415939638,
+          "mileageMeters": 966.9854598600068,
+          "offsetMeters": 0.044587492495185496
+        },
+        {
+          "stopId": "stop_a364e88b44da5a66",
+          "sourceIndex": 3,
+          "segmentIndex": 24,
+          "ratio": 0.9997280977475719,
+          "mileageMeters": 1252.9166804697174,
+          "offsetMeters": 0.0013353510153031932
+        },
+        {
+          "stopId": "stop_bd8657d2e9c19d6b",
+          "sourceIndex": 5,
+          "segmentIndex": 29,
+          "ratio": 0.9994100170573517,
+          "mileageMeters": 1502.6117299077066,
+          "offsetMeters": 0.0066721719352597665
+        },
+        {
+          "stopId": "stop_55927eb0bcaf5302",
+          "sourceIndex": 6,
+          "segmentIndex": 33,
+          "ratio": 0.998427345943779,
+          "mileageMeters": 1649.2106525580473,
+          "offsetMeters": 0.0032471742520636996
+        },
+        {
+          "stopId": "stop_c8adab1ad6c4c071",
+          "sourceIndex": 7,
+          "segmentIndex": 38,
+          "ratio": 0.00018733271171071002,
+          "mileageMeters": 1766.5869805042528,
+          "offsetMeters": 0.017159481904445842
+        },
+        {
+          "stopId": "stop_dc34d932925b31b9",
+          "sourceIndex": 8,
+          "segmentIndex": 44,
+          "ratio": 0.9991682418758673,
+          "mileageMeters": 2065.990705218756,
+          "offsetMeters": 0.0028811838140934075
+        },
+        {
+          "stopId": "stop_bd402671a181757f",
+          "sourceIndex": 9,
+          "segmentIndex": 53,
+          "ratio": 0.9968165013680297,
+          "mileageMeters": 2359.7863502174623,
+          "offsetMeters": 0.04956021325740336
+        },
+        {
+          "stopId": "stop_49254bcf6cd32d27",
+          "sourceIndex": 10,
+          "segmentIndex": 59,
+          "ratio": 0.000572804587054315,
+          "mileageMeters": 2564.2657724826413,
+          "offsetMeters": 0.041169276518781814
+        },
+        {
+          "stopId": "stop_ee61e2af9010cb31",
+          "sourceIndex": 12,
+          "segmentIndex": 62,
+          "ratio": 1,
+          "mileageMeters": 2744.095390985244,
+          "offsetMeters": 0.05767733090740344
+        },
+        {
+          "stopId": "stop_84c52fad6491105a",
+          "sourceIndex": 11,
+          "segmentIndex": 65,
+          "ratio": 0.0003614822945614502,
+          "mileageMeters": 2831.7277949041027,
+          "offsetMeters": 0.00588604580932418
+        },
+        {
+          "stopId": "stop_0e99f4f34774b41b",
+          "sourceIndex": 13,
+          "segmentIndex": 69,
+          "ratio": 0.0008028228364450943,
+          "mileageMeters": 3072.667073573648,
+          "offsetMeters": 0.007920087062569078
+        },
+        {
+          "stopId": "stop_f1e4de32040366a6",
+          "sourceIndex": 14,
+          "segmentIndex": 73,
+          "ratio": 0.9964674925707273,
+          "mileageMeters": 3282.6776542731113,
+          "offsetMeters": 0.003703329069851217
+        },
+        {
+          "stopId": "stop_afc38ff511a402d6",
+          "sourceIndex": 15,
+          "segmentIndex": 77,
+          "ratio": 1,
+          "mileageMeters": 3498.976276052074,
+          "offsetMeters": 0.015391398409454351
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "route_2",
+      "name": "2号线",
+      "color": "#1699e2",
+      "points": [
+        {
+          "latitude": 29.811303395,
+          "longitude": 106.4135277273
+        },
+        {
+          "latitude": 29.8112289224,
+          "longitude": 106.4139032366
+        },
+        {
+          "latitude": 29.8113359766,
+          "longitude": 106.4139676096
+        },
+        {
+          "latitude": 29.8112894314,
+          "longitude": 106.4144825938
+        },
+        {
+          "latitude": 29.8112754678,
+          "longitude": 106.4146542551
+        },
+        {
+          "latitude": 29.8112894314,
+          "longitude": 106.4148259165
+        },
+        {
+          "latitude": 29.8110055045,
+          "longitude": 106.41479373
+        },
+        {
+          "latitude": 29.8109449954,
+          "longitude": 106.415346265
+        },
+        {
+          "latitude": 29.811480267,
+          "longitude": 106.4154267313
+        },
+        {
+          "latitude": 29.8114197581,
+          "longitude": 106.4156574013
+        },
+        {
+          "latitude": 29.8113359766,
+          "longitude": 106.4161241057
+        },
+        {
+          "latitude": 29.8112289224,
+          "longitude": 106.4165318014
+        },
+        {
+          "latitude": 29.8111265226,
+          "longitude": 106.4168697598
+        },
+        {
+          "latitude": 29.8114244127,
+          "longitude": 106.4169716837
+        },
+        {
+          "latitude": 29.8122901506,
+          "longitude": 106.4172667267
+        },
+        {
+          "latitude": 29.813672523,
+          "longitude": 106.417706609
+        },
+        {
+          "latitude": 29.8138586998,
+          "longitude": 106.4176797862
+        },
+        {
+          "latitude": 29.8139378248,
+          "longitude": 106.4178031685
+        },
+        {
+          "latitude": 29.8140448761,
+          "longitude": 106.4178407195
+        },
+        {
+          "latitude": 29.8138168101,
+          "longitude": 106.4188224079
+        },
+        {
+          "latitude": 29.8137144129,
+          "longitude": 106.4193266632
+        },
+        {
+          "latitude": 29.8136539055,
+          "longitude": 106.4195626976
+        },
+        {
+          "latitude": 29.813849391,
+          "longitude": 106.4196163418
+        },
+        {
+          "latitude": 29.8142869048,
+          "longitude": 106.4197450878
+        },
+        {
+          "latitude": 29.8146359832,
+          "longitude": 106.4198523762
+        },
+        {
+          "latitude": 29.8150036782,
+          "longitude": 106.4199972155
+        },
+        {
+          "latitude": 29.8152969024,
+          "longitude": 106.4200562241
+        },
+        {
+          "latitude": 29.8164604818,
+          "longitude": 106.4204692843
+        },
+        {
+          "latitude": 29.8170329584,
+          "longitude": 106.4206463107
+        },
+        {
+          "latitude": 29.8173029054,
+          "longitude": 106.4207321414
+        },
+        {
+          "latitude": 29.8174192616,
+          "longitude": 106.4208072433
+        },
+        {
+          "latitude": 29.8171167352,
+          "longitude": 106.4213222274
+        },
+        {
+          "latitude": 29.8171167352,
+          "longitude": 106.4214348802
+        },
+        {
+          "latitude": 29.8176938617,
+          "longitude": 106.4218801269
+        },
+        {
+          "latitude": 29.8180615449,
+          "longitude": 106.4220196004
+        },
+        {
+          "latitude": 29.8184059563,
+          "longitude": 106.4222770925
+        },
+        {
+          "latitude": 29.8186572828,
+          "longitude": 106.4224487539
+        },
+        {
+          "latitude": 29.8188713752,
+          "longitude": 106.4226418729
+        },
+        {
+          "latitude": 29.8190668505,
+          "longitude": 106.4228135356
+        },
+        {
+          "latitude": 29.8192390546,
+          "longitude": 106.4229637393
+        },
+        {
+          "latitude": 29.8192902504,
+          "longitude": 106.4232319602
+        },
+        {
+          "latitude": 29.8193554086,
+          "longitude": 106.4233177909
+        },
+        {
+          "latitude": 29.8195369205,
+          "longitude": 106.4230388411
+        },
+        {
+          "latitude": 29.8192437088,
+          "longitude": 106.4229583749
+        },
+        {
+          "latitude": 29.8195415747,
+          "longitude": 106.4230388412
+        },
+        {
+          "latitude": 29.81978359,
+          "longitude": 106.422985197
+        },
+        {
+          "latitude": 29.8202629648,
+          "longitude": 106.4233177909
+        },
+        {
+          "latitude": 29.8208912682,
+          "longitude": 106.4238005885
+        },
+        {
+          "latitude": 29.8211937838,
+          "longitude": 106.424041986
+        },
+        {
+          "latitude": 29.8213752923,
+          "longitude": 106.4240688081
+        },
+        {
+          "latitude": 29.821594033,
+          "longitude": 106.4239507909
+        },
+        {
+          "latitude": 29.8216452276,
+          "longitude": 106.4238595958
+        },
+        {
+          "latitude": 29.8218918919,
+          "longitude": 106.424041986
+        },
+        {
+          "latitude": 29.8223479865,
+          "longitude": 106.4248305555
+        },
+        {
+          "latitude": 29.822515531,
+          "longitude": 106.4251685138
+        },
+        {
+          "latitude": 29.8225899951,
+          "longitude": 106.4256244893
+        },
+        {
+          "latitude": 29.8226365351,
+          "longitude": 106.4260321864
+        },
+        {
+          "latitude": 29.8231019343,
+          "longitude": 106.4266544589
+        },
+        {
+          "latitude": 29.8234323665,
+          "longitude": 106.4271265277
+        },
+        {
+          "latitude": 29.8235114839,
+          "longitude": 106.4272767314
+        },
+        {
+          "latitude": 29.8235440616,
+          "longitude": 106.4274215707
+        },
+        {
+          "latitude": 29.8235766393,
+          "longitude": 106.4277058849
+        },
+        {
+          "latitude": 29.8235673314,
+          "longitude": 106.4280116554
+        },
+        {
+          "latitude": 29.8237953751,
+          "longitude": 106.4289718862
+        },
+        {
+          "latitude": 29.8240280723,
+          "longitude": 106.4294546851
+        },
+        {
+          "latitude": 29.8240653038,
+          "longitude": 106.4299803968
+        },
+        {
+          "latitude": 29.8241304589,
+          "longitude": 106.4302057023
+        },
+        {
+          "latitude": 29.8244934651,
+          "longitude": 106.4308065185
+        },
+        {
+          "latitude": 29.8248518149,
+          "longitude": 106.4313697811
+        },
+        {
+          "latitude": 29.8251729334,
+          "longitude": 106.4318740364
+        },
+        {
+          "latitude": 29.8254754366,
+          "longitude": 106.4323461064
+        },
+        {
+          "latitude": 29.8258198213,
+          "longitude": 106.4326787004
+        },
+        {
+          "latitude": 29.8261037072,
+          "longitude": 106.4329898366
+        },
+        {
+          "latitude": 29.8264760138,
+          "longitude": 106.4334028968
+        },
+        {
+          "latitude": 29.827015856,
+          "longitude": 106.4326626071
+        },
+        {
+          "latitude": 29.8271787388,
+          "longitude": 106.4324533948
+        },
+        {
+          "latitude": 29.8273695441,
+          "longitude": 106.4322870979
+        },
+        {
+          "latitude": 29.8274905424,
+          "longitude": 106.4322549114
+        },
+        {
+          "latitude": 29.8287051708,
+          "longitude": 106.4321959027
+        },
+        {
+          "latitude": 29.8289238954,
+          "longitude": 106.4327698955
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_eb35fe18296c8deb",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0.0009535035679205769,
+          "mileageMeters": 0.03543565518058097,
+          "offsetMeters": 0.03695521744252954
+        },
+        {
+          "stopId": "stop_595ebcca87dadd8b",
+          "sourceIndex": 1,
+          "segmentIndex": 9,
+          "ratio": 0.9997713502345837,
+          "mileageMeters": 348.514203058076,
+          "offsetMeters": 0.0004818363491373944
+        },
+        {
+          "stopId": "stop_515ee659a1f8e07f",
+          "sourceIndex": 2,
+          "segmentIndex": 16,
+          "ratio": 0.002461033944473275,
+          "mileageMeters": 739.4610051566019,
+          "offsetMeters": 0.014583621884753428
+        },
+        {
+          "stopId": "stop_888e4c0494b12420",
+          "sourceIndex": 3,
+          "segmentIndex": 23,
+          "ratio": 0.9998121387367623,
+          "mileageMeters": 1051.1458827079603,
+          "offsetMeters": 0.03555053672080428
+        },
+        {
+          "stopId": "stop_d2614b46646a0515",
+          "sourceIndex": 4,
+          "segmentIndex": 26,
+          "ratio": 0.9995621741126239,
+          "mileageMeters": 1262.7825974478958,
+          "offsetMeters": 0.010443200951831303
+        },
+        {
+          "stopId": "stop_26c811d76e0e64fc",
+          "sourceIndex": 5,
+          "segmentIndex": 33,
+          "ratio": 0.0002504607430526523,
+          "mileageMeters": 1522.8183549654798,
+          "offsetMeters": 0.01643647333010294
+        },
+        {
+          "stopId": "stop_dc6d79672edc6d24",
+          "sourceIndex": 6,
+          "segmentIndex": 36,
+          "ratio": 0.9991631394259032,
+          "mileageMeters": 1674.1863811233204,
+          "offsetMeters": 0.035368777915437535
+        },
+        {
+          "stopId": "stop_72648518c8fd9cbe",
+          "sourceIndex": 7,
+          "segmentIndex": 41,
+          "ratio": 0.5902295163575062,
+          "mileageMeters": 1782.9027903421365,
+          "offsetMeters": 0.6195954612233929
+        },
+        {
+          "stopId": "stop_d940fe5793399682",
+          "sourceIndex": 8,
+          "segmentIndex": 48,
+          "ratio": 0.0011803077562240274,
+          "mileageMeters": 2078.7440490699883,
+          "offsetMeters": 0.0017174568391915789
+        },
+        {
+          "stopId": "stop_61da21ba346237d2",
+          "sourceIndex": 9,
+          "segmentIndex": 54,
+          "ratio": 0.9989658887777801,
+          "mileageMeters": 2342.6817266930343,
+          "offsetMeters": 0.009267283830982022
+        },
+        {
+          "stopId": "stop_445e67839c3cf6b3",
+          "sourceIndex": 10,
+          "segmentIndex": 61,
+          "ratio": 0.00032831218092122503,
+          "mileageMeters": 2579.229578791753,
+          "offsetMeters": 0.04047275741367036
+        },
+        {
+          "stopId": "stop_690f20ea6d323028",
+          "sourceIndex": 11,
+          "segmentIndex": 64,
+          "ratio": 0.0005821772434176726,
+          "mileageMeters": 2758.0843663827795,
+          "offsetMeters": 0.010484354667193479
+        },
+        {
+          "stopId": "stop_ef36349a72a82bbd",
+          "sourceIndex": 12,
+          "segmentIndex": 69,
+          "ratio": 0.004194542350132689,
+          "mileageMeters": 3030.439340449548,
+          "offsetMeters": 1.133876502194536
+        },
+        {
+          "stopId": "stop_89a18a92bac03153",
+          "sourceIndex": 13,
+          "segmentIndex": 71,
+          "ratio": 0.0007877988397450508,
+          "mileageMeters": 3136.8092316005122,
+          "offsetMeters": 0.0072528680441920615
+        },
+        {
+          "stopId": "stop_afc38ff511a402d6",
+          "sourceIndex": 14,
+          "segmentIndex": 78,
+          "ratio": 1,
+          "mileageMeters": 3594.2622131200264,
+          "offsetMeters": 0.015391398409454351
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "route_3",
+      "name": "3号线",
+      "color": "#feab19",
+      "points": [
+        {
+          "latitude": 29.8162091492,
+          "longitude": 106.4158666136
+        },
+        {
+          "latitude": 29.8157669895,
+          "longitude": 106.416188478
+        },
+        {
+          "latitude": 29.8154318777,
+          "longitude": 106.4164674278
+        },
+        {
+          "latitude": 29.8152550127,
+          "longitude": 106.4165264364
+        },
+        {
+          "latitude": 29.8150502212,
+          "longitude": 106.4165049787
+        },
+        {
+          "latitude": 29.8142589787,
+          "longitude": 106.4162796731
+        },
+        {
+          "latitude": 29.8140448752,
+          "longitude": 106.4170414212
+        },
+        {
+          "latitude": 29.8138633534,
+          "longitude": 106.4176744225
+        },
+        {
+          "latitude": 29.8139145519,
+          "longitude": 106.4177924397
+        },
+        {
+          "latitude": 29.814030912,
+          "longitude": 106.4178514482
+        },
+        {
+          "latitude": 29.8139052431,
+          "longitude": 106.4184468987
+        },
+        {
+          "latitude": 29.8136492502,
+          "longitude": 106.4195626976
+        },
+        {
+          "latitude": 29.8140821105,
+          "longitude": 106.4196914443
+        },
+        {
+          "latitude": 29.8138493901,
+          "longitude": 106.4205229291
+        },
+        {
+          "latitude": 29.8140774561,
+          "longitude": 106.4196914443
+        },
+        {
+          "latitude": 29.8145289331,
+          "longitude": 106.4198040971
+        },
+        {
+          "latitude": 29.8150176419,
+          "longitude": 106.4199972161
+        },
+        {
+          "latitude": 29.8153201736,
+          "longitude": 106.4200669536
+        },
+        {
+          "latitude": 29.8165023698,
+          "longitude": 106.420474648
+        },
+        {
+          "latitude": 29.8168654048,
+          "longitude": 106.4205980297
+        },
+        {
+          "latitude": 29.8172935969,
+          "longitude": 106.4207160469
+        },
+        {
+          "latitude": 29.8174099531,
+          "longitude": 106.4207965131
+        },
+        {
+          "latitude": 29.8171074266,
+          "longitude": 106.4214026924
+        },
+        {
+          "latitude": 29.8176892064,
+          "longitude": 106.4218747611
+        },
+        {
+          "latitude": 29.8180894696,
+          "longitude": 106.4220303306
+        },
+        {
+          "latitude": 29.8184245725,
+          "longitude": 106.4222717294
+        },
+        {
+          "latitude": 29.818829487,
+          "longitude": 106.4225989589
+        },
+        {
+          "latitude": 29.8192343999,
+          "longitude": 106.4229476461
+        },
+        {
+          "latitude": 29.8192855957,
+          "longitude": 106.4232319602
+        },
+        {
+          "latitude": 29.8193507539,
+          "longitude": 106.4233124265
+        },
+        {
+          "latitude": 29.8194624535,
+          "longitude": 106.4231514939
+        },
+        {
+          "latitude": 29.8195322658,
+          "longitude": 106.4230388412
+        },
+        {
+          "latitude": 29.8192297458,
+          "longitude": 106.4229530105
+        },
+        {
+          "latitude": 29.8195322658,
+          "longitude": 106.4230334768
+        },
+        {
+          "latitude": 29.8197975524,
+          "longitude": 106.4229744668
+        },
+        {
+          "latitude": 29.8203234683,
+          "longitude": 106.4233607049
+        },
+        {
+          "latitude": 29.820723721,
+          "longitude": 106.4236772069
+        },
+        {
+          "latitude": 29.8211937832,
+          "longitude": 106.4240366229
+        },
+        {
+          "latitude": 29.8214264864,
+          "longitude": 106.4240473504
+        },
+        {
+          "latitude": 29.8216545351,
+          "longitude": 106.4238595958
+        },
+        {
+          "latitude": 29.8213985621,
+          "longitude": 106.4232265945
+        },
+        {
+          "latitude": 29.8212077454,
+          "longitude": 106.4229422803
+        },
+        {
+          "latitude": 29.8208074946,
+          "longitude": 106.4224863048
+        },
+        {
+          "latitude": 29.8206585637,
+          "longitude": 106.4222556361
+        },
+        {
+          "latitude": 29.8205980605,
+          "longitude": 106.4221107968
+        },
+        {
+          "latitude": 29.8206213309,
+          "longitude": 106.4219444999
+        },
+        {
+          "latitude": 29.8207423374,
+          "longitude": 106.4215689906
+        },
+        {
+          "latitude": 29.8208633431,
+          "longitude": 106.4212578531
+        },
+        {
+          "latitude": 29.8209378085,
+          "longitude": 106.4211344715
+        },
+        {
+          "latitude": 29.8210401982,
+          "longitude": 106.4210593696
+        },
+        {
+          "latitude": 29.8213101343,
+          "longitude": 106.4209574457
+        },
+        {
+          "latitude": 29.8214962967,
+          "longitude": 106.4208930726
+        },
+        {
+          "latitude": 29.8218779286,
+          "longitude": 106.4209038015
+        },
+        {
+          "latitude": 29.8221292464,
+          "longitude": 106.4209735389
+        },
+        {
+          "latitude": 29.8223759095,
+          "longitude": 106.4211076494
+        },
+        {
+          "latitude": 29.8225062218,
+          "longitude": 106.4212578544
+        },
+        {
+          "latitude": 29.8226598046,
+          "longitude": 106.4214938875
+        },
+        {
+          "latitude": 29.8230553939,
+          "longitude": 106.42165482
+        },
+        {
+          "latitude": 29.8232322452,
+          "longitude": 106.4217996593
+        },
+        {
+          "latitude": 29.8234789055,
+          "longitude": 106.4221322532
+        },
+        {
+          "latitude": 29.823544061,
+          "longitude": 106.4222770925
+        },
+        {
+          "latitude": 29.823758143,
+          "longitude": 106.422770619
+        },
+        {
+          "latitude": 29.8239070693,
+          "longitude": 106.423130035
+        },
+        {
+          "latitude": 29.8240141099,
+          "longitude": 106.4232802387
+        },
+        {
+          "latitude": 29.8242607684,
+          "longitude": 106.4234626289
+        },
+        {
+          "latitude": 29.8245353497,
+          "longitude": 106.4235913749
+        },
+        {
+          "latitude": 29.8247959686,
+          "longitude": 106.4236128326
+        },
+        {
+          "latitude": 29.8250612407,
+          "longitude": 106.423618197
+        },
+        {
+          "latitude": 29.825442859,
+          "longitude": 106.424337029
+        },
+        {
+          "latitude": 29.8253265121,
+          "longitude": 106.4244496818
+        },
+        {
+          "latitude": 29.8256988216,
+          "longitude": 106.4251953372
+        },
+        {
+          "latitude": 29.8259920144,
+          "longitude": 106.4258015165
+        },
+        {
+          "latitude": 29.8260013221,
+          "longitude": 106.4259839067
+        },
+        {
+          "latitude": 29.8259780528,
+          "longitude": 106.426236033
+        },
+        {
+          "latitude": 29.826033899,
+          "longitude": 106.4265578981
+        },
+        {
+          "latitude": 29.8263131293,
+          "longitude": 106.4272069927
+        },
+        {
+          "latitude": 29.8264108597,
+          "longitude": 106.4274376626
+        },
+        {
+          "latitude": 29.826429475,
+          "longitude": 106.4276468749
+        },
+        {
+          "latitude": 29.8261548989,
+          "longitude": 106.4280277486
+        },
+        {
+          "latitude": 29.8257174371,
+          "longitude": 106.4284783597
+        },
+        {
+          "latitude": 29.8253916664,
+          "longitude": 106.4285212751
+        },
+        {
+          "latitude": 29.8248378537,
+          "longitude": 106.428853869
+        },
+        {
+          "latitude": 29.8252846272,
+          "longitude": 106.4295244226
+        },
+        {
+          "latitude": 29.8248425076,
+          "longitude": 106.4288485058
+        },
+        {
+          "latitude": 29.8253916663,
+          "longitude": 106.4285212764
+        },
+        {
+          "latitude": 29.8257220909,
+          "longitude": 106.4284729966
+        },
+        {
+          "latitude": 29.8261548989,
+          "longitude": 106.4280331144
+        },
+        {
+          "latitude": 29.8264341288,
+          "longitude": 106.4276468762
+        },
+        {
+          "latitude": 29.8264667056,
+          "longitude": 106.4280170211
+        },
+        {
+          "latitude": 29.8265132439,
+          "longitude": 106.4285695562
+        },
+        {
+          "latitude": 29.8261130143,
+          "longitude": 106.4293688544
+        },
+        {
+          "latitude": 29.825289281,
+          "longitude": 106.4295244226
+        },
+        {
+          "latitude": 29.8257965526,
+          "longitude": 106.430248619
+        },
+        {
+          "latitude": 29.8263317446,
+          "longitude": 106.4308226117
+        },
+        {
+          "latitude": 29.8265690898,
+          "longitude": 106.4310264596
+        },
+        {
+          "latitude": 29.8268157419,
+          "longitude": 106.4310747394
+        },
+        {
+          "latitude": 29.827485888,
+          "longitude": 106.4308869821
+        },
+        {
+          "latitude": 29.8277185766,
+          "longitude": 106.4308762533
+        },
+        {
+          "latitude": 29.8278721508,
+          "longitude": 106.4309459907
+        },
+        {
+          "latitude": 29.8283654481,
+          "longitude": 106.4315092572
+        },
+        {
+          "latitude": 29.8285702122,
+          "longitude": 106.4317613849
+        },
+        {
+          "latitude": 29.8287237851,
+          "longitude": 106.4321959027
+        },
+        {
+          "latitude": 29.8289285485,
+          "longitude": 106.4327752599
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_c786fb5faf44edf1",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0.0005835370192552315,
+          "mileageMeters": 0.03393321160654954,
+          "offsetMeters": 0.02265924429365587
+        },
+        {
+          "stopId": "stop_a5b66bc04c63e33e",
+          "sourceIndex": 1,
+          "segmentIndex": 6,
+          "ratio": 0.9995899995961113,
+          "mileageMeters": 379.627967120617,
+          "offsetMeters": 0.05010287750708825
+        },
+        {
+          "stopId": "stop_846cb02f3ecc476e",
+          "sourceIndex": 2,
+          "segmentIndex": 11,
+          "ratio": 0.9995451843391854,
+          "mileageMeters": 626.6789880233385,
+          "offsetMeters": 0.03843495198298492
+        },
+        {
+          "stopId": "stop_d10213da43f348b4",
+          "sourceIndex": 3,
+          "segmentIndex": 12,
+          "ratio": 1,
+          "mileageMeters": 710.991898421769,
+          "offsetMeters": 0.0439132212212978
+        },
+        {
+          "stopId": "stop_be9fa9c6c9e2282a",
+          "sourceIndex": 4,
+          "segmentIndex": 17,
+          "ratio": 0.9997838415192877,
+          "mileageMeters": 1075.4263227068918,
+          "offsetMeters": 0.04432135927096144
+        },
+        {
+          "stopId": "stop_d359781952a897dc",
+          "sourceIndex": 5,
+          "segmentIndex": 22,
+          "ratio": 0.9999304925673372,
+          "mileageMeters": 1328.160261830998,
+          "offsetMeters": 0.032057585461873025
+        },
+        {
+          "stopId": "stop_afa6a4aae1578ab3",
+          "sourceIndex": 6,
+          "segmentIndex": 25,
+          "ratio": 0.9992350701783494,
+          "mileageMeters": 1474.0233735912932,
+          "offsetMeters": 0.03433482759222024
+        },
+        {
+          "stopId": "stop_474c82b6bcc469d0",
+          "sourceIndex": 7,
+          "segmentIndex": 30,
+          "ratio": 0.0007085001120030527,
+          "mileageMeters": 1588.7918749831445,
+          "offsetMeters": 0.06872881185621386
+        },
+        {
+          "stopId": "stop_5d277861d3b28f79",
+          "sourceIndex": 8,
+          "segmentIndex": 37,
+          "ratio": 0.0009863114479841638,
+          "mileageMeters": 1887.4099039794637,
+          "offsetMeters": 0.035386683230114215
+        },
+        {
+          "stopId": "stop_c6ef97c6f0f6d6e9",
+          "sourceIndex": 9,
+          "segmentIndex": 38,
+          "ratio": 1,
+          "mileageMeters": 1944.4429029477778,
+          "offsetMeters": 0.06475191009616311
+        },
+        {
+          "stopId": "stop_8e6922276d07fcbf",
+          "sourceIndex": 10,
+          "segmentIndex": 45,
+          "ratio": 0.9996399678407434,
+          "mileageMeters": 2207.1965596056198,
+          "offsetMeters": 0.034853839456176726
+        },
+        {
+          "stopId": "stop_8a5e3af3625808e5",
+          "sourceIndex": 11,
+          "segmentIndex": 49,
+          "ratio": 0.9999744776010884,
+          "mileageMeters": 2299.68294985362,
+          "offsetMeters": 0.045509342862672775
+        },
+        {
+          "stopId": "stop_bb62f18d991e6ef9",
+          "sourceIndex": 12,
+          "segmentIndex": 54,
+          "ratio": 0.9996336500855555,
+          "mileageMeters": 2443.2980451843337,
+          "offsetMeters": 0.02737145047627698
+        },
+        {
+          "stopId": "stop_03da67e19fabdb68",
+          "sourceIndex": 13,
+          "segmentIndex": 59,
+          "ratio": 0.9992983056932604,
+          "mileageMeters": 2600.4767992315265,
+          "offsetMeters": 0.001913980627223621
+        },
+        {
+          "stopId": "stop_1b8aeaa80f9f2f29",
+          "sourceIndex": 14,
+          "segmentIndex": 64,
+          "ratio": 0.0011329503786373836,
+          "mileageMeters": 2743.515682890232,
+          "offsetMeters": 0.02345703329300201
+        },
+        {
+          "stopId": "stop_e5e24f40b282b8d7",
+          "sourceIndex": 15,
+          "segmentIndex": 72,
+          "ratio": 0.0005208185155268348,
+          "mileageMeters": 3100.7684053611747,
+          "offsetMeters": 0.034662852625211044
+        },
+        {
+          "stopId": "stop_f3392fa38af4c283",
+          "sourceIndex": 16,
+          "segmentIndex": 81,
+          "ratio": 0.00024436911993839144,
+          "mileageMeters": 3490.7460756821492,
+          "offsetMeters": 0.0052046964093329946
+        },
+        {
+          "stopId": "stop_303888fcc2579cea",
+          "sourceIndex": 17,
+          "segmentIndex": 89,
+          "ratio": 0.0005687719253561056,
+          "mileageMeters": 3961.877604382071,
+          "offsetMeters": 0.0020876644540882908
+        },
+        {
+          "stopId": "stop_2c131a2e3ad5aa74",
+          "sourceIndex": 18,
+          "segmentIndex": 90,
+          "ratio": 0.000041373381130658594,
+          "mileageMeters": 4050.8574694346025,
+          "offsetMeters": 0.01360355779390841
+        },
+        {
+          "stopId": "stop_c110bf3fe7c30323",
+          "sourceIndex": 19,
+          "segmentIndex": 93,
+          "ratio": 0.998951850425131,
+          "mileageMeters": 4347.623410244735,
+          "offsetMeters": 0.02958593817481086
+        },
+        {
+          "stopId": "stop_283127fa51578223",
+          "sourceIndex": 20,
+          "segmentIndex": 97,
+          "ratio": 0.6782333742501101,
+          "mileageMeters": 4490.5063396563455,
+          "offsetMeters": 0.9902992731663833
+        },
+        {
+          "stopId": "stop_01fdb87c6d18d113",
+          "sourceIndex": 21,
+          "segmentIndex": 101,
+          "ratio": 0.999929144957685,
+          "mileageMeters": 4712.538489776828,
+          "offsetMeters": 0.05595321993450365
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "route_3b",
+      "name": "3路B线",
+      "color": "#328f4f",
+      "points": [
+        {
+          "latitude": 29.8166679208,
+          "longitude": 106.4155375957
+        },
+        {
+          "latitude": 29.8157463689,
+          "longitude": 106.4162135125
+        },
+        {
+          "latitude": 29.8154391831,
+          "longitude": 106.4164710045
+        },
+        {
+          "latitude": 29.8151692311,
+          "longitude": 106.4165246487
+        },
+        {
+          "latitude": 29.8142476654,
+          "longitude": 106.4162832499
+        },
+        {
+          "latitude": 29.8138520412,
+          "longitude": 106.417683363
+        },
+        {
+          "latitude": 29.8140754527,
+          "longitude": 106.4177048206
+        },
+        {
+          "latitude": 29.8138101514,
+          "longitude": 106.4188152552
+        },
+        {
+          "latitude": 29.8136472468,
+          "longitude": 106.4195662737
+        },
+        {
+          "latitude": 29.8140847615,
+          "longitude": 106.4197003841
+        },
+        {
+          "latitude": 29.8145827812,
+          "longitude": 106.4198291301
+        },
+        {
+          "latitude": 29.8150156374,
+          "longitude": 106.4199954272
+        },
+        {
+          "latitude": 29.8153181702,
+          "longitude": 106.4200598001
+        },
+        {
+          "latitude": 29.8161419856,
+          "longitude": 106.4203602076
+        },
+        {
+          "latitude": 29.8168727089,
+          "longitude": 106.4206016064
+        },
+        {
+          "latitude": 29.8173055552,
+          "longitude": 106.4207303524
+        },
+        {
+          "latitude": 29.8174219114,
+          "longitude": 106.4208000898
+        },
+        {
+          "latitude": 29.8170914594,
+          "longitude": 106.4214116335
+        },
+        {
+          "latitude": 29.8176872031,
+          "longitude": 106.4218676091
+        },
+        {
+          "latitude": 29.8180921206,
+          "longitude": 106.4220553637
+        },
+        {
+          "latitude": 29.8184272235,
+          "longitude": 106.4222753048
+        },
+        {
+          "latitude": 29.8190648467,
+          "longitude": 106.4228063822
+        },
+        {
+          "latitude": 29.8192230883,
+          "longitude": 106.4229565859
+        },
+        {
+          "latitude": 29.8192835924,
+          "longitude": 106.4232194424
+        },
+        {
+          "latitude": 29.8193580589,
+          "longitude": 106.4233320951
+        },
+        {
+          "latitude": 29.8195349167,
+          "longitude": 106.423047781
+        },
+        {
+          "latitude": 29.8196978117,
+          "longitude": 106.4230048656
+        },
+        {
+          "latitude": 29.8199258643,
+          "longitude": 106.4230746031
+        },
+        {
+          "latitude": 29.8203726597,
+          "longitude": 106.4233964682
+        },
+        {
+          "latitude": 29.8209125349,
+          "longitude": 106.4238202572
+        },
+        {
+          "latitude": 29.8211964335,
+          "longitude": 106.4240509272
+        },
+        {
+          "latitude": 29.8213919043,
+          "longitude": 106.4240777492
+        },
+        {
+          "latitude": 29.8216013368,
+          "longitude": 106.4239436388
+        },
+        {
+          "latitude": 29.8216618394,
+          "longitude": 106.4238578081
+        },
+        {
+          "latitude": 29.8213779421,
+          "longitude": 106.4232087135
+        },
+        {
+          "latitude": 29.8211778172,
+          "longitude": 106.4229297638
+        },
+        {
+          "latitude": 29.8208054908,
+          "longitude": 106.4224952459
+        },
+        {
+          "latitude": 29.8206053649,
+          "longitude": 106.4221894741
+        },
+        {
+          "latitude": 29.8205960567,
+          "longitude": 106.4221036434
+        },
+        {
+          "latitude": 29.8205960567,
+          "longitude": 106.421969533
+        },
+        {
+          "latitude": 29.8207356795,
+          "longitude": 106.4215832949
+        },
+        {
+          "latitude": 29.8208985726,
+          "longitude": 106.4211595058
+        },
+        {
+          "latitude": 29.8209870001,
+          "longitude": 106.4210736751
+        },
+        {
+          "latitude": 29.8214989476,
+          "longitude": 106.4208912849
+        },
+        {
+          "latitude": 29.8218898875,
+          "longitude": 106.4209234715
+        },
+        {
+          "latitude": 29.8221505133,
+          "longitude": 106.4209663868
+        },
+        {
+          "latitude": 29.8224018304,
+          "longitude": 106.4211326837
+        },
+        {
+          "latitude": 29.8225321427,
+          "longitude": 106.4212775231
+        },
+        {
+          "latitude": 29.8226671088,
+          "longitude": 106.4214974642
+        },
+        {
+          "latitude": 29.8230580442,
+          "longitude": 106.4216583967
+        },
+        {
+          "latitude": 29.8232488573,
+          "longitude": 106.421803236
+        },
+        {
+          "latitude": 29.8233652066,
+          "longitude": 106.4219748973
+        },
+        {
+          "latitude": 29.8234675939,
+          "longitude": 106.4221358299
+        },
+        {
+          "latitude": 29.8235839429,
+          "longitude": 106.4223396778
+        },
+        {
+          "latitude": 29.8238445643,
+          "longitude": 106.4229887724
+        },
+        {
+          "latitude": 29.823951605,
+          "longitude": 106.4232087135
+        },
+        {
+          "latitude": 29.8240539917,
+          "longitude": 106.4233213663
+        },
+        {
+          "latitude": 29.824305304,
+          "longitude": 106.4234983921
+        },
+        {
+          "latitude": 29.8248218883,
+          "longitude": 106.4236164093
+        },
+        {
+          "latitude": 29.8250685448,
+          "longitude": 106.4236217737
+        },
+        {
+          "latitude": 29.8254408553,
+          "longitude": 106.4243352413
+        },
+        {
+          "latitude": 29.825827126,
+          "longitude": 106.4240884781
+        },
+        {
+          "latitude": 29.8262320105,
+          "longitude": 106.4248609543
+        },
+        {
+          "latitude": 29.8266508548,
+          "longitude": 106.4256709814
+        },
+        {
+          "latitude": 29.8270510822,
+          "longitude": 106.4263790846
+        },
+        {
+          "latitude": 29.8274001164,
+          "longitude": 106.4265882969
+        },
+        {
+          "latitude": 29.8280237211,
+          "longitude": 106.4266741276
+        },
+        {
+          "latitude": 29.8280469899,
+          "longitude": 106.4267545938
+        },
+        {
+          "latitude": 29.8280469899,
+          "longitude": 106.4270657301
+        },
+        {
+          "latitude": 29.8280004523,
+          "longitude": 106.4276987314
+        },
+        {
+          "latitude": 29.8280795662,
+          "longitude": 106.4286267757
+        },
+        {
+          "latitude": 29.8280283748,
+          "longitude": 106.428809166
+        },
+        {
+          "latitude": 29.8275071533,
+          "longitude": 106.4297050238
+        },
+        {
+          "latitude": 29.8272139649,
+          "longitude": 106.4301556349
+        },
+        {
+          "latitude": 29.8270138518,
+          "longitude": 106.4302629232
+        },
+        {
+          "latitude": 29.8267113544,
+          "longitude": 106.4303004742
+        },
+        {
+          "latitude": 29.826595009,
+          "longitude": 106.430375576
+        },
+        {
+          "latitude": 29.8265345093,
+          "longitude": 106.4304775
+        },
+        {
+          "latitude": 29.8265577784,
+          "longitude": 106.4306920767
+        },
+        {
+          "latitude": 29.8266880853,
+          "longitude": 106.4309495687
+        },
+        {
+          "latitude": 29.826818392,
+          "longitude": 106.4310729504
+        },
+        {
+          "latitude": 29.8274931919,
+          "longitude": 106.4308851957
+        },
+        {
+          "latitude": 29.827735188,
+          "longitude": 106.4308691025
+        },
+        {
+          "latitude": 29.8278515321,
+          "longitude": 106.4309334755
+        },
+        {
+          "latitude": 29.8283448295,
+          "longitude": 106.4314699173
+        },
+        {
+          "latitude": 29.8285682086,
+          "longitude": 106.4317756891
+        },
+        {
+          "latitude": 29.8287171278,
+          "longitude": 106.4321887493
+        },
+        {
+          "latitude": 29.8289218912,
+          "longitude": 106.4327788353
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_c786fb5faf44edf1",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0.49491938936648466,
+          "mileageMeters": 60.113447311809225,
+          "offsetMeters": 0.5854931667225978
+        },
+        {
+          "stopId": "stop_a5b66bc04c63e33e",
+          "sourceIndex": 1,
+          "segmentIndex": 4,
+          "ratio": 0.9912977570591991,
+          "mileageMeters": 440.0701016881494,
+          "offsetMeters": 0.8789434354961543
+        },
+        {
+          "stopId": "stop_d10213da43f348b4",
+          "sourceIndex": 3,
+          "segmentIndex": 8,
+          "ratio": 0.9019397813534594,
+          "mileageMeters": 697.445401608237,
+          "offsetMeters": 83.43594084702657
+        },
+        {
+          "stopId": "stop_846cb02f3ecc476e",
+          "sourceIndex": 2,
+          "segmentIndex": 8,
+          "ratio": 0.9894827224777631,
+          "mileageMeters": 701.8523707510212,
+          "offsetMeters": 0.7960185636133177
+        },
+        {
+          "stopId": "stop_be9fa9c6c9e2282a",
+          "sourceIndex": 4,
+          "segmentIndex": 13,
+          "ratio": 0.4913801188093463,
+          "mileageMeters": 981.6920826222466,
+          "offsetMeters": 0.3839945560577375
+        },
+        {
+          "stopId": "stop_d359781952a897dc",
+          "sourceIndex": 5,
+          "segmentIndex": 18,
+          "ratio": 0.009303010727565238,
+          "mileageMeters": 1238.449439264282,
+          "offsetMeters": 0.5869332768610495
+        },
+        {
+          "stopId": "stop_afa6a4aae1578ab3",
+          "sourceIndex": 6,
+          "segmentIndex": 20,
+          "ratio": 0.623045832812161,
+          "mileageMeters": 1383.9103615330487,
+          "offsetMeters": 0.8558378008395192
+        },
+        {
+          "stopId": "stop_474c82b6bcc469d0",
+          "sourceIndex": 7,
+          "segmentIndex": 24,
+          "ratio": 0.6202346474472116,
+          "mileageMeters": 1500.5104204189931,
+          "offsetMeters": 0.7870350684736462
+        },
+        {
+          "stopId": "stop_5d277861d3b28f79",
+          "sourceIndex": 8,
+          "segmentIndex": 29,
+          "ratio": 0.9742311057960557,
+          "mileageMeters": 1726.988708453225,
+          "offsetMeters": 0.9422469868652801
+        },
+        {
+          "stopId": "stop_c6ef97c6f0f6d6e9",
+          "sourceIndex": 9,
+          "segmentIndex": 32,
+          "ratio": 0.9396662107370597,
+          "mileageMeters": 1786.5382125954932,
+          "offsetMeters": 0.45689989327587643
+        },
+        {
+          "stopId": "stop_8e6922276d07fcbf",
+          "sourceIndex": 10,
+          "segmentIndex": 40,
+          "ratio": 0.03456309406140212,
+          "mileageMeters": 2051.2881885787074,
+          "offsetMeters": 0.08396723570056516
+        },
+        {
+          "stopId": "stop_8a5e3af3625808e5",
+          "sourceIndex": 11,
+          "segmentIndex": 42,
+          "ratio": 0.6316892451419936,
+          "mileageMeters": 2144.9516233453437,
+          "offsetMeters": 0.14754019640202568
+        },
+        {
+          "stopId": "stop_bb62f18d991e6ef9",
+          "sourceIndex": 12,
+          "segmentIndex": 46,
+          "ratio": 0.8311000543232989,
+          "mileageMeters": 2288.704967439387,
+          "offsetMeters": 0.6620674166916877
+        },
+        {
+          "stopId": "stop_03da67e19fabdb68",
+          "sourceIndex": 13,
+          "segmentIndex": 52,
+          "ratio": 0.6817034420627678,
+          "mileageMeters": 2445.9709646043843,
+          "offsetMeters": 0.3872466313234522
+        },
+        {
+          "stopId": "stop_1b8aeaa80f9f2f29",
+          "sourceIndex": 14,
+          "segmentIndex": 56,
+          "ratio": 0.8172826262283485,
+          "mileageMeters": 2589.293938564491,
+          "offsetMeters": 0.3444122158851351
+        },
+        {
+          "stopId": "stop_dc2ac0953d86f877",
+          "sourceIndex": 15,
+          "segmentIndex": 62,
+          "ratio": 0.000035057955598185454,
+          "mileageMeters": 2897.758257065756,
+          "offsetMeters": 0.0032599928304326586
+        },
+        {
+          "stopId": "stop_ce61f1a750a9320c",
+          "sourceIndex": 16,
+          "segmentIndex": 70,
+          "ratio": 0.00031030336768310873,
+          "mileageMeters": 3373.2625943371922,
+          "offsetMeters": 0.052554567584992704
+        },
+        {
+          "stopId": "stop_283127fa51578223",
+          "sourceIndex": 17,
+          "segmentIndex": 82,
+          "ratio": 0.7649879250703147,
+          "mileageMeters": 3818.7383617038313,
+          "offsetMeters": 0.4651431226585974
+        },
+        {
+          "stopId": "stop_01fdb87c6d18d113",
+          "sourceIndex": 18,
+          "segmentIndex": 86,
+          "ratio": 0.999185501658862,
+          "mileageMeters": 4040.487095964555,
+          "offsetMeters": 0.8713288917832763
+        }
+      ],
+      "warnings": [
+        "「2号门」偏离发布轨迹约 83 米（超过35米），位置待核对，暂不作为本线路自动上下车/换乘点；未判定实际停靠情况。"
+      ]
+    },
+    {
+      "id": "route_4",
+      "name": "4号线",
+      "color": "#e94ece",
+      "points": [
+        {
+          "latitude": 29.8138540452,
+          "longitude": 106.4205712089
+        },
+        {
+          "latitude": 29.8140681479,
+          "longitude": 106.4196914443
+        },
+        {
+          "latitude": 29.81447308,
+          "longitude": 106.419777275
+        },
+        {
+          "latitude": 29.8146499464,
+          "longitude": 106.4198523769
+        },
+        {
+          "latitude": 29.8150176414,
+          "longitude": 106.4199918517
+        },
+        {
+          "latitude": 29.8153108655,
+          "longitude": 106.4200615892
+        },
+        {
+          "latitude": 29.8165209876,
+          "longitude": 106.4204853769
+        },
+        {
+          "latitude": 29.8171679314,
+          "longitude": 106.4206945905
+        },
+        {
+          "latitude": 29.8174099525,
+          "longitude": 106.4207750568
+        },
+        {
+          "latitude": 29.8171027718,
+          "longitude": 106.4214026937
+        },
+        {
+          "latitude": 29.8176985157,
+          "longitude": 106.4218693967
+        },
+        {
+          "latitude": 29.8181034328,
+          "longitude": 106.4220303306
+        },
+        {
+          "latitude": 29.8184059563,
+          "longitude": 106.4222770938
+        },
+        {
+          "latitude": 29.8188574127,
+          "longitude": 106.4226204166
+        },
+        {
+          "latitude": 29.8192250924,
+          "longitude": 106.4229530092
+        },
+        {
+          "latitude": 29.8192902507,
+          "longitude": 106.4232373233
+        },
+        {
+          "latitude": 29.8193647172,
+          "longitude": 106.4233124252
+        },
+        {
+          "latitude": 29.819481071,
+          "longitude": 106.4231353994
+        },
+        {
+          "latitude": 29.8195415749,
+          "longitude": 106.423028111
+        },
+        {
+          "latitude": 29.8192297466,
+          "longitude": 106.4229583736
+        },
+        {
+          "latitude": 29.8195462291,
+          "longitude": 106.4230334755
+        },
+        {
+          "latitude": 29.8198208231,
+          "longitude": 106.422963738
+        },
+        {
+          "latitude": 29.8209331555,
+          "longitude": 106.4238059516
+        },
+        {
+          "latitude": 29.8212077454,
+          "longitude": 106.4240312585
+        },
+        {
+          "latitude": 29.8214125243,
+          "longitude": 106.4240795383
+        },
+        {
+          "latitude": 29.8216033405,
+          "longitude": 106.423934699
+        },
+        {
+          "latitude": 29.8216684972,
+          "longitude": 106.4238435039
+        },
+        {
+          "latitude": 29.8213706383,
+          "longitude": 106.4232051368
+        },
+        {
+          "latitude": 29.821114664,
+          "longitude": 106.4228725442
+        },
+        {
+          "latitude": 29.8208168028,
+          "longitude": 106.4224970349
+        },
+        {
+          "latitude": 29.8206306397,
+          "longitude": 106.4222127195
+        },
+        {
+          "latitude": 29.8205934069,
+          "longitude": 106.42211616
+        },
+        {
+          "latitude": 29.8206073692,
+          "longitude": 106.4219605918
+        },
+        {
+          "latitude": 29.8207283757,
+          "longitude": 106.421590447
+        },
+        {
+          "latitude": 29.8209145386,
+          "longitude": 106.4211559291
+        },
+        {
+          "latitude": 29.8210215825,
+          "longitude": 106.4210593696
+        },
+        {
+          "latitude": 29.8213008268,
+          "longitude": 106.4209628114
+        },
+        {
+          "latitude": 29.8214916433,
+          "longitude": 106.4208877095
+        },
+        {
+          "latitude": 29.8218825832,
+          "longitude": 106.4209145316
+        },
+        {
+          "latitude": 29.8221618251,
+          "longitude": 106.4209789033
+        },
+        {
+          "latitude": 29.8223991801,
+          "longitude": 106.421129107
+        },
+        {
+          "latitude": 29.8225294924,
+          "longitude": 106.4212578531
+        },
+        {
+          "latitude": 29.8226598046,
+          "longitude": 106.4215046163
+        },
+        {
+          "latitude": 29.8230367786,
+          "longitude": 106.4216548213
+        },
+        {
+          "latitude": 29.8231531281,
+          "longitude": 106.4217299232
+        },
+        {
+          "latitude": 29.8232601696,
+          "longitude": 106.4218157539
+        },
+        {
+          "latitude": 29.8234602903,
+          "longitude": 106.4221376189
+        },
+        {
+          "latitude": 29.8235533695,
+          "longitude": 106.4223092803
+        },
+        {
+          "latitude": 29.8237674515,
+          "longitude": 106.4227974424
+        },
+        {
+          "latitude": 29.8239163778,
+          "longitude": 106.4231729516
+        },
+        {
+          "latitude": 29.8240373802,
+          "longitude": 106.4233070621
+        },
+        {
+          "latitude": 29.8243352318,
+          "longitude": 106.4235001811
+        },
+        {
+          "latitude": 29.8245493121,
+          "longitude": 106.4235752817
+        },
+        {
+          "latitude": 29.8247913153,
+          "longitude": 106.4236235614
+        },
+        {
+          "latitude": 29.8250752029,
+          "longitude": 106.4235699172
+        },
+        {
+          "latitude": 29.8252194734,
+          "longitude": 106.4239239688
+        },
+        {
+          "latitude": 29.8254335512,
+          "longitude": 106.4243155727
+        },
+        {
+          "latitude": 29.8253265121,
+          "longitude": 106.4244443187
+        },
+        {
+          "latitude": 29.8256941678,
+          "longitude": 106.4251846084
+        },
+        {
+          "latitude": 29.8260013221,
+          "longitude": 106.4258122453
+        },
+        {
+          "latitude": 29.8259966688,
+          "longitude": 106.4260160919
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_e7b9941b2e553f53",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0.00020473378448136777,
+          "mileageMeters": 0.018047966898519147,
+          "offsetMeters": 0.010282216030878191
+        },
+        {
+          "stopId": "stop_bfd831bb5e1c4e72",
+          "sourceIndex": 1,
+          "segmentIndex": 0,
+          "ratio": 1,
+          "mileageMeters": 88.15333992989144,
+          "offsetMeters": 0.04591158629410749
+        },
+        {
+          "stopId": "stop_6ca9aedf704f5f54",
+          "sourceIndex": 2,
+          "segmentIndex": 5,
+          "ratio": 0.9999342133059772,
+          "mileageMeters": 371.8537753517021,
+          "offsetMeters": 0.035191875285446074
+        },
+        {
+          "stopId": "stop_e4903debb7b846f6",
+          "sourceIndex": 4,
+          "segmentIndex": 10,
+          "ratio": 0.000806982503048675,
+          "mileageMeters": 624.2425999357166,
+          "offsetMeters": 0.05373596966272291
+        },
+        {
+          "stopId": "stop_f0b84bbd5c0923e0",
+          "sourceIndex": 3,
+          "segmentIndex": 12,
+          "ratio": 0.9989950765810003,
+          "mileageMeters": 773.122848538152,
+          "offsetMeters": 0.008273993174052167
+        },
+        {
+          "stopId": "stop_b15f16020eff2794",
+          "sourceIndex": 5,
+          "segmentIndex": 17,
+          "ratio": 0.002268460281936964,
+          "mileageMeters": 885.9802748724982,
+          "offsetMeters": 0.027618371373922538
+        },
+        {
+          "stopId": "stop_5a8e2333f33e5b2a",
+          "sourceIndex": 6,
+          "segmentIndex": 23,
+          "ratio": 0.00097834508032299,
+          "mileageMeters": 1186.3003475641888,
+          "offsetMeters": 0.030105113573802807
+        },
+        {
+          "stopId": "stop_e69dc2ee3b0dcf17",
+          "sourceIndex": 7,
+          "segmentIndex": 25,
+          "ratio": 0.9936746402821978,
+          "mileageMeters": 1246.2496787939854,
+          "offsetMeters": 0.012252794103002935
+        },
+        {
+          "stopId": "stop_01d3f63a099b9517",
+          "sourceIndex": 8,
+          "segmentIndex": 33,
+          "ratio": 0.0004313811926456585,
+          "mileageMeters": 1506.0463371616931,
+          "offsetMeters": 0.05655143926626044
+        },
+        {
+          "stopId": "stop_f7e42e80e4a6ce66",
+          "sourceIndex": 9,
+          "segmentIndex": 36,
+          "ratio": 0.0005506660752805592,
+          "mileageMeters": 1600.321830116182,
+          "offsetMeters": 0.023441672492088502
+        },
+        {
+          "stopId": "stop_1653f1b95f3c213c",
+          "sourceIndex": 10,
+          "segmentIndex": 40,
+          "ratio": 0.9983049898633096,
+          "mileageMeters": 1747.1039746208962,
+          "offsetMeters": 0.046392133369433805
+        },
+        {
+          "stopId": "stop_b300f8f2dd519be9",
+          "sourceIndex": 11,
+          "segmentIndex": 46,
+          "ratio": 0.9977107101421069,
+          "mileageMeters": 1906.36727236174,
+          "offsetMeters": 0.020510117086659008
+        },
+        {
+          "stopId": "stop_6aef059fded98ff7",
+          "sourceIndex": 12,
+          "segmentIndex": 49,
+          "ratio": 0.9981449222045793,
+          "mileageMeters": 2017.6403999381755,
+          "offsetMeters": 0.024983853615556616
+        },
+        {
+          "stopId": "stop_3bd58c6ef947dca8",
+          "sourceIndex": 13,
+          "segmentIndex": 49,
+          "ratio": 0.9981449222045793,
+          "mileageMeters": 2017.6403999381755,
+          "offsetMeters": 0.024983853615556616
+        },
+        {
+          "stopId": "stop_cf4a995c275ecb84",
+          "sourceIndex": 14,
+          "segmentIndex": 59,
+          "ratio": 0.9995002374407898,
+          "mileageMeters": 2410.9058587508725,
+          "offsetMeters": 0.036581879064332204
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "route_5",
+      "name": "5号线",
+      "color": "#db363a",
+      "points": [
+        {
+          "latitude": 29.8138819717,
+          "longitude": 106.4204531907
+        },
+        {
+          "latitude": 29.8140821112,
+          "longitude": 106.4197075366
+        },
+        {
+          "latitude": 29.8144823887,
+          "longitude": 106.419788003
+        },
+        {
+          "latitude": 29.8148780105,
+          "longitude": 106.4199435711
+        },
+        {
+          "latitude": 29.8152969024,
+          "longitude": 106.4200508594
+        },
+        {
+          "latitude": 29.8163767048,
+          "longitude": 106.4204531909
+        },
+        {
+          "latitude": 29.8168654045,
+          "longitude": 106.4206033945
+        },
+        {
+          "latitude": 29.8173075594,
+          "longitude": 106.4207375049
+        },
+        {
+          "latitude": 29.8174239156,
+          "longitude": 106.4208072424
+        },
+        {
+          "latitude": 29.8171027721,
+          "longitude": 106.4213973283
+        },
+        {
+          "latitude": 29.8176938612,
+          "longitude": 106.4218693971
+        },
+        {
+          "latitude": 29.8180801618,
+          "longitude": 106.4220303299
+        },
+        {
+          "latitude": 29.8184106105,
+          "longitude": 106.4222717288
+        },
+        {
+          "latitude": 29.8186572828,
+          "longitude": 106.4224541189
+        },
+        {
+          "latitude": 29.8188155256,
+          "longitude": 106.4225775002
+        },
+        {
+          "latitude": 29.8192344005,
+          "longitude": 106.4229530095
+        },
+        {
+          "latitude": 29.819290251,
+          "longitude": 106.4232319592
+        },
+        {
+          "latitude": 29.8193554092,
+          "longitude": 106.4233338832
+        },
+        {
+          "latitude": 29.8194671088,
+          "longitude": 106.4231461285
+        },
+        {
+          "latitude": 29.8195462294,
+          "longitude": 106.4230281113
+        },
+        {
+          "latitude": 29.8192437093,
+          "longitude": 106.4229530095
+        },
+        {
+          "latitude": 29.8195462294,
+          "longitude": 106.4230334758
+        },
+        {
+          "latitude": 29.8198301319,
+          "longitude": 106.4229583739
+        },
+        {
+          "latitude": 29.820798187,
+          "longitude": 106.4237308504
+        },
+        {
+          "latitude": 29.8211937838,
+          "longitude": 106.4240419864
+        },
+        {
+          "latitude": 29.8214171789,
+          "longitude": 106.4240849017
+        },
+        {
+          "latitude": 29.8215986859,
+          "longitude": 106.4239454268
+        },
+        {
+          "latitude": 29.8216824588,
+          "longitude": 106.4238649606
+        },
+        {
+          "latitude": 29.8218965459,
+          "longitude": 106.4240419863
+        },
+        {
+          "latitude": 29.8223479866,
+          "longitude": 106.4248359209
+        },
+        {
+          "latitude": 29.822515531,
+          "longitude": 106.4251416917
+        },
+        {
+          "latitude": 29.8225993031,
+          "longitude": 106.4256137612
+        },
+        {
+          "latitude": 29.8226411891,
+          "longitude": 106.4258444311
+        },
+        {
+          "latitude": 29.8226551511,
+          "longitude": 106.4260590079
+        },
+        {
+          "latitude": 29.8231065872,
+          "longitude": 106.4266490938
+        },
+        {
+          "latitude": 29.8234370204,
+          "longitude": 106.4271211626
+        },
+        {
+          "latitude": 29.8235114839,
+          "longitude": 106.4272713663
+        },
+        {
+          "latitude": 29.8235580235,
+          "longitude": 106.4274269345
+        },
+        {
+          "latitude": 29.8235719853,
+          "longitude": 106.4276951554
+        },
+        {
+          "latitude": 29.8235673314,
+          "longitude": 106.4280170204
+        },
+        {
+          "latitude": 29.8237860673,
+          "longitude": 106.4289665224
+        },
+        {
+          "latitude": 29.8240373791,
+          "longitude": 106.4294546845
+        },
+        {
+          "latitude": 29.8246889282,
+          "longitude": 106.4289343359
+        },
+        {
+          "latitude": 29.8248238915,
+          "longitude": 106.4288485052
+        },
+        {
+          "latitude": 29.8252892816,
+          "longitude": 106.4295351507
+        },
+        {
+          "latitude": 29.8259315149,
+          "longitude": 106.4304202797
+        },
+        {
+          "latitude": 29.8261409379,
+          "longitude": 106.4306455852
+        },
+        {
+          "latitude": 29.8265225509,
+          "longitude": 106.430988908
+        },
+        {
+          "latitude": 29.8267971261,
+          "longitude": 106.4310693743
+        },
+        {
+          "latitude": 29.8274998499,
+          "longitude": 106.4308869841
+        },
+        {
+          "latitude": 29.827741846,
+          "longitude": 106.4308762553
+        },
+        {
+          "latitude": 29.8278256137,
+          "longitude": 106.4309138062
+        },
+        {
+          "latitude": 29.8283794098,
+          "longitude": 106.431514621
+        },
+        {
+          "latitude": 29.8285609053,
+          "longitude": 106.4317560198
+        },
+        {
+          "latitude": 29.8289238954,
+          "longitude": 106.4327698942
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_1951e3684ee52c89",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0.00024576146733159464,
+          "mileageMeters": 0.018506489899020907,
+          "offsetMeters": 0.002431075724646963
+        },
+        {
+          "stopId": "stop_54a25ea311d47688",
+          "sourceIndex": 1,
+          "segmentIndex": 0,
+          "ratio": 0.999384284065299,
+          "mileageMeters": 75.2562855321014,
+          "offsetMeters": 0.0014001144082057423
+        },
+        {
+          "stopId": "stop_5cb8bc2bacfa4936",
+          "sourceIndex": 2,
+          "segmentIndex": 5,
+          "ratio": 0.00047957099619277906,
+          "mileageMeters": 340.8933327862482,
+          "offsetMeters": 0.026253041334039107
+        },
+        {
+          "stopId": "stop_8e44c9cc979f8b01",
+          "sourceIndex": 3,
+          "segmentIndex": 9,
+          "ratio": 0.9998857809080889,
+          "mileageMeters": 609.6835790680477,
+          "offsetMeters": 0.040279490208643076
+        },
+        {
+          "stopId": "stop_e412ffbc912c1037",
+          "sourceIndex": 4,
+          "segmentIndex": 14,
+          "ratio": 0.0012073524849758187,
+          "mileageMeters": 752.7725689838459,
+          "offsetMeters": 0.00567433063814294
+        },
+        {
+          "stopId": "stop_c8adab1ad6c4c071",
+          "sourceIndex": 5,
+          "segmentIndex": 18,
+          "ratio": 0.0001676348775138758,
+          "mileageMeters": 873.504938215438,
+          "offsetMeters": 0.017152924327100902
+        },
+        {
+          "stopId": "stop_d940fe5793399682",
+          "sourceIndex": 6,
+          "segmentIndex": 24,
+          "ratio": 0.0009502004751693193,
+          "mileageMeters": 1173.4125193210384,
+          "offsetMeters": 0.0026580618561334395
+        },
+        {
+          "stopId": "stop_45ca6ec2a31f3999",
+          "sourceIndex": 7,
+          "segmentIndex": 31,
+          "ratio": 0.0006880978589060846,
+          "mileageMeters": 1437.2135550913645,
+          "offsetMeters": 0.03770781469503876
+        },
+        {
+          "stopId": "stop_dad733d476c09ab9",
+          "sourceIndex": 8,
+          "segmentIndex": 37,
+          "ratio": 0.9994264817376851,
+          "mileageMeters": 1673.5713079394384,
+          "offsetMeters": 0.0025294860243060447
+        },
+        {
+          "stopId": "stop_38d2b37453b7549d",
+          "sourceIndex": 9,
+          "segmentIndex": 40,
+          "ratio": 1,
+          "mileageMeters": 1854.1706997656563,
+          "offsetMeters": 0.05199321596688456
+        },
+        {
+          "stopId": "stop_1660a6bbba867754",
+          "sourceIndex": 10,
+          "segmentIndex": 46,
+          "ratio": 0.0005585004256866211,
+          "mileageMeters": 2186.7032093661073,
+          "offsetMeters": 0.0272951025873673
+        },
+        {
+          "stopId": "stop_283127fa51578223",
+          "sourceIndex": 11,
+          "segmentIndex": 51,
+          "ratio": 0.000521408230036695,
+          "mileageMeters": 2389.0665503394653,
+          "offsetMeters": 0.015826111988537877
+        },
+        {
+          "stopId": "stop_afc38ff511a402d6",
+          "sourceIndex": 12,
+          "segmentIndex": 53,
+          "ratio": 1,
+          "mileageMeters": 2610.20428446603,
+          "offsetMeters": 0.015473819078094695
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "id": "route_6",
+      "name": "6号线",
+      "color": "#7cd5e2",
+      "points": [
+        {
+          "latitude": 29.8162117759,
+          "longitude": 106.4158481357
+        },
+        {
+          "latitude": 29.8155275912,
+          "longitude": 106.4164060352
+        },
+        {
+          "latitude": 29.8154065784,
+          "longitude": 106.4164811371
+        },
+        {
+          "latitude": 29.8151738612,
+          "longitude": 106.4165240524
+        },
+        {
+          "latitude": 29.8143453832,
+          "longitude": 106.416309476
+        },
+        {
+          "latitude": 29.8142429869,
+          "longitude": 106.416261196
+        },
+        {
+          "latitude": 29.8138566714,
+          "longitude": 106.4176827667
+        },
+        {
+          "latitude": 29.8140707742,
+          "longitude": 106.4177149532
+        },
+        {
+          "latitude": 29.8137030755,
+          "longitude": 106.4193403721
+        },
+        {
+          "latitude": 29.8137961638,
+          "longitude": 106.4195978641
+        },
+        {
+          "latitude": 29.8140754284,
+          "longitude": 106.4196944237
+        },
+        {
+          "latitude": 29.8137822007,
+          "longitude": 106.4207565784
+        },
+        {
+          "latitude": 29.8140800828,
+          "longitude": 106.4196944236
+        },
+        {
+          "latitude": 29.8145874113,
+          "longitude": 106.419839263
+        },
+        {
+          "latitude": 29.8150481936,
+          "longitude": 106.4199894667
+        },
+        {
+          "latitude": 29.8154019241,
+          "longitude": 106.4201128483
+        },
+        {
+          "latitude": 29.8168680304,
+          "longitude": 106.4206010103
+        },
+        {
+          "latitude": 29.817305531,
+          "longitude": 106.4207190276
+        },
+        {
+          "latitude": 29.817398616,
+          "longitude": 106.4208048583
+        },
+        {
+          "latitude": 29.8171147065,
+          "longitude": 106.4213949443
+        },
+        {
+          "latitude": 29.8176871789,
+          "longitude": 106.4218562842
+        },
+        {
+          "latitude": 29.8181014049,
+          "longitude": 106.422060132
+        },
+        {
+          "latitude": 29.8183992741,
+          "longitude": 106.4222532511
+        },
+        {
+          "latitude": 29.8190601684,
+          "longitude": 106.4228111505
+        },
+        {
+          "latitude": 29.8192416808,
+          "longitude": 106.4229720829
+        },
+        {
+          "latitude": 29.8195442008,
+          "longitude": 106.4230418203
+        },
+        {
+          "latitude": 29.8198932613,
+          "longitude": 106.4230203627
+        },
+        {
+          "latitude": 29.8212987989,
+          "longitude": 106.4240556954
+        },
+        {
+          "latitude": 29.8216664693,
+          "longitude": 106.4238893984
+        },
+        {
+          "latitude": 29.8218805556,
+          "longitude": 106.4240181448
+        },
+        {
+          "latitude": 29.8224948862,
+          "longitude": 106.4251339437
+        },
+        {
+          "latitude": 29.8226577764,
+          "longitude": 106.4260190727
+        },
+        {
+          "latitude": 29.8231138675,
+          "longitude": 106.426652074
+        },
+        {
+          "latitude": 29.8234210298,
+          "longitude": 106.4270919563
+        },
+        {
+          "latitude": 29.8235373789,
+          "longitude": 106.4273172618
+        },
+        {
+          "latitude": 29.8235792645,
+          "longitude": 106.4277410509
+        },
+        {
+          "latitude": 29.8235792645,
+          "longitude": 106.4280843736
+        },
+        {
+          "latitude": 29.8238026549,
+          "longitude": 106.4290016891
+        },
+        {
+          "latitude": 29.824040006,
+          "longitude": 106.4294469358
+        },
+        {
+          "latitude": 29.8248404801,
+          "longitude": 106.4288729431
+        },
+        {
+          "latitude": 29.8252872529,
+          "longitude": 106.4295381309
+        },
+        {
+          "latitude": 29.8261249478,
+          "longitude": 106.4293664695
+        },
+        {
+          "latitude": 29.8265112158,
+          "longitude": 106.4285671712
+        },
+        {
+          "latitude": 29.8264181393,
+          "longitude": 106.4274513723
+        },
+        {
+          "latitude": 29.8260504863,
+          "longitude": 106.4265555145
+        },
+        {
+          "latitude": 29.8259713715,
+          "longitude": 106.4262229206
+        },
+        {
+          "latitude": 29.825985333,
+          "longitude": 106.4258420469
+        },
+        {
+          "latitude": 29.8253384462,
+          "longitude": 106.424458027
+        },
+        {
+          "latitude": 29.8254454853,
+          "longitude": 106.4243346454
+        },
+        {
+          "latitude": 29.8252593302,
+          "longitude": 106.4239484073
+        },
+        {
+          "latitude": 29.8250778281,
+          "longitude": 106.4236211778
+        },
+        {
+          "latitude": 29.8245193599,
+          "longitude": 106.4235782625
+        },
+        {
+          "latitude": 29.8240586212,
+          "longitude": 106.4233261348
+        },
+        {
+          "latitude": 29.8238817714,
+          "longitude": 106.4231008292
+        },
+        {
+          "latitude": 29.8235606487,
+          "longitude": 106.4222961666
+        },
+        {
+          "latitude": 29.8233558743,
+          "longitude": 106.4219528438
+        },
+        {
+          "latitude": 29.8231464454,
+          "longitude": 106.4217382671
+        },
+        {
+          "latitude": 29.8226763924,
+          "longitude": 106.4214968683
+        },
+        {
+          "latitude": 29.8224204226,
+          "longitude": 106.4211589099
+        },
+        {
+          "latitude": 29.8221597975,
+          "longitude": 106.4209765197
+        },
+        {
+          "latitude": 29.8218619389,
+          "longitude": 106.4209389686
+        },
+        {
+          "latitude": 29.8214709988,
+          "longitude": 106.4209014177
+        },
+        {
+          "latitude": 29.8209916301,
+          "longitude": 106.4210784435
+        },
+        {
+          "latitude": 29.8208985484,
+          "longitude": 106.4211589098
+        },
+        {
+          "latitude": 29.8205774161,
+          "longitude": 106.4219796657
+        },
+        {
+          "latitude": 29.8206239571,
+          "longitude": 106.4222425222
+        },
+        {
+          "latitude": 29.821173139,
+          "longitude": 106.4228916168
+        },
+        {
+          "latitude": 29.8215687343,
+          "longitude": 106.4236319065
+        },
+        {
+          "latitude": 29.8216618153,
+          "longitude": 106.423894763
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_f0c1c29dfb556fac",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0.027291117067871715,
+          "mileageMeters": 2.5433311964655285,
+          "offsetMeters": 2.6754076482692524
+        },
+        {
+          "stopId": "stop_820c2cf469a2f887",
+          "sourceIndex": 1,
+          "segmentIndex": 5,
+          "ratio": 1,
+          "mileageMeters": 385.1231339227031,
+          "offsetMeters": 8.373523118000584
+        },
+        {
+          "stopId": "stop_8b7d711f06983be7",
+          "sourceIndex": 21,
+          "segmentIndex": 9,
+          "ratio": 0.9726688259428341,
+          "mileageMeters": 629.6378857525867,
+          "offsetMeters": 0.079030638372727
+        },
+        {
+          "stopId": "stop_4c0ff1ff364120a9",
+          "sourceIndex": 2,
+          "segmentIndex": 10,
+          "ratio": 1,
+          "mileageMeters": 738.0605269947278,
+          "offsetMeters": 3.128049235258848
+        },
+        {
+          "stopId": "stop_22e2d0eb6df2237a",
+          "sourceIndex": 3,
+          "segmentIndex": 15,
+          "ratio": 0.7240293716923887,
+          "mileageMeters": 1121.0745959153912,
+          "offsetMeters": 0.1715255868777637
+        },
+        {
+          "stopId": "stop_438f01e1a25a0958",
+          "sourceIndex": 4,
+          "segmentIndex": 20,
+          "ratio": 0.8975818494137363,
+          "mileageMeters": 1418.8433477950414,
+          "offsetMeters": 1.127220035294052
+        },
+        {
+          "stopId": "stop_196f9d5b5cda40c4",
+          "sourceIndex": 5,
+          "segmentIndex": 22,
+          "ratio": 0.5140805732654704,
+          "mileageMeters": 1508.8022048080995,
+          "offsetMeters": 3.5806656319109216
+        },
+        {
+          "stopId": "stop_bd58e09a9f8777c3",
+          "sourceIndex": 6,
+          "segmentIndex": 24,
+          "ratio": 0.6560310216027524,
+          "mileageMeters": 1601.0334908944753,
+          "offsetMeters": 4.050154017572955
+        },
+        {
+          "stopId": "stop_5328d65e501d26ac",
+          "sourceIndex": 7,
+          "segmentIndex": 26,
+          "ratio": 0.9261087305334312,
+          "mileageMeters": 1823.4754094952843,
+          "offsetMeters": 6.389212400826225
+        },
+        {
+          "stopId": "stop_fa8fcda81741db62",
+          "sourceIndex": 20,
+          "segmentIndex": 30,
+          "ratio": 0.7595116986738418,
+          "mileageMeters": 2101.7323689228247,
+          "offsetMeters": 2.8868322351742703
+        },
+        {
+          "stopId": "stop_bccde1b7c256c2f6",
+          "sourceIndex": 19,
+          "segmentIndex": 34,
+          "ratio": 0.8448106813856654,
+          "mileageMeters": 2316.630624610585,
+          "offsetMeters": 6.576567831417994
+        },
+        {
+          "stopId": "stop_79ec87a7d8cabf02",
+          "sourceIndex": 18,
+          "segmentIndex": 37,
+          "ratio": 0.979788119920802,
+          "mileageMeters": 2497.441896025573,
+          "offsetMeters": 1.8543619842058425
+        },
+        {
+          "stopId": "stop_30998191572dd84d",
+          "sourceIndex": 17,
+          "segmentIndex": 39,
+          "ratio": 0.12791130954109525,
+          "mileageMeters": 2613.667556615369,
+          "offsetMeters": 5.677373606780214
+        },
+        {
+          "stopId": "stop_c17acfb1967faa1e",
+          "sourceIndex": 16,
+          "segmentIndex": 42,
+          "ratio": 0.10633401372902301,
+          "mileageMeters": 2878.806259475829,
+          "offsetMeters": 1.4877934529437684
+        },
+        {
+          "stopId": "stop_6b2876490b14eaba",
+          "sourceIndex": 15,
+          "segmentIndex": 45,
+          "ratio": 0.18058403709888166,
+          "mileageMeters": 3110.95143850816,
+          "offsetMeters": 0.3219436876838597
+        },
+        {
+          "stopId": "stop_47f91bd058dcb375",
+          "sourceIndex": 14,
+          "segmentIndex": 46,
+          "ratio": 0.6943430992533433,
+          "mileageMeters": 3246.3856675837274,
+          "offsetMeters": 1.411043799988191
+        },
+        {
+          "stopId": "stop_fb6d8c14df4d016d",
+          "sourceIndex": 13,
+          "segmentIndex": 48,
+          "ratio": 0.8645739788613125,
+          "mileageMeters": 3346.4231390807986,
+          "offsetMeters": 6.810484407438439
+        },
+        {
+          "stopId": "stop_6da16239cfd9efb1",
+          "sourceIndex": 12,
+          "segmentIndex": 52,
+          "ratio": 0.7778842323186262,
+          "mileageMeters": 3531.4116731852987,
+          "offsetMeters": 3.756687539710273
+        },
+        {
+          "stopId": "stop_52365ed96ee16399",
+          "sourceIndex": 11,
+          "segmentIndex": 54,
+          "ratio": 0.9435543462267679,
+          "mileageMeters": 3661.2886840092306,
+          "offsetMeters": 4.1246789168282625
+        },
+        {
+          "stopId": "stop_dd077e73bde81cb1",
+          "sourceIndex": 10,
+          "segmentIndex": 61,
+          "ratio": 0.09113299106383944,
+          "mileageMeters": 3911.1579938272744,
+          "offsetMeters": 3.894961431535509
+        },
+        {
+          "stopId": "stop_0892623bece7b53e",
+          "sourceIndex": 9,
+          "segmentIndex": 63,
+          "ratio": 0.5719055895156951,
+          "mileageMeters": 4024.642275036529,
+          "offsetMeters": 0.8671485132787319
+        },
+        {
+          "stopId": "stop_df0e627fc79ac5c4",
+          "sourceIndex": 8,
+          "segmentIndex": 67,
+          "ratio": 0.6300577212580803,
+          "mileageMeters": 4276.305268713002,
+          "offsetMeters": 5.238714151905164
+        }
+      ],
+      "warnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ]
+    },
+    {
+      "id": "route_7",
+      "name": "7号线",
+      "color": "#f6a1af",
+      "points": [
+        {
+          "latitude": 29.8137868794,
+          "longitude": 106.4207625389
+        },
+        {
+          "latitude": 29.8140614895,
+          "longitude": 106.4197057486
+        },
+        {
+          "latitude": 29.8147317212,
+          "longitude": 106.4198827744
+        },
+        {
+          "latitude": 29.815234392,
+          "longitude": 106.4200490713
+        },
+        {
+          "latitude": 29.8155881218,
+          "longitude": 106.4201778173
+        },
+        {
+          "latitude": 29.8168587461,
+          "longitude": 106.4206069708
+        },
+        {
+          "latitude": 29.8172869382,
+          "longitude": 106.4207303524
+        },
+        {
+          "latitude": 29.8174032944,
+          "longitude": 106.4208054543
+        },
+        {
+          "latitude": 29.8171100765,
+          "longitude": 106.4213901758
+        },
+        {
+          "latitude": 29.8176639319,
+          "longitude": 106.4218783379
+        },
+        {
+          "latitude": 29.8180828122,
+          "longitude": 106.4220285416
+        },
+        {
+          "latitude": 29.818632007999643,
+          "longitude": 106.42243623737062
+        },
+        {
+          "latitude": 29.8189205673,
+          "longitude": 106.4226990938
+        },
+        {
+          "latitude": 29.8192370508,
+          "longitude": 106.4229565859
+        },
+        {
+          "latitude": 29.8195395708,
+          "longitude": 106.4230424166
+        },
+        {
+          "latitude": 29.819739699,
+          "longitude": 106.4229995012
+        },
+        {
+          "latitude": 29.819949135,
+          "longitude": 106.4230746031
+        },
+        {
+          "latitude": 29.8209078807,
+          "longitude": 106.4238148928
+        },
+        {
+          "latitude": 29.8211917794,
+          "longitude": 106.4240401983
+        },
+        {
+          "latitude": 29.821452407,
+          "longitude": 106.4239597321
+        },
+        {
+          "latitude": 29.8216618394,
+          "longitude": 106.4238470793
+        },
+        {
+          "latitude": 29.821415174535126,
+          "longitude": 106.42332136626207
+        },
+        {
+          "latitude": 29.8211824713,
+          "longitude": 106.4229297638
+        },
+        {
+          "latitude": 29.820814799,
+          "longitude": 106.4224952459
+        },
+        {
+          "latitude": 29.8205867485,
+          "longitude": 106.4221304655
+        },
+        {
+          "latitude": 29.820721717270374,
+          "longitude": 106.42159402369997
+        },
+        {
+          "latitude": 29.8209032267,
+          "longitude": 106.4211595058
+        },
+        {
+          "latitude": 29.82108938986133,
+          "longitude": 106.42103612421468
+        },
+        {
+          "latitude": 29.8214896395,
+          "longitude": 106.4208859205
+        },
+        {
+          "latitude": 29.8218759254,
+          "longitude": 106.4209127426
+        },
+        {
+          "latitude": 29.8221551673,
+          "longitude": 106.4209771156
+        },
+        {
+          "latitude": 29.8223925224,
+          "longitude": 106.4211112261
+        },
+        {
+          "latitude": 29.8225274887,
+          "longitude": 106.4212882519
+        },
+        {
+          "latitude": 29.8226624548,
+          "longitude": 106.4214974642
+        },
+        {
+          "latitude": 29.8230580442,
+          "longitude": 106.4216583967
+        },
+        {
+          "latitude": 29.8232628193,
+          "longitude": 106.4218354225
+        },
+        {
+          "latitude": 29.823458286,
+          "longitude": 106.4221304655
+        },
+        {
+          "latitude": 29.8235839429,
+          "longitude": 106.4223021269
+        },
+        {
+          "latitude": 29.8238911037,
+          "longitude": 106.423112154
+        },
+        {
+          "latitude": 29.8240167602,
+          "longitude": 106.4232891798
+        },
+        {
+          "latitude": 29.8242820343,
+          "longitude": 106.4234822989
+        },
+        {
+          "latitude": 29.8245985008,
+          "longitude": 106.423600316
+        },
+        {
+          "latitude": 29.825059237,
+          "longitude": 106.4236164093
+        },
+        {
+          "latitude": 29.8253152006,
+          "longitude": 106.4240938425
+        },
+        {
+          "latitude": 29.8254408553,
+          "longitude": 106.4243352413
+        },
+        {
+          "latitude": 29.8253245084,
+          "longitude": 106.4244371653
+        },
+        {
+          "latitude": 29.82556185590002,
+          "longitude": 106.424946785
+        },
+        {
+          "latitude": 29.8257898951,
+          "longitude": 106.4253813028
+        },
+        {
+          "latitude": 29.8259946646,
+          "longitude": 106.4258104563
+        },
+        {
+          "latitude": 29.8259853569,
+          "longitude": 106.4261806011
+        },
+        {
+          "latitude": 29.8259760492,
+          "longitude": 106.426255703
+        },
+        {
+          "latitude": 29.8260505107,
+          "longitude": 106.4265614748
+        },
+        {
+          "latitude": 29.8263064718,
+          "longitude": 106.4271944761
+        },
+        {
+          "latitude": 29.8263948946,
+          "longitude": 106.4274305105
+        },
+        {
+          "latitude": 29.8264228175,
+          "longitude": 106.4276504517
+        },
+        {
+          "latitude": 29.826501932554418,
+          "longitude": 106.42846584321802
+        },
+        {
+          "latitude": 29.8265112402,
+          "longitude": 106.4285624027
+        },
+        {
+          "latitude": 29.826106356841567,
+          "longitude": 106.42935633663608
+        },
+        {
+          "latitude": 29.8252826235,
+          "longitude": 106.4295494556
+        },
+        {
+          "latitude": 29.8248311961,
+          "longitude": 106.4288628101
+        },
+        {
+          "latitude": 29.8240353759,
+          "longitude": 106.4294689894
+        },
+        {
+          "latitude": 29.8237933709,
+          "longitude": 106.4289915562
+        },
+        {
+          "latitude": 29.8235606731,
+          "longitude": 106.4280259609
+        },
+        {
+          "latitude": 29.8235560192,
+          "longitude": 106.4277148247
+        },
+        {
+          "latitude": 29.8235513652,
+          "longitude": 106.4274358749
+        },
+        {
+          "latitude": 29.8234955177,
+          "longitude": 106.4272427559
+        },
+        {
+          "latitude": 29.823109238,
+          "longitude": 106.4266473055
+        },
+        {
+          "latitude": 29.8226624548,
+          "longitude": 106.4260572195
+        },
+        {
+          "latitude": 29.8225042186,
+          "longitude": 106.4251452684
+        },
+        {
+          "latitude": 29.8219038497,
+          "longitude": 106.4240562916
+        },
+        {
+          "latitude": 29.82165718540961,
+          "longitude": 106.42385244373959
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_4c0ff1ff364120a9",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0,
+          "mileageMeters": 0,
+          "offsetMeters": 2.6099311194721326
+        },
+        {
+          "stopId": "stop_22e2d0eb6df2237a",
+          "sourceIndex": 1,
+          "segmentIndex": 4,
+          "ratio": 0.6875639696195277,
+          "mileageMeters": 383.51780741464324,
+          "offsetMeters": 0.4913805049166096
+        },
+        {
+          "stopId": "stop_438f01e1a25a0958",
+          "sourceIndex": 2,
+          "segmentIndex": 9,
+          "ratio": 0.9520701978390884,
+          "mileageMeters": 682.5505146823107,
+          "offsetMeters": 2.895420298660943
+        },
+        {
+          "stopId": "stop_196f9d5b5cda40c4",
+          "sourceIndex": 3,
+          "segmentIndex": 11,
+          "ratio": 0.3833459752679492,
+          "mileageMeters": 773.2043441239416,
+          "offsetMeters": 4.057555125208301
+        },
+        {
+          "stopId": "stop_bd58e09a9f8777c3",
+          "sourceIndex": 4,
+          "segmentIndex": 13,
+          "ratio": 0.6788868857439239,
+          "mileageMeters": 865.0180790257273,
+          "offsetMeters": 4.385880908520971
+        },
+        {
+          "stopId": "stop_5328d65e501d26ac",
+          "sourceIndex": 5,
+          "segmentIndex": 17,
+          "ratio": 0.9261990463681127,
+          "mileageMeters": 1086.9837269610885,
+          "offsetMeters": 1.3386906814628157
+        },
+        {
+          "stopId": "stop_df0e627fc79ac5c4",
+          "sourceIndex": 6,
+          "segmentIndex": 20,
+          "ratio": 0.09473332814690116,
+          "mileageMeters": 1150.975368868627,
+          "offsetMeters": 4.112017691015668
+        },
+        {
+          "stopId": "stop_0892623bece7b53e",
+          "sourceIndex": 7,
+          "segmentIndex": 24,
+          "ratio": 0.9348613774981178,
+          "mileageMeters": 1401.264016623663,
+          "offsetMeters": 1.0506029353346173
+        },
+        {
+          "stopId": "stop_dd077e73bde81cb1",
+          "sourceIndex": 8,
+          "segmentIndex": 27,
+          "ratio": 0.8386303111529346,
+          "mileageMeters": 1514.4290069804358,
+          "offsetMeters": 4.650812179895562
+        },
+        {
+          "stopId": "stop_52365ed96ee16399",
+          "sourceIndex": 9,
+          "segmentIndex": 35,
+          "ratio": 0.4957556605489722,
+          "mileageMeters": 1766.8204836349714,
+          "offsetMeters": 5.355289225106416
+        },
+        {
+          "stopId": "stop_6da16239cfd9efb1",
+          "sourceIndex": 10,
+          "segmentIndex": 38,
+          "ratio": 0.23504705276438476,
+          "mileageMeters": 1897.0121608396032,
+          "offsetMeters": 3.5398904494602874
+        },
+        {
+          "stopId": "stop_fb6d8c14df4d016d",
+          "sourceIndex": 11,
+          "segmentIndex": 42,
+          "ratio": 0.8199036802923334,
+          "mileageMeters": 2081.4096929440484,
+          "offsetMeters": 4.980542820358777
+        },
+        {
+          "stopId": "stop_47f91bd058dcb375",
+          "sourceIndex": 12,
+          "segmentIndex": 45,
+          "ratio": 0.8757156412494992,
+          "mileageMeters": 2183.4296323231943,
+          "offsetMeters": 0.9285315012457697
+        },
+        {
+          "stopId": "stop_6b2876490b14eaba",
+          "sourceIndex": 13,
+          "segmentIndex": 48,
+          "ratio": 0.9294884289503385,
+          "mileageMeters": 2319.8036933704216,
+          "offsetMeters": 1.670095172258129
+        },
+        {
+          "stopId": "stop_c17acfb1967faa1e",
+          "sourceIndex": 14,
+          "segmentIndex": 54,
+          "ratio": 0.9786342213452097,
+          "mileageMeters": 2551.348740369557,
+          "offsetMeters": 1.3697597655051186
+        },
+        {
+          "stopId": "stop_62c0c3d156ddebd2",
+          "sourceIndex": 15,
+          "segmentIndex": 57,
+          "ratio": 0.02510227337072466,
+          "mileageMeters": 2653.5980938472926,
+          "offsetMeters": 1.4947658528120318
+        },
+        {
+          "stopId": "stop_30998191572dd84d",
+          "sourceIndex": 16,
+          "segmentIndex": 58,
+          "ratio": 0.8589378810282225,
+          "mileageMeters": 2816.108419893053,
+          "offsetMeters": 6.016607331083031
+        },
+        {
+          "stopId": "stop_79ec87a7d8cabf02",
+          "sourceIndex": 17,
+          "segmentIndex": 60,
+          "ratio": 0.04789247737631724,
+          "mileageMeters": 2936.4538867585475,
+          "offsetMeters": 0.3587495387035616
+        },
+        {
+          "stopId": "stop_bccde1b7c256c2f6",
+          "sourceIndex": 18,
+          "segmentIndex": 63,
+          "ratio": 0.11738318250767593,
+          "mileageMeters": 3117.0964764306555,
+          "offsetMeters": 4.612434963652005
+        },
+        {
+          "stopId": "stop_fa8fcda81741db62",
+          "sourceIndex": 19,
+          "segmentIndex": 67,
+          "ratio": 0.27569151224665134,
+          "mileageMeters": 3332.5045802336003,
+          "offsetMeters": 2.854159000330478
+        }
+      ],
+      "warnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ]
+    },
+    {
+      "id": "route_8",
+      "name": "8号线",
+      "color": "#a660d9",
+      "points": [
+        {
+          "latitude": 29.82148963953961,
+          "longitude": 106.42668485638066
+        },
+        {
+          "latitude": 29.8216432232,
+          "longitude": 106.4263093472
+        },
+        {
+          "latitude": 29.8218480012,
+          "longitude": 106.4260947704
+        },
+        {
+          "latitude": 29.822103973,
+          "longitude": 106.4259338379
+        },
+        {
+          "latitude": 29.8226391848,
+          "longitude": 106.4260518551
+        },
+        {
+          "latitude": 29.8226438388,
+          "longitude": 106.4258319139
+        },
+        {
+          "latitude": 29.8226391848171,
+          "longitude": 106.42605721952305
+        },
+        {
+          "latitude": 29.82310458398634,
+          "longitude": 106.42664730545077
+        },
+        {
+          "latitude": 29.823458286,
+          "longitude": 106.427167654
+        },
+        {
+          "latitude": 29.8235513652,
+          "longitude": 106.4274090528
+        },
+        {
+          "latitude": 29.8235699811,
+          "longitude": 106.4276880026
+        },
+        {
+          "latitude": 29.8235653271,
+          "longitude": 106.4280420542
+        },
+        {
+          "latitude": 29.8237980248,
+          "longitude": 106.4289754629
+        },
+        {
+          "latitude": 29.824026068,
+          "longitude": 106.4294743538
+        },
+        {
+          "latitude": 29.8243937285,
+          "longitude": 106.4291954041
+        },
+        {
+          "latitude": 29.8248079266,
+          "longitude": 106.4288628101
+        },
+        {
+          "latitude": 29.824961505310956,
+          "longitude": 106.4289110899279
+        },
+        {
+          "latitude": 29.824812580511097,
+          "longitude": 106.42886817454124
+        },
+        {
+          "latitude": 29.82527331570103,
+          "longitude": 106.42956018451636
+        },
+        {
+          "latitude": 29.826083087577015,
+          "longitude": 106.42935633656413
+        },
+        {
+          "latitude": 29.8265112402,
+          "longitude": 106.4285731316
+        },
+        {
+          "latitude": 29.8264600481,
+          "longitude": 106.4280152321
+        },
+        {
+          "latitude": 29.8264181637,
+          "longitude": 106.4276611805
+        },
+        {
+          "latitude": 29.8263948946,
+          "longitude": 106.4273929596
+        },
+        {
+          "latitude": 29.826041203,
+          "longitude": 106.4265829325
+        },
+        {
+          "latitude": 29.8259760492,
+          "longitude": 106.4262503386
+        },
+        {
+          "latitude": 29.8259993184,
+          "longitude": 106.4258211851
+        },
+        {
+          "latitude": 29.8253245084,
+          "longitude": 106.4244478941
+        },
+        {
+          "latitude": 29.8254408553,
+          "longitude": 106.4243459702
+        },
+        {
+          "latitude": 29.8250731987,
+          "longitude": 106.4236110449
+        },
+        {
+          "latitude": 29.8245938469,
+          "longitude": 106.4235842228
+        },
+        {
+          "latitude": 29.8242354951,
+          "longitude": 106.4234501123
+        },
+        {
+          "latitude": 29.8239795287,
+          "longitude": 106.4232462645
+        },
+        {
+          "latitude": 29.8237282156,
+          "longitude": 106.4227205515
+        },
+        {
+          "latitude": 29.8234675939,
+          "longitude": 106.4221572876
+        },
+        {
+          "latitude": 29.8232488573,
+          "longitude": 106.4218246937
+        },
+        {
+          "latitude": 29.8230673522,
+          "longitude": 106.4216852188
+        },
+        {
+          "latitude": 29.8226717628,
+          "longitude": 106.421508193
+        },
+        {
+          "latitude": 29.8225181807,
+          "longitude": 106.4212614298
+        },
+        {
+          "latitude": 29.8223552902,
+          "longitude": 106.4210790396
+        },
+        {
+          "latitude": 29.8221551673,
+          "longitude": 106.4209771156
+        },
+        {
+          "latitude": 29.8218852335,
+          "longitude": 106.420918107
+        },
+        {
+          "latitude": 29.8214849854,
+          "longitude": 106.4208966494
+        },
+        {
+          "latitude": 29.8210009624,
+          "longitude": 106.4210683107
+        },
+        {
+          "latitude": 29.8208985726,
+          "longitude": 106.4211541414
+        },
+        {
+          "latitude": 29.8207310254,
+          "longitude": 106.421572566
+        },
+        {
+          "latitude": 29.8205914026,
+          "longitude": 106.4220821857
+        },
+        {
+          "latitude": 29.820610019,
+          "longitude": 106.4222055674
+        },
+        {
+          "latitude": 29.8208380695,
+          "longitude": 106.4225435257
+        },
+        {
+          "latitude": 29.8213407096,
+          "longitude": 106.4231389761
+        },
+        {
+          "latitude": 29.8216478773,
+          "longitude": 106.4238363504
+        },
+        {
+          "latitude": 29.8218898875,
+          "longitude": 106.4240401983
+        },
+        {
+          "latitude": 29.8223506362,
+          "longitude": 106.4248394966
+        },
+        {
+          "latitude": 29.8224949106,
+          "longitude": 106.4251345396
+        },
+        {
+          "latitude": 29.822639184774584,
+          "longitude": 106.42583727840653
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_b9becb079771729e",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0,
+          "mileageMeters": 0,
+          "offsetMeters": 1.5578989735755686
+        },
+        {
+          "stopId": "stop_bccde1b7c256c2f6",
+          "sourceIndex": 2,
+          "segmentIndex": 9,
+          "ratio": 0.96448248870013,
+          "mileageMeters": 399.0180176993013,
+          "offsetMeters": 6.169474162387751
+        },
+        {
+          "stopId": "stop_79ec87a7d8cabf02",
+          "sourceIndex": 3,
+          "segmentIndex": 12,
+          "ratio": 0.9538243479179247,
+          "mileageMeters": 579.7104478596787,
+          "offsetMeters": 0.686497346587645
+        },
+        {
+          "stopId": "stop_30998191572dd84d",
+          "sourceIndex": 4,
+          "segmentIndex": 16,
+          "ratio": 0.13359479875915584,
+          "mileageMeters": 707.277790082853,
+          "offsetMeters": 1.6549493380175768
+        },
+        {
+          "stopId": "stop_62c0c3d156ddebd2",
+          "sourceIndex": 5,
+          "segmentIndex": 19,
+          "ratio": 0.009388603658841515,
+          "mileageMeters": 899.2190908527853,
+          "offsetMeters": 0.5398275049815928
+        },
+        {
+          "stopId": "stop_c17acfb1967faa1e",
+          "sourceIndex": 6,
+          "segmentIndex": 20,
+          "ratio": 0.223286504727099,
+          "mileageMeters": 999.7660535498039,
+          "offsetMeters": 1.3205049116431526
+        },
+        {
+          "stopId": "stop_6b2876490b14eaba",
+          "sourceIndex": 7,
+          "segmentIndex": 25,
+          "ratio": 0.2227673791791377,
+          "mileageMeters": 1231.885008729485,
+          "offsetMeters": 1.1400592653970034
+        },
+        {
+          "stopId": "stop_47f91bd058dcb375",
+          "sourceIndex": 8,
+          "segmentIndex": 26,
+          "ratio": 0.6852003488263203,
+          "mileageMeters": 1368.4467395287772,
+          "offsetMeters": 1.5256368975191172
+        },
+        {
+          "stopId": "stop_fb6d8c14df4d016d",
+          "sourceIndex": 9,
+          "segmentIndex": 28,
+          "ratio": 0.4599787812474507,
+          "mileageMeters": 1470.26873787661,
+          "offsetMeters": 5.229428323473053
+        },
+        {
+          "stopId": "stop_6da16239cfd9efb1",
+          "sourceIndex": 10,
+          "segmentIndex": 32,
+          "ratio": 0.17847830393689657,
+          "mileageMeters": 1654.6515923469112,
+          "offsetMeters": 4.910088213943249
+        },
+        {
+          "stopId": "stop_52365ed96ee16399",
+          "sourceIndex": 11,
+          "segmentIndex": 34,
+          "ratio": 0.5157264508281133,
+          "mileageMeters": 1784.5673579970671,
+          "offsetMeters": 6.029860410133304
+        },
+        {
+          "stopId": "stop_dd077e73bde81cb1",
+          "sourceIndex": 12,
+          "segmentIndex": 42,
+          "ratio": 0.11857919873254452,
+          "mileageMeters": 2036.1664639360038,
+          "offsetMeters": 3.935934484409497
+        },
+        {
+          "stopId": "stop_0892623bece7b53e",
+          "sourceIndex": 13,
+          "segmentIndex": 45,
+          "ratio": 0.11191040509390968,
+          "mileageMeters": 2150.1056490063397,
+          "offsetMeters": 0.7695925991026373
+        },
+        {
+          "stopId": "stop_df0e627fc79ac5c4",
+          "sourceIndex": 14,
+          "segmentIndex": 49,
+          "ratio": 0.9477617897671948,
+          "mileageMeters": 2400.9336994649057,
+          "offsetMeters": 4.884508919456045
+        },
+        {
+          "stopId": "stop_fa8fcda81741db62",
+          "sourceIndex": 1,
+          "segmentIndex": 53,
+          "ratio": 0.9515356427512868,
+          "mileageMeters": 2629.7433875035167,
+          "offsetMeters": 1.3491830978018786
+        }
+      ],
+      "warnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ]
+    },
+    {
+      "id": "route_jingguan",
+      "name": "经管专线",
+      "color": "#00d499",
+      "points": [
+        {
+          "latitude": 29.8113013909,
+          "longitude": 106.4135313034
+        },
+        {
+          "latitude": 29.8112315729,
+          "longitude": 106.4138960838
+        },
+        {
+          "latitude": 29.811296736320433,
+          "longitude": 106.4139229059591
+        },
+        {
+          "latitude": 29.8112781182,
+          "longitude": 106.4146524668
+        },
+        {
+          "latitude": 29.8112874273,
+          "longitude": 106.4148133993
+        },
+        {
+          "latitude": 29.811240882,
+          "longitude": 106.4153927565
+        },
+        {
+          "latitude": 29.8114642993,
+          "longitude": 106.4154410362
+        },
+        {
+          "latitude": 29.8113339726,
+          "longitude": 106.4161008596
+        },
+        {
+          "latitude": 29.811119864,
+          "longitude": 106.416862607
+        },
+        {
+          "latitude": 29.8124975981,
+          "longitude": 106.417323947
+        },
+        {
+          "latitude": 29.8136798278,
+          "longitude": 106.4177101851
+        },
+        {
+          "latitude": 29.8138799677,
+          "longitude": 106.4176779985
+        },
+        {
+          "latitude": 29.8140754527,
+          "longitude": 106.4177155495
+        },
+        {
+          "latitude": 29.8137077543,
+          "longitude": 106.4193356037
+        },
+        {
+          "latitude": 29.8136472468,
+          "longitude": 106.419544816
+        },
+        {
+          "latitude": 29.8140614895,
+          "longitude": 106.4196950197
+        },
+        {
+          "latitude": 29.8144664217,
+          "longitude": 106.4197862148
+        },
+        {
+          "latitude": 29.8149923656,
+          "longitude": 106.4199954271
+        },
+        {
+          "latitude": 29.8152623181,
+          "longitude": 106.4200490713
+        },
+        {
+          "latitude": 29.8158580726,
+          "longitude": 106.4202529192
+        },
+        {
+          "latitude": 29.8166586122,
+          "longitude": 106.4205425978
+        }
+      ],
+      "visits": [
+        {
+          "stopId": "stop_eb35fe18296c8deb",
+          "sourceIndex": 0,
+          "segmentIndex": 0,
+          "ratio": 0,
+          "mileageMeters": 0,
+          "offsetMeters": 0.3655022413869185
+        },
+        {
+          "stopId": "stop_595ebcca87dadd8b",
+          "sourceIndex": 1,
+          "segmentIndex": 7,
+          "ratio": 0.02659364706004114,
+          "mileageMeters": 278.4689047810565,
+          "offsetMeters": 0.902499236584007
+        },
+        {
+          "stopId": "stop_515ee659a1f8e07f",
+          "sourceIndex": 2,
+          "segmentIndex": 10,
+          "ratio": 0.8960480042261146,
+          "mileageMeters": 669.9723443950097,
+          "offsetMeters": 0.1309576868548761
+        },
+        {
+          "stopId": "stop_dc7a18809a56ec7b",
+          "sourceIndex": 3,
+          "segmentIndex": 16,
+          "ratio": 0.321576761709505,
+          "mileageMeters": 991.2404416155454,
+          "offsetMeters": 0.15233844776348815
+        },
+        {
+          "stopId": "stop_d2614b46646a0515",
+          "sourceIndex": 4,
+          "segmentIndex": 19,
+          "ratio": 0.7513665189054709,
+          "mileageMeters": 1202.8781524472906,
+          "offsetMeters": 0.159160317003941
+        }
+      ],
+      "warnings": []
+    }
+  ]
+}
