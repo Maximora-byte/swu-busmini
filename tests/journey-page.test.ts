@@ -9,8 +9,21 @@ import type { Coordinate } from '../miniprogram/models/index'
 import type { TransitDataset } from '../miniprogram/models/current-transit'
 import type { TransitJourney } from '../miniprogram/services/navigation/transit-journey.service'
 import type { TransitStopSuggestion } from '../miniprogram/services/navigation/transit-stop-search.service'
+import type { CurrentRouteStopView } from '../miniprogram/services/map/current-transit-map.service'
 
 interface PageData {
+  viewMode: string
+  showAllRoutes: boolean
+  referenceReverse: boolean
+  routeStops: CurrentRouteStopView[]
+  routeSummary: string
+  mapLegend: { routeId: string; name: string; color: string }[]
+  mapLocation: Coordinate | null
+  mapLocating: boolean
+  mapLocationMessage: string
+  latitude: number
+  longitude: number
+  scale: number
   routeOptions: { id: string; name: string }[]
   selectedRouteId: string
   sourceText: string
@@ -39,7 +52,7 @@ interface PageData {
   mapPolylines: { points: Coordinate[] }[]
   mapMarkers: { stopId: string; latitude: number; longitude: number; callout: { content: string } }[]
 }
-interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; stopId?: string; searchVersion?: number } } }
+interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; stopId?: string; searchVersion?: number; view?: string; order?: string; visitKey?: string } } }
 interface JourneyPage {
   data: PageData
   setData(update: Partial<PageData>, callback?: () => void): void
@@ -60,6 +73,14 @@ interface JourneyPage {
   handleStartMapSelection(event: Event): void
   handleCancelMapSelection(): void
   handleMapTap(event: { detail: Coordinate }): void
+  handleViewChange(event: Event): void
+  handleNetworkChange(event: { detail: { value: boolean } }): void
+  handleReferenceOrderChange(event: Event): void
+  handleRouteStopTap(event: Event): void
+  handleUseRouteStop(event: Event): void
+  handleCampusOverview(): void
+  handleBeibeiOverview(): void
+  handleMapLocate(): Promise<void>
 }
 
 function createRuntime(deferRendering = false, deferMapMeasurement = false) {
@@ -68,13 +89,14 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
   const pendingRendering: (() => void)[] = []
   const pendingLocation: { success(result: Coordinate & { accuracy: number }): void; fail(error: { errMsg: string }): void }[] = []
   const fitPoints: Coordinate[][] = []
+  const cameraMoves: Coordinate[] = []
   const fitPadding: number[][] = []
   const pendingMapMeasurement: ((rect: { width: number; height: number }) => void)[] = []
   const openedStops: Coordinate[] = []
   let page: JourneyPage | undefined
   const wx = {
     createMapContext() {
-      return { setBoundary() {}, includePoints(options: { points: Coordinate[]; padding: number[] }) {
+      return { setBoundary() {}, moveToLocation(point: Coordinate) { cameraMoves.push(point) }, includePoints(options: { points: Coordinate[]; padding: number[] }) {
         fitPoints.push(options.points)
         fitPadding.push(options.padding)
       } }
@@ -128,7 +150,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
     return module.exports
   }
   return {
-    fitPoints, fitPadding, openedStops,
+    fitPoints, fitPadding, openedStops, cameraMoves,
     flushMapMeasurements(width = 390, height = 294) {
       pendingMapMeasurement.splice(0).forEach((callback) => callback({ width, height }))
     },
@@ -555,6 +577,10 @@ test('map points on both ends auto-plan and a far point keeps its reference with
   assert.ok(page.data.mapCircles.some(({ longitude }) => longitude === 106.5))
   assert.ok(page.data.mapFitPoints.some(({ latitude, longitude }) => latitude === 29.9 && longitude === 106.5),
     'look-at-all must retain the selected reference even when no journey is available')
+  page.handleViewChange({ currentTarget: { dataset: { view: 'map' } } })
+  page.handleViewChange({ currentTarget: { dataset: { view: 'journey' } } })
+  assert.equal(page.data.mapCircles.length, 2, 'returning to a no-result plan must restore its selected references')
+  assert.ok(page.data.mapFitPoints.some(({ latitude, longitude }) => latitude === 29.9 && longitude === 106.5))
 })
 
 test('a successful location request automatically refreshes the recommendation for a selected destination', async () => {
@@ -569,4 +595,107 @@ test('a successful location request automatically refreshes the recommendation f
   await locating
   assert.equal(page.data.originMode, 'coordinate')
   assert.ok(page.data.journeys.length, 'the user should not need a second query action after GPS completes')
+})
+
+test('unified campus map defaults to current data and all-route mode has an accurate legend', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  assert.equal(page.data.viewMode, 'map')
+  assert.deepEqual(Array.from(page.data.mapLegend, ({ routeId }) => routeId), ['route_1'])
+  page.handleNetworkChange({ detail: { value: true } })
+  assert.equal(page.data.mapLegend.length, 10)
+  assert.equal(page.data.mapPolylines.length, 10)
+  assert.ok(!page.data.mapLegend.some(({ routeId }) => routeId === 'route_9'))
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_8' } } })
+  assert.equal(page.data.showAllRoutes, false)
+  assert.equal(page.data.mapLegend[0].routeId, 'route_8')
+  assert.equal(page.data.mapLegend[0].color, '#a660d9')
+})
+
+test('campus browsing preserves the chosen journey and restores its actual line legend on return', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  page.handlePlanJourney()
+  const selected = page.data.selectedJourneyId
+  assert.equal(page.data.viewMode, 'journey')
+  page.handleViewChange({ currentTarget: { dataset: { view: 'map' } } })
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_8' } } })
+  page.handleNetworkChange({ detail: { value: true } })
+  assert.equal(page.data.mapLegend.length, 10)
+  page.handleViewChange({ currentTarget: { dataset: { view: 'journey' } } })
+  assert.equal(page.data.selectedJourneyId, selected)
+  assert.equal(page.data.originIndex, 0)
+  assert.equal(page.data.destinationIndex, 28)
+  assert.deepEqual(Array.from(page.data.mapLegend, ({ routeId }) => routeId), ['route_1', 'route_2'])
+})
+
+test('reference order and stop focus retain published geometry and quarantine route-specific actions', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad({ routeId: 'route_3b' })
+  page.onReady()
+  const keys = Array.from(page.data.routeStops, ({ key }) => key)
+  const geometry = JSON.stringify(page.data.mapPolylines[0].points)
+  page.handleReferenceOrderChange({ currentTarget: { dataset: { order: 'reverse' } } })
+  assert.deepEqual(Array.from(page.data.routeStops, ({ key }) => key), keys.reverse())
+  assert.equal(JSON.stringify(page.data.mapPolylines[0].points), geometry)
+  const gate = page.data.routeStops.find(({ name }) => name === '2号门')!
+  const oldOrigin = page.data.originIndex
+  page.handleUseRouteStop({ currentTarget: { dataset: { field: 'origin', visitKey: gate.key } } })
+  assert.equal(page.data.originIndex, oldOrigin)
+  page.handleRouteStopTap({ currentTarget: { dataset: { visitKey: gate.key } } })
+  assert.equal(page.data.latitude, gate.coordinate.latitude)
+  assert.equal(page.data.longitude, gate.coordinate.longitude)
+  const valid = page.data.routeStops.find(({ canBoard }) => canBoard)!
+  page.handleUseRouteStop({ currentTarget: { dataset: { field: 'origin', visitKey: valid.key } } })
+  assert.equal(page.data.viewMode, 'journey')
+  assert.equal(page.data.stopOptions[page.data.originIndex].id, valid.stopId)
+})
+
+test('map-only location preserves planned endpoints and a later overview prevents a camera jump', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  const oldOrigin = page.data.originIndex
+  const locating = page.handleMapLocate()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.handleCampusOverview()
+  const cameraCount = runtime.cameraMoves.length
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await locating
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originIndex, oldOrigin)
+  assert.equal(page.data.mapLocation?.latitude, 29.82)
+  assert.equal(runtime.cameraMoves.length, cameraCount)
+  assert.equal(page.data.mapLocating, false)
+})
+
+test('switching tabs or hiding cancels the map-only locating status and discards its old result', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  const first = page.handleMapLocate()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.handleViewChange({ currentTarget: { dataset: { view: 'journey' } } })
+  assert.equal(page.data.mapLocating, false)
+  assert.doesNotMatch(page.data.mapLocationMessage, /正在定位/)
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await first
+  assert.equal(page.data.mapLocation, null)
+  page.handleViewChange({ currentTarget: { dataset: { view: 'map' } } })
+  const second = page.handleMapLocate()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.onHide()
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await second
+  page.onShow()
+  assert.equal(page.data.mapLocating, false)
+  assert.doesNotMatch(page.data.mapLocationMessage, /正在定位/)
+  assert.equal(page.data.mapLocation, null)
 })

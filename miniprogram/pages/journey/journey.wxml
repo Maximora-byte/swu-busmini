@@ -1,21 +1,42 @@
-<view class="journey-page">
+<view class="journey-page {{viewMode === 'map' ? 'journey-page--map' : ''}}">
   <view class="journey-header">
-    <text class="journey-title">西大公交导航</text>
-    <button class="history-button" size="mini" bindtap="handleOpenHistory">历史图示</button>
+    <text class="journey-title">SWU Go · 校园出行</text>
+    <button class="notes-button" size="mini" bindtap="toggleDataNotes">{{dataNotesExpanded ? '收起说明' : '数据说明'}}</button>
   </view>
+  <view class="home-tabs"><button class="home-tab {{viewMode === 'map' ? 'home-tab--active' : ''}}" data-view="map" bindtap="handleViewChange">校园地图</button><button class="home-tab {{viewMode === 'journey' ? 'home-tab--active' : ''}}" data-view="journey" bindtap="handleViewChange">出行规划</button></view>
   <text class="source-note">{{sourceText}} · 静态数据</text>
-  <scroll-view class="line-selector" scroll-x>
+  <scroll-view wx:if="{{viewMode === 'map'}}" class="line-selector" scroll-x>
     <view class="line-selector__track">
-      <button wx:for="{{routeOptions}}" wx:key="id" class="line-button {{selectedRouteId === item.id ? 'line-button--active' : ''}}" size="mini" data-route-id="{{item.id}}" bindtap="handleRouteChange">{{item.name}}</button>
+      <button wx:for="{{routeOptions}}" wx:key="id" class="line-button" style="border-color: {{item.color}}; background: {{selectedRouteId === item.id ? item.color : '#ffffff'}}; color: {{selectedRouteId === item.id ? '#ffffff' : '#315e49'}}" size="mini" data-route-id="{{item.id}}" bindtap="handleRouteChange">{{item.name}}</button>
     </view>
   </scroll-view>
+  <view wx:if="{{viewMode === 'map'}}" class="campus-toolbar"><button size="mini" bindtap="handleCampusOverview">校园全览</button><button size="mini" bindtap="handleBeibeiOverview">北碚城区</button><button size="mini" loading="{{mapLocating}}" disabled="{{mapLocating}}" bindtap="handleMapLocate">我的位置</button><label class="network-toggle"><switch checked="{{showAllRoutes}}" color="#126b47" bindchange="handleNetworkChange" />全线路</label></view>
+  <text wx:if="{{viewMode === 'map' && mapLocationMessage}}" class="map-location-message">{{mapLocationMessage}}</text>
   <view class="map-heading"><text class="map-title">{{mapTitle}}</text><button size="mini" class="map-fit" bindtap="fitMap">看全图</button></view>
-  <view class="review-status"><text>{{directionStatusText}}</text><text wx:if="{{routeWarnings.length}}">本线含待核对项；偏移点不自动推荐，详见下方说明。</text></view>
+  <view class="review-status"><text>{{directionStatusText}}</text></view>
   <view wx:if="{{mapSelectionField}}" class="map-selection"><text>{{mapSelectionMessage}}</text><button size="mini" bindtap="handleCancelMapSelection">取消选点</button></view>
-  <map id="journey-map" class="journey-map" latitude="{{latitude}}" longitude="{{longitude}}" scale="{{scale}}" min-scale="{{minScale}}" max-scale="{{maxScale}}" markers="{{mapMarkers}}" polyline="{{mapPolylines}}" circles="{{mapCircles}}" bindtap="handleMapTap" bindmarkertap="handleMarkerTap" bindcallouttap="handleMarkerTap" show-location="{{originMode === 'coordinate'}}" show-scale></map>
+  <map id="journey-map" class="journey-map" latitude="{{latitude}}" longitude="{{longitude}}" scale="{{scale}}" min-scale="{{minScale}}" max-scale="{{maxScale}}" markers="{{mapMarkers}}" polyline="{{mapPolylines}}" circles="{{mapCircles}}" bindtap="handleMapTap" bindmarkertap="handleMarkerTap" bindcallouttap="handleMarkerTap" show-location="{{originMode === 'coordinate' || !!mapLocation}}" show-scale></map>
+  <scroll-view class="map-legend" scroll-x><view class="map-legend__track"><view wx:for="{{mapLegend}}" wx:key="routeId" class="map-legend__item"><view class="map-legend__line" style="background: {{item.color}}"></view><text>{{item.name}}</text></view></view></scroll-view>
+  <text class="basemap-note">校车轨迹以图例实线为准，底图其他线条不表示校车路线。</text>
   <view wx:if="{{mapCircles.length}}" class="reference-legend"><text wx:if="{{originCoordinate}}" class="reference-origin">● 出发参考位置</text><text wx:if="{{destinationCoordinate}}" class="reference-destination">● 到达参考位置</text><text>图标为实际乘降点</text></view>
   <text wx:if="{{stopMessage}}" class="stop-message">{{stopMessage}}</text>
-  <scroll-view class="journey-content" scroll-y>
+  <scroll-view wx:if="{{dataNotesExpanded}}" class="data-notes-panel" scroll-y><view class="data-notes">
+    <text>非官方校园出行参考。线路与坐标为运营方发布资料，未冒称现场测量；实际停靠和运营方向请结合现场核对。</text>
+    <text>6／7／8的近闭环不证明连续循环运营，当前不补闭合边。偏移待核对点保留原位置，暂停该线路的自动乘降，不代表停站。</text>
+    <text>接驳为直线估计，未绘制步行道路；当前不提供实时车辆、等待或到站预测。</text>
+    <text wx:for="{{routeWarnings}}" wx:key="*this" class="data-warning">{{item}}</text>
+  </view></scroll-view>
+  <view wx:if="{{viewMode === 'map'}}" class="campus-panel">
+    <button class="route-summary" bindtap="toggleRouteDetails"><view class="route-summary__heading"><text class="route-badge" style="background: {{routeColor}}">{{routeName}}</text><text>{{routeDetailsExpanded ? '收起站序 ↑' : '展开站序 ↓'}}</text></view><text class="route-summary__path">{{routeSummary}}</text></button>
+    <view wx:if="{{routeDetailsExpanded}}" class="reference-orders"><button size="mini" class="{{!referenceReverse ? 'reference-order--active' : ''}}" data-order="forward" bindtap="handleReferenceOrderChange">正序参考</button><button size="mini" class="{{referenceReverse ? 'reference-order--active' : ''}}" data-order="reverse" bindtap="handleReferenceOrderChange">反序参考</button><text>几何参考顺序，非运营方向</text></view>
+    <scroll-view wx:if="{{routeDetailsExpanded}}" class="campus-stops" scroll-y>
+      <view wx:for="{{routeStops}}" wx:key="key" class="campus-stop {{selectedVisitKey === item.key ? 'campus-stop--selected' : ''}}">
+        <view class="campus-stop__main" data-visit-key="{{item.key}}" bindtap="handleRouteStopTap"><text class="campus-stop__number" style="color: {{routeColor}}">{{index + 1}}</text><view class="campus-stop__name"><text>{{item.name}}</text><text class="campus-stop__status">{{item.canBoard ? '查看候车参考位置' : item.reviewText}}</text></view></view>
+        <view class="campus-stop__actions"><button size="mini" disabled="{{!item.canBoard}}" data-visit-key="{{item.key}}" data-field="origin" bindtap="handleUseRouteStop">从此出发</button><button size="mini" disabled="{{!item.canBoard}}" data-visit-key="{{item.key}}" data-field="destination" bindtap="handleUseRouteStop">到这里</button></view>
+      </view>
+    </scroll-view>
+  </view>
+  <scroll-view wx:if="{{viewMode === 'journey'}}" class="journey-content" scroll-y>
     <view class="journey-content__inner">
       <view class="journey-form">
         <view class="field-heading"><text>从哪里出发</text><button size="mini" class="location-button" loading="{{locating}}" disabled="{{locating}}" bindtap="handleUseLocation">从我的位置出发</button></view>
@@ -56,15 +77,7 @@
             <button size="mini" data-journey-id="{{journey.id}}" data-leg-index="{{legIndex}}" data-point-kind="alighting" bindtap="handleOpenStop">查看下车点</button>
           </view>
         </view>
-        <text wx:for="{{journey.warnings}}" wx:key="*this" class="data-warning">{{item}}</text>
         <button class="show-journey" data-journey-id="{{journey.id}}" bindtap="handleShowJourney">{{selectedJourneyId === journey.id ? '地图正在显示此方案' : '在地图查看乘车区间'}}</button>
-      </view>
-      <view class="data-notes">
-        <text>轨迹和坐标来自运营方发布资料，未冒称现场测量。几何排序不能独立证明允许运营的方向，出发前请核对车头和现场运行。</text>
-        <text>6／7／8存在引入段与中段近闭环图形，连续绕行与回走尚未确认，当前不跨回接点补边规划。偏移待核对点保留原位置，仅暂停该线的自动上下车和换乘推荐，不表示停站。</text>
-        <text>接驳距离为直线估算，打开站点地图后可按实际道路前往。</text>
-        <text>当前不提供实时车辆、班次等待或到站预测。</text>
-        <text wx:for="{{routeWarnings}}" wx:key="*this" class="data-warning">{{item}}</text>
       </view>
     </view>
   </scroll-view>
