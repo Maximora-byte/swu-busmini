@@ -81,6 +81,9 @@ function classify(historicalLabel: string, currentLabel: string): Pick<Candidate
   return null
 }
 
+// Reuse the reviewed semantic rules for cross-route analysis without assuming route identity.
+export { key as normalizeHistoricalLandmark, classify as classifyHistoricalLandmark }
+
 // LCS on matched landmark candidates only. One current position can be consumed once.
 // Ambiguous candidate assignments maximize this score; no rotation or closing edge is added.
 function longestCandidateSubsequence(candidateIndices: number[][], sequence: number[]): number {
