@@ -5,7 +5,8 @@ import { transitJourneyService, type TransitJourney, type TransitJourneyLeg } fr
 import { isAutomaticBoardingVisit } from '../../services/navigation/transit-visit-policy'
 import { transitStopSearchService, type TransitStopSuggestion } from '../../services/navigation/transit-stop-search.service'
 import { locationService } from '../../services/location/location.service'
-import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT } from '../../services/map/map-viewport.service'
+import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT, getLocationViewport } from '../../services/map/map-viewport.service'
+import { getCurrentMapPresentation, type CurrentRouteStopView } from '../../services/map/current-transit-map.service'
 
 interface JourneyLegView extends TransitJourneyLeg {
   boardingName: string
@@ -49,9 +50,16 @@ Page({
   mapReady: false,
   cameraRequestVersion: 0,
   endpointRequestVersion: 0,
+  mapLocationRequestVersion: 0,
+  rememberedJourneyId: '',
   data: {
+    viewMode: 'map', showAllRoutes: false, referenceReverse: false,
+    routeStops: [] as CurrentRouteStopView[], routeSummary: '', routeColor: '#126b47', selectedVisitKey: '',
+    routeDetailsExpanded: false, dataNotesExpanded: false,
+    mapLegend: [] as { routeId: string; name: string; color: string }[],
+    mapLocation: null as Coordinate | null, mapLocating: false, mapLocationMessage: '',
     sourceText: '', directionStatusText: '实际运营方向尚未独立确认，请现场核对。',
-    routeOptions: [] as { id: string; name: string }[], selectedRouteId: '', routeName: '',
+    routeOptions: [] as { id: string; name: string; color: string }[], selectedRouteId: '', routeName: '',
     stopOptions: [] as { id: string; label: string }[], stopNames: [] as string[],
     originIndex: 0, destinationIndex: 0, originMode: 'stop', originCoordinate: null as Coordinate | null,
     destinationMode: 'stop', destinationCoordinate: null as Coordinate | null,
@@ -66,7 +74,7 @@ Page({
     mapFitPoints: [] as Coordinate[], mapTitle: '', routeWarnings: [] as string[], stopMessage: '',
   },
 
-  onLoad(query: { routeId?: string } = {}) {
+  onLoad(query: { routeId?: string; view?: string } = {}) {
     this.dataset = currentTransitRepository.getDataset()
     const dataset = this.dataset
     const eligibleStopIds = new Set(dataset.routes.flatMap((route) => route.visits.filter(isAutomaticBoardingVisit).map(({ stopId }) => stopId)))
@@ -79,7 +87,8 @@ Page({
     })
     this.setData({
       sourceText: `${dataset.source} · ${dataset.observedAt}`,
-      routeOptions: dataset.routes.map(({ id, name }) => ({ id, name })),
+      routeOptions: dataset.routes.map(({ id, name, color }) => ({ id, name, color })),
+      viewMode: query.view === 'journey' ? 'journey' : 'map',
       stopOptions, stopNames: stopOptions.map(({ label }) => label), destinationIndex: stopOptions.length > 1 ? 1 : 0,
       originQuery: planningStops[0]?.name ?? '', destinationQuery: planningStops[1]?.name ?? planningStops[0]?.name ?? '',
     })
@@ -98,8 +107,10 @@ Page({
     this.pageVisible = false
     this.cameraRequestVersion += 1
     this.endpointRequestVersion += 1
+    this.mapLocationRequestVersion += 1
     if (updateView) this.setData({
-      locating: false,
+      locating: false, mapLocating: false,
+      ...(this.data.mapLocating ? { mapLocationMessage: '定位已取消，可重新定位。' } : {}),
       activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1,
       mapSelectionField: '', mapSelectionMessage: '',
       ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
@@ -126,27 +137,128 @@ Page({
     const route = dataset?.routes.find(({ id }) => id === routeId)
     if (!dataset || !route) return
     const version = ++this.cameraRequestVersion
-    const ids = new Set(route.visits.map(({ stopId }) => stopId))
-    const eligibleIds = new Set(route.visits.filter(isAutomaticBoardingVisit).map(({ stopId }) => stopId))
+    const view = getCurrentMapPresentation(dataset, route.id, {
+      network: this.data.viewMode === 'map' && this.data.showAllRoutes, reverse: this.data.referenceReverse,
+    })
+    const ids = new Set(view.stopIds)
+    const eligibleIds = new Set(view.eligibleStopIds)
     this.setData({
-      selectedRouteId: route.id, routeName: route.name, selectedJourneyId: '', stopMessage: '',
-      mapTitle: `${route.name} · 运营方发布轨迹`, routeWarnings: [...route.warnings],
-      mapPolylines: [{ points: route.points, color: route.color, width: 7 }],
+      selectedRouteId: route.id, routeName: route.name, routeColor: route.color, selectedJourneyId: '', stopMessage: '', selectedVisitKey: '',
+      routeStops: view.stops, routeSummary: view.summary, mapLegend: view.legend,
+      mapTitle: this.data.viewMode === 'map' && this.data.showAllRoutes ? '十条现行线路总览' : `${route.name} · 运营方发布轨迹`,
+      routeWarnings: view.warnings, mapPolylines: view.polylines,
       mapMarkers: dataset.stops.filter(({ id }) => ids.has(id)).map((stop) => {
         if (eligibleIds.has(stop.id)) return marker(dataset, stop)
         const reviewMarker = marker(dataset, stop, '待核对 · ')
         return { ...reviewMarker, title: `${stop.name}（待核对，暂不自动推荐）`,
           callout: { ...reviewMarker.callout, color: '#956324' } }
       }),
-      mapFitPoints: route.points, mapCircles: [],
+      mapFitPoints: view.fitPoints, mapCircles: [],
     }, () => { if (fit && version === this.cameraRequestVersion) this.fitMap() })
   },
   handleRouteChange(event: WechatMiniprogram.TouchEvent) {
     const routeId = event.currentTarget.dataset.routeId
-    if (typeof routeId === 'string') this.showRoute(routeId)
+    if (typeof routeId !== 'string' || !this.dataset?.routes.some(({ id }) => id === routeId)) return
+    if (this.data.selectedJourneyId) this.rememberedJourneyId = this.data.selectedJourneyId
+    this.setData({ viewMode: 'map', showAllRoutes: false, referenceReverse: false })
+    this.showRoute(routeId)
+  },
+  handleViewChange(event: WechatMiniprogram.TouchEvent) {
+    const view = event.currentTarget.dataset.view
+    if (!['map', 'journey'].includes(view) || view === this.data.viewMode) return
+    if (this.data.selectedJourneyId) this.rememberedJourneyId = this.data.selectedJourneyId
+    this.endpointRequestVersion += 1
+    this.mapLocationRequestVersion += 1
+    this.cameraRequestVersion += 1
+    this.setData({ viewMode: view, locating: false, mapLocating: false,
+      activeSearchField: '', searchResults: [], searchVersion: this.data.searchVersion + 1, mapSelectionField: '', mapSelectionMessage: '',
+      ...(this.data.locating ? { locationMessage: '定位已取消，可重新定位或选择上车站。' } : {}),
+      ...(this.data.mapLocating ? { mapLocationMessage: '定位已取消，可重新定位。' } : {}),
+    })
+    const journey = this.data.journeys.find(({ id }) => id === this.rememberedJourneyId) ?? this.data.journeys[0]
+    if (view === 'journey' && journey) this.showJourney(journey)
+    else if (view === 'journey') this.showPlanningOverview(true)
+    else this.showRoute(this.data.selectedRouteId)
+  },
+  handleNetworkChange(event: WechatMiniprogram.SwitchChange) {
+    this.setData({ showAllRoutes: !!event.detail.value, viewMode: 'map' })
+    this.showRoute(this.data.selectedRouteId)
+  },
+  handleReferenceOrderChange(event: WechatMiniprogram.TouchEvent) {
+    const order = event.currentTarget.dataset.order
+    if (!['forward', 'reverse'].includes(order)) return
+    this.setData({ referenceReverse: order === 'reverse' })
+    this.showRoute(this.data.selectedRouteId, false)
+  },
+  toggleRouteDetails() {
+    const version = ++this.cameraRequestVersion
+    this.setData({ routeDetailsExpanded: !this.data.routeDetailsExpanded, dataNotesExpanded: false }, () => {
+      if (version === this.cameraRequestVersion) this.fitMap()
+    })
+  },
+  toggleDataNotes() {
+    const version = ++this.cameraRequestVersion
+    this.setData({ dataNotesExpanded: !this.data.dataNotesExpanded, routeDetailsExpanded: false }, () => {
+      if (version === this.cameraRequestVersion) this.fitMap()
+    })
+  },
+  moveViewport(coordinate: Coordinate, scale: number) {
+    const version = ++this.cameraRequestVersion
+    this.setData({ ...coordinate, scale }, () => {
+      if (version === this.cameraRequestVersion && this.mapReady && this.pageVisible) {
+        wx.createMapContext('journey-map', this).moveToLocation(coordinate)
+      }
+    })
+  },
+  handleCampusOverview() { this.moveViewport(CAMPUS_VIEWPORT.center, CAMPUS_VIEWPORT.scale) },
+  handleBeibeiOverview() { this.moveViewport(BEIBEI_VIEWPORT.center, BEIBEI_VIEWPORT.scale) },
+  async handleMapLocate() {
+    const version = ++this.mapLocationRequestVersion
+    const cameraVersion = this.cameraRequestVersion
+    this.setData({ mapLocating: true, mapLocation: null, mapLocationMessage: '正在定位…' })
+    try {
+      const location = await locationService.getCurrentLocation()
+      if (version !== this.mapLocationRequestVersion || !this.pageVisible) return
+      const viewport = getLocationViewport(location.coordinate)
+      this.setData({ mapLocation: viewport.isWithinArea ? location.coordinate : null,
+        mapLocationMessage: viewport.isWithinArea ?
+          `已取得本次位置${location.isApproximate ? '，精度较低，请核对现场' : ''}。` : '当前位置不在北碚浏览范围，可继续手动选站或地图选点。' })
+      if (viewport.isWithinArea && cameraVersion === this.cameraRequestVersion && this.data.viewMode === 'map') this.moveViewport(viewport.center, viewport.scale)
+    } catch (error: unknown) {
+      if (version === this.mapLocationRequestVersion && this.pageVisible) this.setData({
+        mapLocationMessage: error instanceof Error ? error.message : '定位失败，可继续浏览线路。',
+      })
+    } finally {
+      if (version === this.mapLocationRequestVersion && this.pageVisible) this.setData({ mapLocating: false })
+    }
+  },
+  handleRouteStopTap(event: WechatMiniprogram.TouchEvent) {
+    const stop = this.data.routeStops.find(({ key }) => key === event.currentTarget.dataset.visitKey)
+    if (!stop) return
+    this.setData({ showAllRoutes: false })
+    this.showRoute(this.data.selectedRouteId, false)
+    this.setData({ selectedVisitKey: stop.key, stopMessage: `${stop.name} · ${stop.canBoard ? '公布候车参考点' : stop.reviewText}`,
+      mapMarkers: this.data.mapMarkers.map((item) => item.stopId === stop.stopId ?
+        { ...item, callout: { ...item.callout, display: 'ALWAYS' as const } } : item),
+    })
+    this.moveViewport(stop.coordinate, 17)
+  },
+  handleUseRouteStop(event: WechatMiniprogram.TouchEvent) {
+    const field = endpointField(event.currentTarget.dataset.field)
+    const stop = this.data.routeStops.find(({ key }) => key === event.currentTarget.dataset.visitKey)
+    if (!field || !stop) return
+    if (!stop.canBoard) { this.setData({ stopMessage: stop.reviewText }); return }
+    const index = this.data.stopOptions.findIndex(({ id }) => id === stop.stopId)
+    if (index < 0) return
+    this.setData({ viewMode: 'journey' })
+    const change = { detail: { value: String(index) } } as WechatMiniprogram.PickerChange
+    if (field === 'origin') this.handleOriginChange(change)
+    else this.handleDestinationChange(change)
+    this.replanIfReady()
   },
 
   clearJourneys() {
+    this.rememberedJourneyId = ''
     this.endpointRequestVersion += 1
     this.setData({
       journeys: [], selectedJourneyId: '', locating: false, journeyMessage: '选择已更新，请重新查询。',
@@ -173,6 +285,7 @@ Page({
   handleSearchFocus(event: WechatMiniprogram.TouchEvent) {
     const field = endpointField(event.currentTarget.dataset.field)
     if (!field || !this.pageVisible) return
+    this.setData({ viewMode: 'journey' })
     this.showSearchResults(field)
   },
   showSearchResults(field: EndpointField) {
@@ -188,6 +301,7 @@ Page({
     const field = endpointField(event.currentTarget.dataset.field)
     if (!field || typeof event.detail.value !== 'string' || !this.pageVisible) return
     const query = event.detail.value.slice(0, 64)
+    this.setData({ viewMode: 'journey' })
     this.clearJourneys()
     this.setData(field === 'origin' ? { originQuery: query, originMode: 'search', originCoordinate: null, locationMessage: '' } :
       { destinationQuery: query, destinationMode: 'search', destinationCoordinate: null })
@@ -212,6 +326,7 @@ Page({
     const field = endpointField(event.currentTarget.dataset.field)
     if (!field || !this.pageVisible || !this.mapReady) return
     wx.hideKeyboard()
+    this.setData({ viewMode: 'journey' })
     this.clearJourneys()
     this.setData({ mapSelectionField: field, mapSelectionMessage: `请点击地图空白处选择${field === 'origin' ? '出发' : '到达'}位置，可先拖动／缩放。` })
   },
@@ -243,7 +358,16 @@ Page({
     }
     return circles
   },
+  showPlanningOverview(fit = false) {
+    this.showRoute(this.data.selectedRouteId, false)
+    const mapCircles = this.referenceCircles()
+    const version = this.cameraRequestVersion
+    this.setData({ mapCircles, mapFitPoints: [
+      ...this.data.mapFitPoints, ...mapCircles.map(({ latitude, longitude }) => ({ latitude, longitude })),
+    ] }, () => { if (fit && version === this.cameraRequestVersion) this.fitMap() })
+  },
   async handleUseLocation() {
+    this.setData({ viewMode: 'journey' })
     this.clearJourneys()
     const version = this.endpointRequestVersion
     this.setData({ locating: true, originMode: 'stop', originCoordinate: null, locationMessage: '正在定位…',
@@ -268,6 +392,7 @@ Page({
   },
 
   handlePlanJourney() {
+    this.setData({ viewMode: 'journey' })
     if (this.data.locating) { this.setData({ journeyMessage: '请等待定位完成，或手动选择上车站。' }); return }
     if (this.data.originMode === 'search' || this.data.destinationMode === 'search') {
       this.setData({ journeyMessage: `请从搜索结果或地图选择${this.data.originMode === 'search' ? '起点' : '终点'}，输入文字尚未确认。` }); return
@@ -296,13 +421,7 @@ Page({
       this.cameraRequestVersion += 1
       this.setData({ journeys, selectedJourneyId: '', journeyMessage: result.message })
       if (journeys[0]) this.showJourney(journeys[0])
-      else {
-        this.showRoute(this.data.selectedRouteId, false)
-        const mapCircles = this.referenceCircles()
-        this.setData({ mapCircles, mapFitPoints: [
-          ...this.data.mapFitPoints, ...mapCircles.map(({ latitude, longitude }) => ({ latitude, longitude })),
-        ] })
-      }
+      else this.showPlanningOverview()
     } catch (error: unknown) {
       this.setData({ journeys: [], selectedJourneyId: '', journeyMessage: error instanceof Error ? error.message : '暂不能生成乘车方案。' })
       this.showRoute(this.data.selectedRouteId, false)
@@ -324,7 +443,9 @@ Page({
     const version = ++this.cameraRequestVersion
     const points = journey.legs.flatMap((leg) => leg.points)
     const mapCircles = this.referenceCircles()
+    this.rememberedJourneyId = journey.id
     this.setData({
+      viewMode: 'journey', mapLegend: journey.legs.map(({ routeId, routeName: name, color }) => ({ routeId, name, color })),
       selectedJourneyId: journey.id, mapTitle: '所选乘车区间', stopMessage: '', routeWarnings: [...journey.warnings],
       mapPolylines: journey.legs.map((leg) => ({ points: leg.points, color: leg.color, width: 8, arrowLine: true })),
       mapMarkers: [...markers.values()], mapCircles, mapFitPoints: [
@@ -346,5 +467,4 @@ Page({
     const stop = this.data.mapMarkers.find(({ id }) => id === Number(event.detail.markerId))
     if (stop) this.setData({ stopMessage: `${stop.title} · 运营方发布候车参考点` })
   },
-  handleOpenHistory() { wx.navigateTo({ url: '/pages/index/index' }) },
 })
