@@ -5,6 +5,7 @@ import { stops as stopRecords } from '../miniprogram/data/stops'
 import { routeGeometries } from '../miniprogram/data/route-geometries'
 import { routePreviewData } from '../miniprogram/data/route-preview'
 import { routePreviewRepository } from '../miniprogram/services/repository/route-preview.repository'
+import { currentTransitRepository } from '../miniprogram/services/repository/current-transit.repository'
 import type { BusStop } from '../miniprogram/models/index'
 import { createCoordinateVerificationService } from '../miniprogram/services/location/coordinate-verification.service'
 import { createStaticBusStopRepository } from '../miniprogram/services/repository/bus-stop.repository'
@@ -142,6 +143,8 @@ function main(): void {
 }
 
 try {
+  const currentTransit = currentTransitRepository.getDataset()
+  console.log(`✓ current transit: ${currentTransit.routes.length} routes, ${currentTransit.stops.length} published stop identities`)
   main()
 } catch (error: unknown) {
   const message = error instanceof Error ? error.message : 'unknown error'

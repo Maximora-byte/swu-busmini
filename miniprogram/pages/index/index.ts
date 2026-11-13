@@ -131,6 +131,10 @@ Page({
     if (route) this.setData({ selectedOperatorRouteId: route.id, selectedOperatorRoute: route })
   },
 
+  handleOpenJourney() {
+    wx.navigateTo({ url: `/pages/journey/journey?routeId=${encodeURIComponent(this.data.selectedOperatorRouteId)}` })
+  },
+
   toggleMapOptions() {
     this.setData({ mapOptionsExpanded: !this.data.mapOptionsExpanded })
   },

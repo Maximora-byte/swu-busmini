@@ -1,0 +1,48 @@
+<view class="journey-page">
+  <view class="journey-header">
+    <text class="journey-title">西大公交导航</text>
+    <button class="history-button" size="mini" bindtap="handleOpenHistory">历史图示</button>
+  </view>
+  <text class="source-note">{{sourceText}} · 静态数据</text>
+  <scroll-view class="line-selector" scroll-x>
+    <view class="line-selector__track">
+      <button wx:for="{{routeOptions}}" wx:key="id" class="line-button {{selectedRouteId === item.id ? 'line-button--active' : ''}}" size="mini" data-route-id="{{item.id}}" bindtap="handleRouteChange">{{item.name}}</button>
+    </view>
+  </scroll-view>
+  <view class="map-heading"><text class="map-title">{{mapTitle}}</text><button size="mini" class="map-fit" bindtap="fitMap">看全图</button></view>
+  <map id="journey-map" class="journey-map" latitude="{{latitude}}" longitude="{{longitude}}" scale="{{scale}}" min-scale="{{minScale}}" max-scale="{{maxScale}}" markers="{{mapMarkers}}" polyline="{{mapPolylines}}" bindmarkertap="handleMarkerTap" bindcallouttap="handleMarkerTap" show-location="{{originMode === 'coordinate'}}" show-scale></map>
+  <text wx:if="{{stopMessage}}" class="stop-message">{{stopMessage}}</text>
+  <scroll-view class="journey-content" scroll-y>
+    <view class="journey-content__inner">
+      <view class="journey-form">
+        <view class="field-heading"><text>从哪里上车</text><button size="mini" class="location-button" loading="{{locating}}" disabled="{{locating}}" bindtap="handleUseLocation">从我的位置出发</button></view>
+        <picker range="{{stopNames}}" value="{{originIndex}}" bindchange="handleOriginChange"><view class="stop-picker">{{originMode === 'coordinate' ? '当前位置（可点此改选站点）' : stopNames[originIndex]}}<text>⌄</text></view></picker>
+        <text wx:if="{{locationMessage}}" class="location-message">{{locationMessage}}</text>
+        <text class="field-heading">到哪里下车</text>
+        <picker range="{{stopNames}}" value="{{destinationIndex}}" bindchange="handleDestinationChange"><view class="stop-picker">{{stopNames[destinationIndex]}}<text>⌄</text></view></picker>
+        <button class="plan-button" bindtap="handlePlanJourney">查询直达 / 一次换乘</button>
+      </view>
+      <text class="journey-message">{{journeyMessage}}</text>
+      <view wx:for="{{journeys}}" wx:key="id" wx:for-item="journey" class="journey-card {{selectedJourneyId === journey.id ? 'journey-card--selected' : ''}}">
+        <view class="journey-card__heading"><text>{{journey.title}}</text><text class="journey-card__distance">{{journey.distanceText}}</text></view>
+        <view wx:for="{{journey.legs}}" wx:key="routeId" wx:for-item="leg" wx:for-index="legIndex" class="ride-leg">
+          <text class="ride-leg__line" style="border-left-color: {{leg.color}}">{{leg.routeName}} · {{leg.directionText}}</text>
+          <text class="ride-leg__station">上车：{{leg.boardingName}}　→　下车：{{leg.alightingName}}</text>
+          <text class="ride-leg__path">{{leg.pathText}}</text>
+          <view class="point-actions">
+            <button size="mini" data-journey-id="{{journey.id}}" data-leg-index="{{legIndex}}" data-point-kind="boarding" bindtap="handleOpenStop">查看上车点</button>
+            <button size="mini" data-journey-id="{{journey.id}}" data-leg-index="{{legIndex}}" data-point-kind="alighting" bindtap="handleOpenStop">查看下车点</button>
+          </view>
+        </view>
+        <text wx:for="{{journey.warnings}}" wx:key="*this" class="data-warning">{{item}}</text>
+        <button class="show-journey" data-journey-id="{{journey.id}}" bindtap="handleShowJourney">{{selectedJourneyId === journey.id ? '地图正在显示此方案' : '在地图查看乘车区间'}}</button>
+      </view>
+      <view class="data-notes">
+        <text>轨迹和坐标来自运营方发布资料，未冒称现场测量。方向按原客户端的轨迹里程规则展示，出发前请核对车头方向。</text>
+        <text>仅沿已提供的路径规划；未补绘缺失的环线闭合段。接驳距离为直线估算，打开站点地图后可按实际道路前往。</text>
+        <text>当前不提供实时车辆、班次等待或到站预测。</text>
+        <text wx:for="{{routeWarnings}}" wx:key="*this" class="data-warning">{{item}}</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>

@@ -7,6 +7,7 @@
   <scroll-view wx:if="{{activeTab === 'catalog'}}" class="navigation-page" scroll-y>
     <view class="navigation-page__content">
       <text class="navigation-title">享坐车 · 西南大学线路</text>
+      <button class="navigation-submit" bindtap="handleOpenJourney">使用当前线路规划公交出行</button>
       <text class="navigation-subtitle">{{selectedOperatorRoute.source}} · 记录于 {{selectedOperatorRoute.observedAt}}</text>
       <view class="catalog-selector">
         <button wx:for="{{operatorRoutes}}" wx:key="id" class="catalog-selector__button {{selectedOperatorRouteId === item.id ? 'catalog-selector__button--active' : ''}}" data-route-id="{{item.id}}" bindtap="handleOperatorRouteChange">{{item.name}}</button>
