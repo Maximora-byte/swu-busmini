@@ -14,6 +14,9 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/**/*.test.ts",
     "validate:data": "tsx scripts/validate-routes.ts",
+    "fingerprint:package-size": "tsx scripts/package-size.ts fingerprint",
+    "record:package-size": "tsx scripts/package-size.ts record",
+    "check:package-size": "tsx scripts/package-size.ts check",
     "test:coverage": "c8 npm test"
   },
   "devDependencies": {

@@ -1,7 +1,8 @@
 {
   "pages": [
     "pages/journey/journey",
-    "pages/index/index"
+    "pages/index/index",
+    "pages/recovery/recovery"
   ],
   "window": {
     "navigationBarBackgroundColor": "#126b47",
