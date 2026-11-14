@@ -1,5 +1,12 @@
 import type { Coordinate } from './index'
 
+/** A published occurrence and geometric travel order, not a verified operating direction. */
+export interface TransitVisitDirection {
+  routeId: string
+  visitIndex: number
+  directionId: 'forward' | 'reverse'
+}
+
 /** 运营方公布的物理站点；同名异点、异名同点均保持不同身份。 */
 export interface TransitStop {
   id: string

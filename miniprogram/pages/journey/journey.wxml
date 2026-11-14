@@ -35,18 +35,16 @@
       </view>
 
       <view wx:elif="{{selectedStation}}" class="sheet-content station-content">
-        <view class="station-overview"><view class="station-symbol"><image src="/assets/icons/bus-stop-marker.png" /></view><view class="station-overview-copy"><text class="station-category">校园校车站</text><text class="station-meta">{{selectedStation.routes.length}}条途经线路 · {{selectedStation.stopIds.length}}个发布参考记录</text></view></view>
+        <view class="station-overview"><view class="station-symbol"><image src="/assets/icons/bus-stop-marker.png" /></view><view class="station-overview-copy"><text class="station-category">校园校车站</text><text class="station-meta">{{selectedStation.routes.length}}条途经线路 · {{selectedStation.directions.length ? '两个参考方向' : '方向待核对'}}</text></view></view>
         <view class="station-primary-actions"><button class="subtle-button" disabled="{{!selectedStation.canBoard}}" data-field="origin" bindtap="handleUseStation">从此站出发</button><button class="compact-primary" disabled="{{!selectedStation.canBoard}}" data-field="destination" bindtap="handleUseStation">到此站去<image class="tiny-icon" src="/assets/icons/ui-forward-light.svg" /></button></view>
-        <view class="station-section-heading"><text>途经线路</text><text class="station-meta">按发布资料展示</text></view>
-        <text class="quiet-note">相邻站为几何参考站序，实际运营方向请现场核对。</text>
-        <view wx:for="{{selectedStation.routes}}" wx:key="routeId" wx:for-item="line" class="station-route">
-          <button class="station-line-heading" style="color: {{line.color}}" data-route-id="{{line.routeId}}" bindtap="handleRouteChange"><text class="station-line-badge" style="border-color: {{line.color}}">{{line.name}}</text><view class="station-view-line"><text>查看线路</text><image class="tiny-icon" src="/assets/icons/ui-forward.svg" /></view></button>
-          <view wx:for="{{line.visits}}" wx:key="key" wx:for-item="visit" class="station-visit">
-            <view class="station-visit-copy"><view class="station-visit-dot" style="background: {{line.color}}"></view><view><text class="station-reference">{{visit.referenceText}}</text><text class="station-status {{!visit.canBoard ? 'station-status--review' : ''}}">{{visit.canBoard ? '发布候车参考点' : '位置待核对，暂不推荐乘降'}}</text></view></view>
-            <view class="station-visit-actions"><button class="subtle-button" disabled="{{!visit.canBoard}}" data-visit-key="{{visit.key}}" data-field="origin" bindtap="handleUseStationVisit">在此上车</button><button class="subtle-button" disabled="{{!visit.canBoard}}" data-visit-key="{{visit.key}}" data-field="destination" bindtap="handleUseStationVisit">在此下车</button></view>
-          </view>
+        <view class="station-section-heading"><text>参考乘车方向</text><text class="station-meta">实际方向请现场核对</text></view>
+        <view wx:for="{{selectedStation.directions}}" wx:key="id" wx:for-item="direction" class="station-direction">
+          <view class="station-direction-heading"><view class="direction-symbol {{direction.id === 'b' ? 'direction-symbol--opposite' : ''}}"><image class="small-icon" src="/assets/icons/ui-forward.svg" /></view><view><text class="station-direction-title">{{direction.label}}</text><text class="station-direction-hint">{{direction.hint}}</text></view></view>
+          <view class="station-direction-lines"><button wx:for="{{direction.routes}}" wx:key="routeId" wx:for-item="line" class="station-route-chip {{!line.canUse ? 'station-route-chip--review' : ''}}" style="border-color: {{line.canUse ? line.color + '70' : '#d4dcd6'}}; color: {{line.canUse ? line.color : '#7b857e'}}" data-route-id="{{line.routeId}}" bindtap="handleRouteChange"><text>{{line.name}}</text><text wx:if="{{line.statusText}}" class="direction-line-status">{{line.statusText}}</text></button></view>
+          <view class="station-direction-actions"><button class="subtle-button" disabled="{{!direction.canDepart}}" data-direction-id="{{direction.id}}" data-field="origin" bindtap="handleUseStationDirection">从此方向上车</button><button class="subtle-button" disabled="{{!direction.canArrive}}" data-direction-id="{{direction.id}}" data-field="destination" bindtap="handleUseStationDirection">到此方向下车</button></view>
         </view>
-        <text class="station-footnote">同名近邻仅作展示归拢，实际乘降坐标保留在线路记录中。当前不提供实时车辆或到站预测。</text>
+        <text wx:if="{{!selectedStation.directions.length}}" class="quiet-note">暂无法区分参考方向，可用上方入口自动规划。</text>
+        <text class="station-footnote">参考方向依据发布轨迹，并非已确认的道路两侧站位。分岔线路可点击查看，或由上方入口自动选方向；当前无实时到站信息。</text>
       </view>
 
       <view wx:elif="{{viewMode === 'map'}}" class="sheet-content browse-content">

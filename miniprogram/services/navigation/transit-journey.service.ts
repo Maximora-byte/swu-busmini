@@ -1,10 +1,13 @@
 import type { Coordinate } from '../../models/index'
-import type { TransitDataset, TransitRoute, TransitStop, TransitVisit } from '../../models/current-transit'
+import type { TransitDataset, TransitRoute, TransitStop, TransitVisit, TransitVisitDirection } from '../../models/current-transit'
 import { distanceBetween } from '../../utils/distance'
 import { currentTransitRepository } from '../repository/current-transit.repository'
 import { isAutomaticBoardingVisit } from './transit-visit-policy'
 
-export type TransitJourneyEndpoint = { kind: 'stop'; stopId: string } | { kind: 'coordinate'; coordinate: Coordinate }
+export type TransitJourneyEndpoint = ({ kind: 'stop'; stopId: string } | { kind: 'coordinate'; coordinate: Coordinate }) & {
+  /** Undefined means automatic choice; an empty list explicitly allows no occurrence. */
+  allowedVisits?: readonly TransitVisitDirection[]
+}
 export interface TransitJourneyLeg {
   routeId: string
   routeName: string
@@ -135,8 +138,16 @@ export function createTransitJourneyService(dataset: TransitDataset): TransitJou
   }
 
   function candidates(endpoint: TransitJourneyEndpoint): { candidates: Candidate[]; message: string } {
+    const allowedStops = endpoint?.allowedVisits === undefined ? undefined : new Set(
+      (Array.isArray(endpoint.allowedVisits) ? endpoint.allowedVisits : []).flatMap((rule) => {
+        if (!rule || !Number.isInteger(rule.visitIndex) || !['forward', 'reverse'].includes(rule.directionId)) return []
+        const visit = routes.find((route) => route.id === rule.routeId)?.visits[rule.visitIndex]
+        return visit && isAutomaticBoardingVisit(visit) ? [visit.stopId] : []
+      }))
+    if (allowedStops && !allowedStops.size) return { candidates: [], message: '该参考方向暂无可用乘降点，请查看线路或改用自动规划。' }
     if (endpoint?.kind === 'stop') {
       const stop = stopsById.get(endpoint.stopId)
+      if (allowedStops && !allowedStops.has(endpoint.stopId)) return { candidates: [], message: '所选站点不在该参考方向中，请重新选择。' }
       return stop ? { candidates: [{ stop, distanceMeters: 0 }], message: '' } :
         { candidates: [], message: currentStopIds.has(endpoint.stopId) ?
           '所选站点的位置待核对，暂不作为其线路自动上下车点，请重新选择。' :
@@ -146,7 +157,7 @@ export function createTransitJourneyService(dataset: TransitDataset): TransitJou
       return { candidates: [], message: '地点坐标无效，请重新选择或重新定位。' }
     }
     const nearby = stops.map((stop) => ({ stop, distanceMeters: distanceBetween(endpoint.coordinate, stop.coordinate) }))
-      .filter((candidate) => candidate.distanceMeters <= MAX_CONNECTION_METERS)
+      .filter((candidate) => candidate.distanceMeters <= MAX_CONNECTION_METERS && (!allowedStops || allowedStops.has(candidate.stop.id)))
       .sort((a, b) => a.distanceMeters - b.distanceMeters || a.stop.id.localeCompare(b.stop.id))
       .slice(0, MAX_CANDIDATES)
     return { candidates: nearby, message: nearby.length ? '' : '地点不在服务范围内：800 米内没有当前公布站点。' }
@@ -166,7 +177,13 @@ export function createTransitJourneyService(dataset: TransitDataset): TransitJou
         return { journeys: [], message: '起点和终点位置基本重合，无需乘车，请核对所选位置。' }
       }
       const journeys = new Map<string, TransitJourney>()
+      function allows(endpoint: TransitJourneyEndpoint, ride: Ride, point: 'boarding' | 'alighting') {
+        return endpoint.allowedVisits === undefined || endpoint.allowedVisits.some((rule) => rule?.routeId === ride.route.id &&
+          rule.visitIndex === (point === 'boarding' ? ride.boardingIndex : ride.alightingIndex) &&
+          rule.directionId === (ride.boardingIndex < ride.alightingIndex ? 'forward' : 'reverse'))
+      }
       function add(rides: Ride[], boarding: Candidate, alighting: Candidate) {
+        if (!allows(origin, rides[0], 'boarding') || !allows(destination, rides[rides.length - 1], 'alighting')) return
         const id = JSON.stringify(rides.map((ride) => [ride.route.id, ride.boardingIndex, ride.alightingIndex]))
         if (journeys.has(id)) return
         journeys.set(id, {
