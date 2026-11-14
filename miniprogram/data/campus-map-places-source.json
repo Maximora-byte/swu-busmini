@@ -1,0 +1,3276 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-11-13",
+  "osmBaseTimestamp": "2026-11-13T14:37:36Z",
+  "license": {
+    "name": "Open Database License (ODbL) 1.0",
+    "attribution": "© OpenStreetMap contributors",
+    "url": "https://www.openstreetmap.org/copyright",
+    "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/"
+  },
+  "campusBoundary": {
+    "type": "way",
+    "id": 413071891,
+    "version": 21,
+    "timestamp": "2023-07-21T17:50:00Z",
+    "bounds": {
+      "minlat": 29.8130522,
+      "minlon": 106.406342,
+      "maxlat": 29.8334274,
+      "maxlon": 106.430351
+    },
+    "url": "https://www.openstreetmap.org/way/413071891"
+  },
+  "sourceQuality": "Community map references plus user-confirmed building aliases; not field-surveyed entrances",
+  "guideAttribution": "西南大学校园论坛频道（用户提供图文）",
+  "guideDocumentDate": null,
+  "places": [
+    {
+      "id": "osm:relation:4064344",
+      "name": "37教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81530625,
+        "longitude": 106.4128016
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 4064344,
+        "version": 1,
+        "timestamp": "2014-09-25T02:49:08Z",
+        "url": "https://www.openstreetmap.org/relation/4064344"
+      }
+    },
+    {
+      "id": "osm:relation:5477110",
+      "name": "西南大学行政楼",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8171383,
+        "longitude": 106.4134289
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 5477110,
+        "version": 3,
+        "timestamp": "2020-08-26T17:42:14Z",
+        "url": "https://www.openstreetmap.org/relation/5477110"
+      }
+    },
+    {
+      "id": "osm:relation:11546903",
+      "name": "第二学生活动中心",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8181949,
+        "longitude": 106.4157713
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11546903,
+        "version": 2,
+        "timestamp": "2021-04-02T15:16:23Z",
+        "url": "https://www.openstreetmap.org/relation/11546903"
+      }
+    },
+    {
+      "id": "osm:relation:11546904",
+      "name": "31教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8166056,
+        "longitude": 106.416542
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11546904,
+        "version": 2,
+        "timestamp": "2021-04-02T15:16:23Z",
+        "url": "https://www.openstreetmap.org/relation/11546904"
+      }
+    },
+    {
+      "id": "osm:relation:11547708",
+      "name": "农学部",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81524975,
+        "longitude": 106.41134335
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11547708,
+        "version": 2,
+        "timestamp": "2021-04-02T15:16:23Z",
+        "url": "https://www.openstreetmap.org/relation/11547708"
+      }
+    },
+    {
+      "id": "osm:relation:11547709",
+      "name": "经济管理学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81422095,
+        "longitude": 106.4092274
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11547709,
+        "version": 2,
+        "timestamp": "2021-04-02T15:16:23Z",
+        "url": "https://www.openstreetmap.org/relation/11547709"
+      }
+    },
+    {
+      "id": "osm:relation:11548064",
+      "name": "32教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8160111,
+        "longitude": 106.41299515
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11548064,
+        "version": 2,
+        "timestamp": "2021-04-02T15:16:23Z",
+        "url": "https://www.openstreetmap.org/relation/11548064"
+      }
+    },
+    {
+      "id": "osm:relation:11548065",
+      "name": "西南大学30教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8140879,
+        "longitude": 106.4137302
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11548065,
+        "version": 2,
+        "timestamp": "2021-04-02T15:16:23Z",
+        "url": "https://www.openstreetmap.org/relation/11548065"
+      }
+    },
+    {
+      "id": "osm:relation:11564255",
+      "name": "西南大学培训学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8153926,
+        "longitude": 106.41606135
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11564255,
+        "version": 2,
+        "timestamp": "2021-04-02T15:16:23Z",
+        "url": "https://www.openstreetmap.org/relation/11564255"
+      }
+    },
+    {
+      "id": "osm:relation:11564781",
+      "name": "崇实图书馆",
+      "aliases": [],
+      "category": "library",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8157618,
+        "longitude": 106.41501595
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11564781,
+        "version": 2,
+        "timestamp": "2021-04-02T15:16:23Z",
+        "url": "https://www.openstreetmap.org/relation/11564781"
+      }
+    },
+    {
+      "id": "osm:relation:11661636",
+      "name": "茶园一舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8186189,
+        "longitude": 106.41234955
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "relation",
+        "id": 11661636,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/relation/11661636"
+      }
+    },
+    {
+      "id": "osm:way:210254155",
+      "name": "27教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8257044,
+        "longitude": 106.4185312
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 210254155,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/210254155"
+      }
+    },
+    {
+      "id": "osm:way:210254156",
+      "name": "26教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82519795,
+        "longitude": 106.41810155
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 210254156,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/210254156"
+      }
+    },
+    {
+      "id": "osm:way:210254157",
+      "name": "28教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82590185,
+        "longitude": 106.4190977
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 210254157,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/210254157"
+      }
+    },
+    {
+      "id": "osm:way:304932135",
+      "name": "西南大学资源与环境学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81423395,
+        "longitude": 106.41181045
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 304932135,
+        "version": 5,
+        "timestamp": "2020-08-26T16:18:32Z",
+        "url": "https://www.openstreetmap.org/way/304932135"
+      }
+    },
+    {
+      "id": "osm:way:304932137",
+      "name": "动物科技学院",
+      "aliases": [
+        "西南大学37教学楼",
+        "宏朴楼"
+      ],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81530625,
+        "longitude": 106.4128016
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 304932137,
+        "version": 9,
+        "timestamp": "2020-08-26T17:42:14Z",
+        "url": "https://www.openstreetmap.org/way/304932137"
+      }
+    },
+    {
+      "id": "osm:way:304955278",
+      "name": "竹园食堂",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8185349,
+        "longitude": 106.4114672
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 304955278,
+        "version": 6,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/304955278"
+      }
+    },
+    {
+      "id": "osm:way:305935503",
+      "name": "西南大学植物保护学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81482315,
+        "longitude": 106.41393755
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 305935503,
+        "version": 2,
+        "timestamp": "2020-08-31T13:00:30Z",
+        "url": "https://www.openstreetmap.org/way/305935503"
+      }
+    },
+    {
+      "id": "osm:way:305935504",
+      "name": "西南大学33教学楼",
+      "aliases": [
+        "33教学楼",
+        "同庆楼"
+      ],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81587845,
+        "longitude": 106.4142139
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 305935504,
+        "version": 3,
+        "timestamp": "2020-08-26T17:42:14Z",
+        "url": "https://www.openstreetmap.org/way/305935504"
+      }
+    },
+    {
+      "id": "osm:way:305935505",
+      "name": "蚕桑纺织与生物质科学学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81641785,
+        "longitude": 106.4128097
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 305935505,
+        "version": 2,
+        "timestamp": "2020-08-26T17:42:14Z",
+        "url": "https://www.openstreetmap.org/way/305935505"
+      }
+    },
+    {
+      "id": "osm:way:305935506",
+      "name": "食品科学学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8147275,
+        "longitude": 106.41273135
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 305935506,
+        "version": 3,
+        "timestamp": "2026-10-23T18:00:08Z",
+        "url": "https://www.openstreetmap.org/way/305935506"
+      }
+    },
+    {
+      "id": "osm:way:350242130",
+      "name": "西南大学地理科学学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8241302,
+        "longitude": 106.41891865
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 350242130,
+        "version": 3,
+        "timestamp": "2020-09-02T10:14:41Z",
+        "url": "https://www.openstreetmap.org/way/350242130"
+      }
+    },
+    {
+      "id": "osm:way:350242168",
+      "name": "西南大学中心图书馆",
+      "aliases": [],
+      "category": "library",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82306145,
+        "longitude": 106.4204318
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 350242168,
+        "version": 4,
+        "timestamp": "2020-08-31T14:38:41Z",
+        "url": "https://www.openstreetmap.org/way/350242168"
+      }
+    },
+    {
+      "id": "osm:way:368578309",
+      "name": "家蚕基因组国家重点实验室",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81758765,
+        "longitude": 106.41545485
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368578309,
+        "version": 2,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/way/368578309"
+      }
+    },
+    {
+      "id": "osm:way:368578312",
+      "name": "楠园第二食堂",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81909405,
+        "longitude": 106.4160995
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368578312,
+        "version": 3,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/way/368578312"
+      }
+    },
+    {
+      "id": "osm:way:368589378",
+      "name": "西南大学光大礼堂",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82170355,
+        "longitude": 106.4178991
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368589378,
+        "version": 2,
+        "timestamp": "2020-08-31T14:38:41Z",
+        "url": "https://www.openstreetmap.org/way/368589378"
+      }
+    },
+    {
+      "id": "osm:way:368589379",
+      "name": "八一楼",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8221574,
+        "longitude": 106.42007085
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368589379,
+        "version": 3,
+        "timestamp": "2022-02-17T11:57:59Z",
+        "url": "https://www.openstreetmap.org/way/368589379"
+      }
+    },
+    {
+      "id": "osm:way:368589387",
+      "name": "楠园第一食堂",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82032815,
+        "longitude": 106.415309
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368589387,
+        "version": 4,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/way/368589387"
+      }
+    },
+    {
+      "id": "osm:way:368597446",
+      "name": "实验室 蚕桑纺织与生物质科学学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81593875,
+        "longitude": 106.4109546
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368597446,
+        "version": 2,
+        "timestamp": "2020-08-26T16:18:32Z",
+        "url": "https://www.openstreetmap.org/way/368597446"
+      }
+    },
+    {
+      "id": "osm:way:368597447",
+      "name": "西南大学农业机械实验室",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8158672,
+        "longitude": 106.4115344
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368597447,
+        "version": 2,
+        "timestamp": "2020-08-26T16:18:32Z",
+        "url": "https://www.openstreetmap.org/way/368597447"
+      }
+    },
+    {
+      "id": "osm:way:368605817",
+      "name": "西南大学田家炳教育书院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8268617,
+        "longitude": 106.42470975
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368605817,
+        "version": 2,
+        "timestamp": "2020-09-13T10:50:53Z",
+        "url": "https://www.openstreetmap.org/way/368605817"
+      }
+    },
+    {
+      "id": "osm:way:368605820",
+      "name": "西南大学文学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82833335,
+        "longitude": 106.42475715
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 368605820,
+        "version": 2,
+        "timestamp": "2020-09-13T10:50:53Z",
+        "url": "https://www.openstreetmap.org/way/368605820"
+      }
+    },
+    {
+      "id": "osm:way:371876810",
+      "name": "西南大学档案馆",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81755665,
+        "longitude": 106.4135387
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 371876810,
+        "version": 2,
+        "timestamp": "2020-08-26T17:42:14Z",
+        "url": "https://www.openstreetmap.org/way/371876810"
+      }
+    },
+    {
+      "id": "osm:way:840830753",
+      "name": "茶园五舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81961775,
+        "longitude": 106.41367375
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840830753,
+        "version": 5,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840830753"
+      }
+    },
+    {
+      "id": "osm:way:840830754",
+      "name": "茶园四舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8193971,
+        "longitude": 106.41340025
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840830754,
+        "version": 4,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840830754"
+      }
+    },
+    {
+      "id": "osm:way:840830755",
+      "name": "茶园三舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81913595,
+        "longitude": 106.4130946
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840830755,
+        "version": 5,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840830755"
+      }
+    },
+    {
+      "id": "osm:way:840830756",
+      "name": "茶园二舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8188875,
+        "longitude": 106.41267665
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840830756,
+        "version": 5,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840830756"
+      }
+    },
+    {
+      "id": "osm:way:840830760",
+      "name": "茶园六舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81911135,
+        "longitude": 106.4133818
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840830760,
+        "version": 4,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840830760"
+      }
+    },
+    {
+      "id": "osm:way:840863405",
+      "name": "楠园四舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8191473,
+        "longitude": 106.4146719
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840863405,
+        "version": 1,
+        "timestamp": "2020-08-26T10:15:24Z",
+        "url": "https://www.openstreetmap.org/way/840863405"
+      }
+    },
+    {
+      "id": "osm:way:840863406",
+      "name": "楠园一舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8188767,
+        "longitude": 106.41525285
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840863406,
+        "version": 1,
+        "timestamp": "2020-08-26T10:15:24Z",
+        "url": "https://www.openstreetmap.org/way/840863406"
+      }
+    },
+    {
+      "id": "osm:way:840863409",
+      "name": "电子信息工程学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81941145,
+        "longitude": 106.4152013
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840863409,
+        "version": 1,
+        "timestamp": "2020-08-26T10:15:24Z",
+        "url": "https://www.openstreetmap.org/way/840863409"
+      }
+    },
+    {
+      "id": "osm:way:840863417",
+      "name": "博学楼（电子信息工程学院）",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81812145,
+        "longitude": 106.4150517
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840863417,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840863417"
+      }
+    },
+    {
+      "id": "osm:way:840863418",
+      "name": "楠园八舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8197245,
+        "longitude": 106.41457605
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840863418,
+        "version": 1,
+        "timestamp": "2020-08-26T10:15:24Z",
+        "url": "https://www.openstreetmap.org/way/840863418"
+      }
+    },
+    {
+      "id": "osm:way:840863419",
+      "name": "楠园五舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82018305,
+        "longitude": 106.4148602
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840863419,
+        "version": 1,
+        "timestamp": "2020-08-26T10:15:24Z",
+        "url": "https://www.openstreetmap.org/way/840863419"
+      }
+    },
+    {
+      "id": "osm:way:840863426",
+      "name": "楠园四舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82001575,
+        "longitude": 106.41572645
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840863426,
+        "version": 1,
+        "timestamp": "2020-08-26T10:15:24Z",
+        "url": "https://www.openstreetmap.org/way/840863426"
+      }
+    },
+    {
+      "id": "osm:way:840894848",
+      "name": "竹园八舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81968695,
+        "longitude": 106.41247365
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840894848,
+        "version": 3,
+        "timestamp": "2021-05-19T05:48:41Z",
+        "url": "https://www.openstreetmap.org/way/840894848"
+      }
+    },
+    {
+      "id": "osm:way:840894849",
+      "name": "竹园七舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81933255,
+        "longitude": 106.4119117
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840894849,
+        "version": 3,
+        "timestamp": "2021-05-19T05:48:41Z",
+        "url": "https://www.openstreetmap.org/way/840894849"
+      }
+    },
+    {
+      "id": "osm:way:840894850",
+      "name": "楠园六舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8197164,
+        "longitude": 106.4155493
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840894850,
+        "version": 1,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/way/840894850"
+      }
+    },
+    {
+      "id": "osm:way:840894851",
+      "name": "楠园九舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81973275,
+        "longitude": 106.4161813
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840894851,
+        "version": 1,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/way/840894851"
+      }
+    },
+    {
+      "id": "osm:way:840894862",
+      "name": "楠园三舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81856835,
+        "longitude": 106.41593835
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840894862,
+        "version": 1,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/way/840894862"
+      }
+    },
+    {
+      "id": "osm:way:840894874",
+      "name": "西南大学法学院（38教学楼）",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81769755,
+        "longitude": 106.41482095
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840894874,
+        "version": 1,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/way/840894874"
+      }
+    },
+    {
+      "id": "osm:way:840894884",
+      "name": "科技大楼",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81719895,
+        "longitude": 106.4168689
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840894884,
+        "version": 1,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/way/840894884"
+      }
+    },
+    {
+      "id": "osm:way:840953773",
+      "name": "留学生公寓",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82036815,
+        "longitude": 106.4137621
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840953773,
+        "version": 3,
+        "timestamp": "2021-05-19T05:48:41Z",
+        "url": "https://www.openstreetmap.org/way/840953773"
+      }
+    },
+    {
+      "id": "osm:way:840969967",
+      "name": "竹园二舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81927715,
+        "longitude": 106.4101845
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840969967,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840969967"
+      }
+    },
+    {
+      "id": "osm:way:840969968",
+      "name": "竹园一舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8184268,
+        "longitude": 106.4106629
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840969968,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840969968"
+      }
+    },
+    {
+      "id": "osm:way:840969969",
+      "name": "竹园四舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81902235,
+        "longitude": 106.40989275
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840969969,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840969969"
+      }
+    },
+    {
+      "id": "osm:way:840969971",
+      "name": "竹园三舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81835105,
+        "longitude": 106.41026975
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840969971,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840969971"
+      }
+    },
+    {
+      "id": "osm:way:840969972",
+      "name": "竹园五舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81824675,
+        "longitude": 106.40969245
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840969972,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840969972"
+      }
+    },
+    {
+      "id": "osm:way:840969973",
+      "name": "竹园六舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8186091,
+        "longitude": 106.40953645
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840969973,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/840969973"
+      }
+    },
+    {
+      "id": "osm:way:840969991",
+      "name": "新工科实验大楼",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8152115,
+        "longitude": 106.4120843
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840969991,
+        "version": 4,
+        "timestamp": "2026-10-23T18:00:08Z",
+        "url": "https://www.openstreetmap.org/way/840969991"
+      }
+    },
+    {
+      "id": "osm:way:842727306",
+      "name": "楠园二舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82090745,
+        "longitude": 106.415353
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 842727306,
+        "version": 1,
+        "timestamp": "2020-08-31T13:00:30Z",
+        "url": "https://www.openstreetmap.org/way/842727306"
+      }
+    },
+    {
+      "id": "osm:way:842727309",
+      "name": "西南大学校史馆",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8206783,
+        "longitude": 106.4173521
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 842727309,
+        "version": 2,
+        "timestamp": "2020-09-13T10:50:53Z",
+        "url": "https://www.openstreetmap.org/way/842727309"
+      }
+    },
+    {
+      "id": "osm:way:842727329",
+      "name": "Property Management Centre, S.W.U",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8151265,
+        "longitude": 106.416884
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 842727329,
+        "version": 1,
+        "timestamp": "2020-08-31T13:00:30Z",
+        "url": "https://www.openstreetmap.org/way/842727329"
+      }
+    },
+    {
+      "id": "osm:way:842765838",
+      "name": "网络与继续教育学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8224285,
+        "longitude": 106.417857
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 842765838,
+        "version": 1,
+        "timestamp": "2020-08-31T14:38:41Z",
+        "url": "https://www.openstreetmap.org/way/842765838"
+      }
+    },
+    {
+      "id": "osm:way:842765846",
+      "name": "体育学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82026575,
+        "longitude": 106.41986935
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 842765846,
+        "version": 1,
+        "timestamp": "2020-08-31T14:38:41Z",
+        "url": "https://www.openstreetmap.org/way/842765846"
+      }
+    },
+    {
+      "id": "osm:way:843421731",
+      "name": "22教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8223622,
+        "longitude": 106.41937715
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421731,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421731"
+      }
+    },
+    {
+      "id": "osm:way:843421743",
+      "name": "李园四舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8240447,
+        "longitude": 106.42085835
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421743,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421743"
+      }
+    },
+    {
+      "id": "osm:way:843421745",
+      "name": "李园五舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8237648,
+        "longitude": 106.42109435
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421745,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421745"
+      }
+    },
+    {
+      "id": "osm:way:843421746",
+      "name": "李园六舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8234901,
+        "longitude": 106.421437
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421746,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421746"
+      }
+    },
+    {
+      "id": "osm:way:843421747",
+      "name": "李园七舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8231816,
+        "longitude": 106.42185185
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421747,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421747"
+      }
+    },
+    {
+      "id": "osm:way:843421748",
+      "name": "李园八舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82340185,
+        "longitude": 106.42239015
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421748,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421748"
+      }
+    },
+    {
+      "id": "osm:way:843421749",
+      "name": "李园一舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8237174,
+        "longitude": 106.42206335
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421749,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421749"
+      }
+    },
+    {
+      "id": "osm:way:843421750",
+      "name": "李园二舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8240222,
+        "longitude": 106.4216687
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421750,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421750"
+      }
+    },
+    {
+      "id": "osm:way:843421751",
+      "name": "李园三舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82434885,
+        "longitude": 106.4214091
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421751,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421751"
+      }
+    },
+    {
+      "id": "osm:way:843421757",
+      "name": "李园学生食堂",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8225649,
+        "longitude": 106.42242415
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421757,
+        "version": 2,
+        "timestamp": "2020-09-13T10:50:53Z",
+        "url": "https://www.openstreetmap.org/way/843421757"
+      }
+    },
+    {
+      "id": "osm:way:843421759",
+      "name": "西南大学音乐学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82312245,
+        "longitude": 106.4232307
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421759,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421759"
+      }
+    },
+    {
+      "id": "osm:way:843421763",
+      "name": "8教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8247556,
+        "longitude": 106.42224145
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421763,
+        "version": 2,
+        "timestamp": "2021-08-17T10:27:56Z",
+        "url": "https://www.openstreetmap.org/way/843421763"
+      }
+    },
+    {
+      "id": "osm:way:843421764",
+      "name": "7教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82456335,
+        "longitude": 106.4227852
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421764,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421764"
+      }
+    },
+    {
+      "id": "osm:way:843421765",
+      "name": "新闻传媒学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8253057,
+        "longitude": 106.4227051
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421765,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421765"
+      }
+    },
+    {
+      "id": "osm:way:843421766",
+      "name": "14教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82498375,
+        "longitude": 106.4232641
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421766,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421766"
+      }
+    },
+    {
+      "id": "osm:way:843421773",
+      "name": "西南大学美术学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82458905,
+        "longitude": 106.4260971
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421773,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421773"
+      }
+    },
+    {
+      "id": "osm:way:843421780",
+      "name": "西南大学弘文图书馆",
+      "aliases": [],
+      "category": "library",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82729275,
+        "longitude": 106.42583605
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421780,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843421780"
+      }
+    },
+    {
+      "id": "osm:way:843421800",
+      "name": "禾丰楼",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82909275,
+        "longitude": 106.4273906
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421800,
+        "version": 2,
+        "timestamp": "2021-05-05T08:19:19Z",
+        "url": "https://www.openstreetmap.org/way/843421800"
+      }
+    },
+    {
+      "id": "osm:way:843421806",
+      "name": "17号教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.83203005,
+        "longitude": 106.4289499
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421806,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/843421806"
+      }
+    },
+    {
+      "id": "osm:way:843421814",
+      "name": "圆顶",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8284656,
+        "longitude": 106.4268141
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421814,
+        "version": 2,
+        "timestamp": "2021-05-05T08:19:19Z",
+        "url": "https://www.openstreetmap.org/way/843421814"
+      }
+    },
+    {
+      "id": "osm:way:843421823",
+      "name": "化学化工学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82538505,
+        "longitude": 106.41680935
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843421823,
+        "version": 2,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/way/843421823"
+      }
+    },
+    {
+      "id": "osm:way:843465219",
+      "name": "梅园四舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8260275,
+        "longitude": 106.41740185
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465219,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465219"
+      }
+    },
+    {
+      "id": "osm:way:843465220",
+      "name": "梅园三舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82629885,
+        "longitude": 106.41772995
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465220,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465220"
+      }
+    },
+    {
+      "id": "osm:way:843465221",
+      "name": "梅园二舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82650935,
+        "longitude": 106.4181084
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465221,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465221"
+      }
+    },
+    {
+      "id": "osm:way:843465222",
+      "name": "梅园一舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82662585,
+        "longitude": 106.41853755
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465222,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465222"
+      }
+    },
+    {
+      "id": "osm:way:843465223",
+      "name": "梅园学生食堂",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8268301,
+        "longitude": 106.4191051
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465223,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465223"
+      }
+    },
+    {
+      "id": "osm:way:843465224",
+      "name": "西南大学西塔学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8268699,
+        "longitude": 106.42014415
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465224,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465224"
+      }
+    },
+    {
+      "id": "osm:way:843465225",
+      "name": "西南大学数学与统计学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.825976,
+        "longitude": 106.4220026
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465225,
+        "version": 2,
+        "timestamp": "2022-08-06T15:07:35Z",
+        "url": "https://www.openstreetmap.org/way/843465225"
+      }
+    },
+    {
+      "id": "osm:way:843465226",
+      "name": "29教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82503315,
+        "longitude": 106.419253
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465226,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465226"
+      }
+    },
+    {
+      "id": "osm:way:843465238",
+      "name": "25教学楼",
+      "aliases": [
+        "西南大学计算机与信息科学学院 软件学院"
+      ],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82511305,
+        "longitude": 106.4202302
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465238,
+        "version": 3,
+        "timestamp": "2022-08-06T15:07:35Z",
+        "url": "https://www.openstreetmap.org/way/843465238"
+      }
+    },
+    {
+      "id": "osm:way:843465255",
+      "name": "10教学楼",
+      "aliases": [],
+      "category": "teaching_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82936815,
+        "longitude": 106.4250564
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465255,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465255"
+      }
+    },
+    {
+      "id": "osm:way:843465268",
+      "name": "桃园六舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.830339,
+        "longitude": 106.4242725
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465268,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465268"
+      }
+    },
+    {
+      "id": "osm:way:843465269",
+      "name": "桃园五舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.830302,
+        "longitude": 106.423843
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465269,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465269"
+      }
+    },
+    {
+      "id": "osm:way:843465270",
+      "name": "桃园四舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82998855,
+        "longitude": 106.42391355
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465270,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465270"
+      }
+    },
+    {
+      "id": "osm:way:843465271",
+      "name": "桃园学生食堂",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8303377,
+        "longitude": 106.42304395
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465271,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465271"
+      }
+    },
+    {
+      "id": "osm:way:843465272",
+      "name": "桃园三舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8300309,
+        "longitude": 106.42295135
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465272,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465272"
+      }
+    },
+    {
+      "id": "osm:way:843465273",
+      "name": "桃园二舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.829765,
+        "longitude": 106.42316565
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465273,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465273"
+      }
+    },
+    {
+      "id": "osm:way:843465274",
+      "name": "桃园一舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8294919,
+        "longitude": 106.4231984
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465274,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465274"
+      }
+    },
+    {
+      "id": "osm:way:843465275",
+      "name": "西南大学马克思主义学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8292271,
+        "longitude": 106.42390125
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465275,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465275"
+      }
+    },
+    {
+      "id": "osm:way:843465284",
+      "name": "橘园学生食堂",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8291482,
+        "longitude": 106.42211405
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465284,
+        "version": 3,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465284"
+      }
+    },
+    {
+      "id": "osm:way:843465285",
+      "name": "橘园五舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82877155,
+        "longitude": 106.4212221
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465285,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465285"
+      }
+    },
+    {
+      "id": "osm:way:843465286",
+      "name": "橘园四舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8284935,
+        "longitude": 106.4214045
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465286,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465286"
+      }
+    },
+    {
+      "id": "osm:way:843465287",
+      "name": "橘园三舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8282189,
+        "longitude": 106.4215922
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465287,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465287"
+      }
+    },
+    {
+      "id": "osm:way:843465288",
+      "name": "橘园八舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82838205,
+        "longitude": 106.4205171
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465288,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465288"
+      }
+    },
+    {
+      "id": "osm:way:843465289",
+      "name": "橘园九舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8281282,
+        "longitude": 106.42068295
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465289,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465289"
+      }
+    },
+    {
+      "id": "osm:way:843465290",
+      "name": "橘园十舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8278792,
+        "longitude": 106.4208573
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465290,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465290"
+      }
+    },
+    {
+      "id": "osm:way:843465291",
+      "name": "橘园十三舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82817315,
+        "longitude": 106.419308
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465291,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465291"
+      }
+    },
+    {
+      "id": "osm:way:843465293",
+      "name": "橘园六舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8289134,
+        "longitude": 106.42088
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465293,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465293"
+      }
+    },
+    {
+      "id": "osm:way:843465299",
+      "name": "杏园C栋",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82717985,
+        "longitude": 106.4219536
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465299,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465299"
+      }
+    },
+    {
+      "id": "osm:way:843465303",
+      "name": "橘园一舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8276814,
+        "longitude": 106.42229645
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465303,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465303"
+      }
+    },
+    {
+      "id": "osm:way:843465304",
+      "name": "橘园二舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8280632,
+        "longitude": 106.42216635
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465304,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465304"
+      }
+    },
+    {
+      "id": "osm:way:843465305",
+      "name": "杏园D栋",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82698065,
+        "longitude": 106.42220815
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465305,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465305"
+      }
+    },
+    {
+      "id": "osm:way:843465306",
+      "name": "杏园E栋",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82673495,
+        "longitude": 106.4223581
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465306,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465306"
+      }
+    },
+    {
+      "id": "osm:way:843465307",
+      "name": "杏园B栋",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8271451,
+        "longitude": 106.4227776
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465307,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465307"
+      }
+    },
+    {
+      "id": "osm:way:843465308",
+      "name": "杏园A栋",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8274363,
+        "longitude": 106.422707
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465308,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465308"
+      }
+    },
+    {
+      "id": "osm:way:843465309",
+      "name": "杏园F栋",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8267251,
+        "longitude": 106.42142935
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465309,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465309"
+      }
+    },
+    {
+      "id": "osm:way:843465312",
+      "name": "西南大学网络与继续教育学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82363255,
+        "longitude": 106.41848975
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465312,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465312"
+      }
+    },
+    {
+      "id": "osm:way:843465313",
+      "name": "西南大学心理学部",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8234226,
+        "longitude": 106.41785435
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465313,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465313"
+      }
+    },
+    {
+      "id": "osm:way:843465314",
+      "name": "西南大学外国语学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.82397125,
+        "longitude": 106.4172438
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 843465314,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/843465314"
+      }
+    },
+    {
+      "id": "osm:way:846878931",
+      "name": "橘园十一舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8276052,
+        "longitude": 106.42001055
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 846878931,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/846878931"
+      }
+    },
+    {
+      "id": "osm:way:846878932",
+      "name": "橘园十二舍",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8279767,
+        "longitude": 106.4197557
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 846878932,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/846878932"
+      }
+    },
+    {
+      "id": "osm:way:846878934",
+      "name": "北区博士后公寓",
+      "aliases": [],
+      "category": "dormitory",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8264561,
+        "longitude": 106.4216084
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 846878934,
+        "version": 2,
+        "timestamp": "2021-10-28T15:03:19Z",
+        "url": "https://www.openstreetmap.org/way/846878934"
+      }
+    },
+    {
+      "id": "osm:node:3106346026",
+      "name": "竹园园区阅览室",
+      "aliases": [],
+      "category": "library",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8187999,
+        "longitude": 106.4101674
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 3106346026,
+        "version": 1,
+        "timestamp": "2014-10-02T04:50:23Z",
+        "url": "https://www.openstreetmap.org/node/3106346026"
+      }
+    },
+    {
+      "id": "osm:node:7846331369",
+      "name": "含蕴",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8202198,
+        "longitude": 106.4153376
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 7846331369,
+        "version": 1,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/node/7846331369"
+      }
+    },
+    {
+      "id": "osm:node:7846331384",
+      "name": "小吃部",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8192288,
+        "longitude": 106.4161056
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 7846331384,
+        "version": 1,
+        "timestamp": "2020-08-26T11:57:30Z",
+        "url": "https://www.openstreetmap.org/node/7846331384"
+      }
+    },
+    {
+      "id": "osm:node:7847151677",
+      "name": "蚕桑纺织与生物质科学学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8160933,
+        "longitude": 106.4142965
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 7847151677,
+        "version": 1,
+        "timestamp": "2020-08-26T17:42:14Z",
+        "url": "https://www.openstreetmap.org/node/7847151677"
+      }
+    },
+    {
+      "id": "osm:node:7847151706",
+      "name": "园艺园林学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8158931,
+        "longitude": 106.413988
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 7847151706,
+        "version": 1,
+        "timestamp": "2020-08-26T17:42:14Z",
+        "url": "https://www.openstreetmap.org/node/7847151706"
+      }
+    },
+    {
+      "id": "osm:node:14314672014",
+      "name": "化学化工与药学实验楼",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8251847,
+        "longitude": 106.4166896
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 14314672014,
+        "version": 1,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/node/14314672014"
+      }
+    },
+    {
+      "id": "osm:node:14314672015",
+      "name": "民族餐厅",
+      "aliases": [],
+      "category": "canteen",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8269094,
+        "longitude": 106.4192332
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 14314672015,
+        "version": 1,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/node/14314672015"
+      }
+    },
+    {
+      "id": "osm:node:14314672016",
+      "name": "重庆市兽药工程技术研究中心",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8182713,
+        "longitude": 106.414739
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 14314672016,
+        "version": 1,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/node/14314672016"
+      }
+    },
+    {
+      "id": "osm:node:14314672022",
+      "name": "蚕学宫",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8176886,
+        "longitude": 106.4154878
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 14314672022,
+        "version": 1,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/node/14314672022"
+      }
+    },
+    {
+      "id": "osm:node:14314672023",
+      "name": "资源昆虫高效养殖与利用全国重点实验室",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8174428,
+        "longitude": 106.4154214
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 14314672023,
+        "version": 1,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/node/14314672023"
+      }
+    },
+    {
+      "id": "osm:node:14314672036",
+      "name": "人工智能学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8323557,
+        "longitude": 106.4296111
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 14314672036,
+        "version": 1,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/node/14314672036"
+      }
+    },
+    {
+      "id": "osm:node:14314672037",
+      "name": "工程技术学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8155761,
+        "longitude": 106.41206
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 14314672037,
+        "version": 1,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/node/14314672037"
+      }
+    },
+    {
+      "id": "osm:node:14314672038",
+      "name": "水产学院",
+      "aliases": [],
+      "category": "academic_building",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8141813,
+        "longitude": 106.4137512
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 14314672038,
+        "version": 1,
+        "timestamp": "2026-10-24T07:07:00Z",
+        "url": "https://www.openstreetmap.org/node/14314672038"
+      }
+    },
+    {
+      "id": "osm:node:3724521758",
+      "name": "西南大学三号门",
+      "aliases": [],
+      "category": "gate",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8219182,
+        "longitude": 106.4225865
+      },
+      "coordinateKind": "mapped-node",
+      "osm": {
+        "type": "node",
+        "id": 3724521758,
+        "version": 3,
+        "timestamp": "2022-02-17T11:57:59Z",
+        "url": "https://www.openstreetmap.org/node/3724521758"
+      },
+      "accessNotes": "OSM标注该点禁止步行通行，不可视作步行入口。"
+    },
+    {
+      "id": "osm:way:371876809",
+      "name": "西南大学医院（二院）",
+      "aliases": [],
+      "category": "guide_matched_facility",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.81540925,
+        "longitude": 106.41691075
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 371876809,
+        "version": 2,
+        "timestamp": "2020-08-31T13:00:30Z",
+        "url": "https://www.openstreetmap.org/way/371876809"
+      }
+    },
+    {
+      "id": "osm:way:840987852",
+      "name": "第三游泳池",
+      "aliases": [],
+      "category": "guide_matched_facility",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8170653,
+        "longitude": 106.4176931
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 840987852,
+        "version": 1,
+        "timestamp": "2020-08-26T17:42:14Z",
+        "url": "https://www.openstreetmap.org/way/840987852"
+      }
+    },
+    {
+      "id": "osm:way:842765836",
+      "name": "第二游泳池",
+      "aliases": [],
+      "category": "guide_matched_facility",
+      "coordinateSystem": "WGS84",
+      "coordinate": {
+        "latitude": 29.8215118,
+        "longitude": 106.41740505
+      },
+      "coordinateKind": "area-center",
+      "osm": {
+        "type": "way",
+        "id": 842765836,
+        "version": 1,
+        "timestamp": "2020-08-31T14:38:41Z",
+        "url": "https://www.openstreetmap.org/way/842765836"
+      }
+    }
+  ],
+  "guides": [
+    {
+      "id": "guide:north-admin",
+      "name": "行署楼",
+      "aliases": [
+        "第一行政楼",
+        "北区行政楼",
+        "北区署楼",
+        "中国共产党西南大学委员会",
+        "校党委",
+        "党委宣传部",
+        "党委组织部",
+        "西南大学校行政",
+        "校行政",
+        "中国共产党西南大学纪律检查委员会",
+        "校纪委",
+        "东方红会议厅"
+      ],
+      "anchorId": null,
+      "details": "图中“北区行政/署楼”展开为两种写法。不要与南区行政楼合并。 中国共产党西南大学委员会：图文所列校党委及部门办公。 西南大学校行政：不将泛称西南大学当作此建筑的搜索别名。 中国共产党西南大学纪律检查委员会： 东方红会议厅：",
+      "sourceImages": [
+        1,
+        9
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:south-admin",
+      "name": "南区行政楼",
+      "aliases": [
+        "文俊楼",
+        "第二行政楼",
+        "行政楼",
+        "本科生院",
+        "教学运行科",
+        "成绩与学籍管理科",
+        "研究生院",
+        "研究生招生办",
+        "南区师生服务中心",
+        "魔芋协会"
+      ],
+      "anchorId": null,
+      "details": "“行政楼”在该指南指向南区。OSM泛名行政楼尚需独立确认。 本科生院：2楼。指南称2024年12月机构改革后，本科教务请去本科生院。 研究生院：4楼。指南说明原研究生院（八一楼）改造期间的临时办公点；是否仍临时须复核。 南区师生服务中心：1楼靠近法学院。",
+      "sourceImages": [
+        1,
+        5
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:north-student-centre",
+      "name": "圆顶",
+      "aliases": [
+        "圆顶学生活动中心",
+        "北区学生活动中心",
+        "第一学生活动中心",
+        "共青团西南大学委员会",
+        "校团委",
+        "青春西大",
+        "学生职业发展与就业服务中心",
+        "就业中心",
+        "就业处",
+        "北区招聘大厅",
+        "招聘大厅",
+        "圆顶1楼报告厅",
+        "圆顶1楼活动中心",
+        "圆顶3楼报告厅",
+        "圆顶3楼活动中心"
+      ],
+      "anchorId": "osm:way:843421814",
+      "details": "共青团西南大学委员会：照片左侧4楼。 学生职业发展与就业服务中心：照片左侧3楼；部分办事点在301办公室，不记录工作人员姓名。 北区招聘大厅：照片左侧1楼。单独写招聘大厅时指南默认北区。 圆顶1楼报告厅：照片右侧1楼。 圆顶3楼报告厅：照片右侧3楼。",
+      "sourceImages": [
+        1,
+        3
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:south-student-centre",
+      "name": "南区学生活动中心",
+      "aliases": [
+        "南活",
+        "第二学生活动中心",
+        "厚生楼",
+        "南活107报告厅",
+        "党委学生工作部 学生工作处 武装部",
+        "学生处",
+        "学工处",
+        "学工部",
+        "西小办",
+        "心理健康教育服务中心",
+        "心理咨询",
+        "袁隆平书院",
+        "含弘学院",
+        "创新创业学院",
+        "智慧农业学院"
+      ],
+      "anchorId": "osm:relation:11546903",
+      "details": "图文称位于第四运动场西南侧；楠园二食堂出门右拐约100m。此为文本位置关系，不推算坐标。 南活107报告厅：107报告厅。 党委学生工作部 学生工作处 武装部：3楼；图文将这些作为此处服务机构，不是南活的建筑同义词。 心理健康教育服务中心：4楼；未提取热线。 袁隆平书院：5楼。图文为机构等称关系，区别于大创中心实体入口。",
+      "sourceImages": [
+        1,
+        7
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:startup-centre",
+      "name": "大学生创新创业中心",
+      "aliases": [
+        "大创中心",
+        "南区招聘大厅",
+        "大创中心路演厅"
+      ],
+      "anchorId": null,
+      "details": "大创中心入口在马路边。南区招聘大厅入口在四运蓝花楹旁，二者入口描述不同。 大创中心路演厅：2楼；101为办公室。 南区招聘大厅：入口在四运蓝花楹旁，不等同于北区圆顶招聘大厅。",
+      "sourceImages": [
+        1,
+        10
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:tian-jiabing",
+      "name": "田家炳",
+      "aliases": [
+        "田家炳大楼",
+        "田家炳教育书院",
+        "11教",
+        "教育学部",
+        "信息办",
+        "数智西大服务大厅",
+        "校园卡服务",
+        "校园网服务"
+      ],
+      "anchorId": "osm:way:368605817",
+      "details": "数智西大服务大厅位于1楼靠近第一运动场一侧，指南说明非照片所示一侧。 数智西大服务大厅：1楼靠近第一运动场一侧，非照片所示一侧。",
+      "sourceImages": [
+        1,
+        2,
+        4
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:huiwen-a",
+      "name": "荟文楼",
+      "aliases": [
+        "9教",
+        "荟文楼A栋",
+        "历史文化学院 民族学院",
+        "西南民族教育与心理研究中心",
+        "西民中心"
+      ],
+      "anchorId": null,
+      "details": "肉眼核对标题、正文及照片楼牌，首字为荟(U+835F)。单说荟文楼一般特指9教/A栋。",
+      "sourceImages": [
+        1,
+        8
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:huiwen-b",
+      "name": "荟文楼B栋",
+      "aliases": [
+        "10教"
+      ],
+      "anchorId": "osm:way:843465255",
+      "details": "与9教/A栋分开，不将裸称荟文楼绑定到10教。",
+      "sourceImages": [
+        8
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:shiyuan",
+      "name": "师元楼",
+      "aliases": [
+        "6教",
+        "教师教育学院"
+      ],
+      "anchorId": null,
+      "details": "",
+      "sourceImages": [
+        1,
+        4,
+        6
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:hospital-north",
+      "name": "北区校医院",
+      "aliases": [
+        "西南大学医院（一院）"
+      ],
+      "anchorId": null,
+      "details": "“校医院/西南大学医院”泛称需提示区分北区一院和南区二院。",
+      "sourceImages": [
+        1,
+        6
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:hospital-south",
+      "name": "南区校医院",
+      "aliases": [
+        "西南大学医院（二院）"
+      ],
+      "anchorId": "osm:way:371876809",
+      "details": "",
+      "sourceImages": [
+        1,
+        6
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:library-north",
+      "name": "北区图书馆",
+      "aliases": [
+        "弘文图书馆"
+      ],
+      "anchorId": "osm:way:843421780",
+      "details": "",
+      "sourceImages": [
+        1,
+        6
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:library-south",
+      "name": "南区图书馆",
+      "aliases": [
+        "崇实图书馆"
+      ],
+      "anchorId": "osm:relation:11564781",
+      "details": "",
+      "sourceImages": [
+        1,
+        6
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:pool-indoor-north",
+      "name": "北区游泳馆",
+      "aliases": [
+        "恒温游泳馆"
+      ],
+      "anchorId": null,
+      "details": "与北区露天第二游泳池分开；OSM泛称游泳馆与第二游泳池同位置，不能据此认作恒温馆。",
+      "sourceImages": [
+        1,
+        6
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:pool-south",
+      "name": "南区游泳池",
+      "aliases": [
+        "四运游泳池",
+        "第三游泳池"
+      ],
+      "anchorId": "osm:way:840987852",
+      "details": "",
+      "sourceImages": [
+        1,
+        6
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:pool-north",
+      "name": "北区游泳池",
+      "aliases": [
+        "五一所游泳池",
+        "第二游泳池"
+      ],
+      "anchorId": "osm:way:842765836",
+      "details": "指南称在光大礼堂背后。",
+      "sourceImages": [
+        1,
+        6
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:shooting-ground",
+      "name": "射艺场",
+      "aliases": [
+        "国防生训练场",
+        "第六运动场"
+      ],
+      "anchorId": null,
+      "details": "OSM“射艺园”名称相近但未直接证明同址，保持待确认。",
+      "sourceImages": [
+        1,
+        6
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:building-8",
+      "name": "8教",
+      "aliases": [
+        "8教学楼"
+      ],
+      "anchorId": "osm:way:843421763",
+      "details": "图4只提供8教位置示意，不添加图上未明确写出的别名。",
+      "sourceImages": [
+        4
+      ],
+      "coordinateStatus": "building_reference_only"
+    },
+    {
+      "id": "guide:security-office",
+      "name": "保卫处",
+      "aliases": [],
+      "anchorId": null,
+      "details": "仅有示意图位置；不从像素推算坐标，不扩展成未经图片明确写出的全称。",
+      "sourceImages": [
+        4
+      ],
+      "coordinateStatus": "not_geolocated"
+    },
+    {
+      "id": "guide:dormitory-management",
+      "name": "宿管中心",
+      "aliases": [],
+      "anchorId": null,
+      "details": "仅有示意图位置；不从像素推算坐标，不扩展成未经图片明确写出的全称。",
+      "sourceImages": [
+        4
+      ],
+      "coordinateStatus": "not_geolocated"
+    }
+  ],
+  "disambiguationRules": [
+    {
+      "query": "招聘大厅",
+      "defaultServiceId": "recruitment-north",
+      "explicitSouthQueryServiceId": "recruitment-south",
+      "sourceImages": [
+        3,
+        10
+      ]
+    },
+    {
+      "query": "荟文楼",
+      "defaultGroupId": "huiwen-a",
+      "otherGroupId": "huiwen-b",
+      "note": "9教=A栋，10教=B栋；不要合并坐标。",
+      "sourceImages": [
+        8
+      ]
+    },
+    {
+      "query": "校医院",
+      "requireRegionDisambiguation": true,
+      "groupIds": [
+        "hospital-north",
+        "hospital-south"
+      ],
+      "sourceImages": [
+        1,
+        6
+      ]
+    },
+    {
+      "query": "图书馆",
+      "requireRegionDisambiguation": true,
+      "groupIds": [
+        "library-north",
+        "library-south"
+      ],
+      "note": "中心图书馆另为独立OSM地点，不因南北馆指南而合并。",
+      "sourceImages": [
+        1,
+        6
+      ]
+    },
+    {
+      "query": "游泳",
+      "requireRegionAndFacilityDisambiguation": true,
+      "groupIds": [
+        "pool-indoor-north",
+        "pool-north",
+        "pool-south"
+      ],
+      "sourceImages": [
+        1,
+        6
+      ]
+    },
+    {
+      "query": "教务处",
+      "historicalQueryTargetServiceId": "undergraduate-school",
+      "note": "只作旧称检索提示；指南称2024年12月改革后本科教务在本科生院，当前组织状态未独立验证。",
+      "sourceImages": [
+        5
+      ]
+    },
+    {
+      "query": "行政楼",
+      "defaultGroupId": "south-admin",
+      "northGroupId": "north-admin",
+      "note": "用户指南将行政楼指向南区，北区称行署楼。OSM行政楼泛名不能自动视作北区行署楼。",
+      "sourceImages": [
+        1,
+        5,
+        9
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "sourceImages": [
+        2
+      ],
+      "subjectGroupId": "tian-jiabing",
+      "relation": "service_hall_on_side_toward",
+      "objectText": "第一运动场",
+      "note": "数智西大服务大厅位于该侧1楼。"
+    },
+    {
+      "sourceImages": [
+        4
+      ],
+      "subjectGroupId": "security-office",
+      "relation": "schematic_near",
+      "objectText": "数学大楼、田家炳",
+      "note": "仅示意图相对邻接，无经纬度、无比例测量。"
+    },
+    {
+      "sourceImages": [
+        4
+      ],
+      "subjectGroupId": "dormitory-management",
+      "relation": "schematic_near",
+      "objectText": "数学大楼、物院",
+      "note": "仅示意图相对邻接，无经纬度、无比例测量。"
+    },
+    {
+      "sourceImages": [
+        4
+      ],
+      "subjectGroupId": "building-8",
+      "relation": "schematic_near",
+      "objectText": "7教、师元楼",
+      "note": "仅保留图中清晰教学楼参照，不记录不清晰的其他标签。"
+    },
+    {
+      "sourceImages": [
+        7
+      ],
+      "subjectGroupId": "south-student-centre",
+      "relation": "southwest_of",
+      "objectText": "第四运动场",
+      "note": "指南还称楠园二食堂出门右拐约100m；仅文本。"
+    },
+    {
+      "sourceImages": [
+        6
+      ],
+      "subjectGroupId": "pool-north",
+      "relation": "behind",
+      "objectText": "光大礼堂",
+      "note": "只作文本参考。"
+    },
+    {
+      "sourceImages": [
+        10
+      ],
+      "subjectGroupId": "startup-centre",
+      "relation": "entrance_beside",
+      "objectText": "马路",
+      "note": "大创中心入口。"
+    },
+    {
+      "sourceImages": [
+        10
+      ],
+      "subjectServiceId": "recruitment-south",
+      "relation": "entrance_beside",
+      "objectText": "四运蓝花楹",
+      "note": "南区招聘大厅入口。"
+    }
+  ],
+  "limitations": [
+    "Community-contributed OSM data; not independently field verified; campus boundary is OSM mapping rather than an official survey.",
+    "No OSM candidate is a verified campus bus stop.",
+    "Way/relation locations use geometry bounding-box centers; these can be outside the building polygon and are not entrances.",
+    "OSM WGS84 source coordinates have not been converted to GCJ-02.",
+    "Only named/ref/address-tagged elements in the mapped campus area were fetched.",
+    "Gate coverage is incomplete: one named gate found. Duplicate source objects and stale names exist.",
+    "Chinese source names are preferred; English names contain observed number conflicts and are intentionally excluded as aliases.",
+    "Public Overpass was used twice serially for this one-off snapshot; do not call it as a production autocomplete backend."
+  ]
+}

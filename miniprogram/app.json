@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/journey/journey",
     "pages/index/index"
   ],
   "window": {
@@ -15,7 +16,8 @@
     }
   },
   "requiredPrivateInfos": [
-    "getLocation"
+    "getLocation",
+    "chooseLocation"
   ],
   "sitemapLocation": "sitemap.json"
 }

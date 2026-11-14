@@ -1,0 +1,2597 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-11-13",
+  "historicalYear": 2024,
+  "source": {
+    "historical": "User-supplied 2024 campus overview and nine-row route schematic; reviewed label transcription only",
+    "historicalImageSha256": [
+      "b731745027d97fc1c34502492583f9d93f78799d603b3a2f5682163c8c55fc1a",
+      "cc1514f6a1722adad73e76b41af001a0d09626337f5de49c5ab5651d99859f81"
+    ],
+    "current": [
+      {
+        "path": "miniprogram/data/current-transit.json",
+        "sha256": "fcfc27f091eced50613a73d000a662d1141d911d0e14aaacb62f70b2b0ee759c"
+      },
+      {
+        "path": "miniprogram/data/current-transit-source.json",
+        "sha256": "b6b4e82f3d5fa825bdce7cf885a8b863a931f58a0220ae8bf8f43361327eef0f"
+      }
+    ]
+  },
+  "definitions": {
+    "catalog": "Same route identity/number only. Common / historical, common / current, and common / union have distinct denominators. No renaming inferred.",
+    "confirmedCoverage": "Unique normalized historical landmarks with at least one full-label or reviewed synonym match / all unique normalized historical landmarks on that route. Semantic coverage, not bus-stop or geometry accuracy.",
+    "plausibleCoverageUpperBound": "Same denominator, adding explicitly reviewed compound-component or broader-area candidates. A liberal semantic ceiling, not verified stop coverage or a statistical confidence interval.",
+    "duplicates": "Normalize before deduplicating historical labels; retain first occurrence for order. Repeated endpoint/intermediate labels remain recorded but do not increase the coverage denominator.",
+    "order": "LCS of first-occurrence matched historical landmarks against current source-index positions / matched unique historical landmark count, separately forward and reverse. Geometry uses actual visits; sourceArray is diagnostic. All candidate positions are retained; multi-candidate LCS is a maximum feasible alignment, not a unique alignment. Unmatched landmarks are excluded ONLY from the order denominator. No rotation, inferred closing edge or invented return visits.",
+    "noCounterpart": "Historical 9 has no current catalog counterpart. Coverage and order are null (N/A), not zero; snapshot absence does not establish withdrawal.",
+    "aggregation": "Micro coverage sums numerators/denominators across eight comparable route rows; the same landmark on two different routes counts once per route. Historical 9 excluded. Macro coverage averages the eight route percentages before rounding.",
+    "limitations": "Historical schematic has no georeferenced polyline, complete stop inventory, verified operation direction, or current loop closure. Pixel shape, actual-stop accuracy and operational direction cannot be measured."
+  },
+  "aliasRules": {
+    "semanticAliases": {
+      "二号门": "2号门",
+      "五号门": "5号门",
+      "六号门": "6号门",
+      "八教": "8教",
+      "8教学楼": "8教",
+      "二十六教": "26教",
+      "五教": "外语学院",
+      "5教": "外语学院",
+      "外国语学院": "外语学院"
+    },
+    "fiveBuildingEvidence": "User-supplied 2024 overview labels building #5 外国语学院; semantic building reference only.",
+    "plausibleLabels": {
+      "2号门": [
+        "共青花园2号门",
+        "共青团花园2号门",
+        "共青花园、2号门"
+      ],
+      "8教": [
+        "8教李园"
+      ],
+      "地科院": [
+        "中心图书馆地科院"
+      ],
+      "田家炳": [
+        "田家炳文学院"
+      ],
+      "竹园": [
+        "后山竹园"
+      ],
+      "梅园": [
+        "梅园1舍",
+        "梅园食堂"
+      ],
+      "橘园": [
+        "橘园10舍",
+        "橘园12舍",
+        "橘11",
+        "橘园新七舍"
+      ]
+    },
+    "forbiddenSubstitutions": [
+      "六号门 = 资环院/32教",
+      "二食堂 = 楠园",
+      "26教 = 药学院",
+      "李园 = 八教",
+      "9路 = 3路B线/经管专线"
+    ]
+  },
+  "catalog": {
+    "historicalCount": 9,
+    "currentCount": 10,
+    "commonCount": 8,
+    "commonHistoricalRouteNumbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "historicalNumberCoverage": {
+      "numerator": 8,
+      "denominator": 9,
+      "percent": 88.89
+    },
+    "currentCatalogCoverage": {
+      "numerator": 8,
+      "denominator": 10,
+      "percent": 80
+    },
+    "identityJaccard": {
+      "numerator": 8,
+      "denominator": 11,
+      "percent": 72.73
+    },
+    "historicalWithoutCurrentCounterpart": [
+      9
+    ],
+    "currentWithoutHistoricalCounterpart": [
+      {
+        "id": "route_3b",
+        "name": "3路B线"
+      },
+      {
+        "id": "route_jingguan",
+        "name": "经管专线"
+      }
+    ]
+  },
+  "aggregateCoverage": {
+    "comparableRouteCount": 8,
+    "confirmedMicro": {
+      "numerator": 40,
+      "denominator": 53,
+      "percent": 75.47
+    },
+    "plausibleUpperBoundMicro": {
+      "numerator": 48,
+      "denominator": 53,
+      "percent": 90.57
+    },
+    "confirmedMacroPercent": 75.97,
+    "plausibleUpperBoundMacroPercent": 91.47
+  },
+  "routes": [
+    {
+      "historicalRouteNumber": 1,
+      "currentRouteId": "route_1",
+      "status": "compared_semantic_landmarks_only",
+      "historicalRowLabels": [
+        "经管院",
+        "六号门",
+        "二号门",
+        "八教",
+        "田家炳",
+        "圆顶",
+        "五号门"
+      ],
+      "historicalRawLabelCount": 7,
+      "historicalUniqueLabelCount": 7,
+      "currentSourceStationNames": [
+        "经管院",
+        "资环院",
+        "32教",
+        "楠园",
+        "共青团花园2号门",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "8教学楼",
+        "行署楼1号门",
+        "文学院",
+        "田家炳",
+        "圆顶",
+        "外办",
+        "5号门"
+      ],
+      "currentGeometryVisitNames": [
+        "经管院",
+        "资环院",
+        "32教",
+        "共青团花园2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "8教学楼",
+        "行署楼1号门",
+        "田家炳",
+        "文学院",
+        "圆顶",
+        "外办",
+        "5号门"
+      ],
+      "currentVisitSourceIndices": [
+        0,
+        1,
+        2,
+        4,
+        3,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        11,
+        13,
+        14,
+        15
+      ],
+      "currentGeometryWarnings": [],
+      "confirmedCoverage": {
+        "numerator": 5,
+        "denominator": 7,
+        "percent": 71.43
+      },
+      "plausibleCoverageUpperBound": {
+        "numerator": 6,
+        "denominator": 7,
+        "percent": 85.71
+      },
+      "plausibleOnlyHistoricalLabels": [
+        "二号门"
+      ],
+      "unmatchedHistoricalLabels": [
+        "六号门"
+      ],
+      "matches": [
+        {
+          "historicalLabel": "经管院",
+          "normalizedKey": "经管院",
+          "historicalOccurrenceIndices": [
+            0
+          ],
+          "candidates": [
+            {
+              "currentLabel": "经管院",
+              "sourceIndex": 0,
+              "geometryVisitIndices": [
+                0
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "六号门",
+          "normalizedKey": "6号门",
+          "historicalOccurrenceIndices": [
+            1
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "二号门",
+          "normalizedKey": "2号门",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": [
+            {
+              "currentLabel": "共青团花园2号门",
+              "sourceIndex": 4,
+              "geometryVisitIndices": [
+                3
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "八教",
+          "normalizedKey": "8教",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": [
+            {
+              "currentLabel": "8教学楼",
+              "sourceIndex": 9,
+              "geometryVisitIndices": [
+                9
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "田家炳",
+          "normalizedKey": "田家炳",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": [
+            {
+              "currentLabel": "田家炳",
+              "sourceIndex": 12,
+              "geometryVisitIndices": [
+                11
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "圆顶",
+          "normalizedKey": "圆顶",
+          "historicalOccurrenceIndices": [
+            5
+          ],
+          "candidates": [
+            {
+              "currentLabel": "圆顶",
+              "sourceIndex": 13,
+              "geometryVisitIndices": [
+                13
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "五号门",
+          "normalizedKey": "5号门",
+          "historicalOccurrenceIndices": [
+            6
+          ],
+          "candidates": [
+            {
+              "currentLabel": "5号门",
+              "sourceIndex": 15,
+              "geometryVisitIndices": [
+                15
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        }
+      ],
+      "order": {
+        "confirmed": {
+          "matchedHistoricalLabels": [
+            "经管院",
+            "八教",
+            "田家炳",
+            "圆顶",
+            "五号门"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          }
+        },
+        "includingPlausible": {
+          "matchedHistoricalLabels": [
+            "经管院",
+            "二号门",
+            "八教",
+            "田家炳",
+            "圆顶",
+            "五号门"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 6,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 6,
+              "percent": 16.67
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 6,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 6,
+              "percent": 16.67
+            }
+          }
+        }
+      }
+    },
+    {
+      "historicalRouteNumber": 2,
+      "currentRouteId": "route_2",
+      "status": "compared_semantic_landmarks_only",
+      "historicalRowLabels": [
+        "经管院",
+        "六号门",
+        "二号门",
+        "八教",
+        "田家炳",
+        "西师街",
+        "五号门"
+      ],
+      "historicalRawLabelCount": 7,
+      "historicalUniqueLabelCount": 7,
+      "currentSourceStationNames": [
+        "经管院",
+        "资环院",
+        "32教",
+        "共青花园2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "8教李园",
+        "行署楼1号门",
+        "田家炳",
+        "校医院",
+        "西师街",
+        "5号门"
+      ],
+      "currentGeometryVisitNames": [
+        "经管院",
+        "资环院",
+        "32教",
+        "共青花园2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "8教李园",
+        "行署楼1号门",
+        "田家炳",
+        "校医院",
+        "西师街",
+        "5号门"
+      ],
+      "currentVisitSourceIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "currentGeometryWarnings": [],
+      "confirmedCoverage": {
+        "numerator": 4,
+        "denominator": 7,
+        "percent": 57.14
+      },
+      "plausibleCoverageUpperBound": {
+        "numerator": 6,
+        "denominator": 7,
+        "percent": 85.71
+      },
+      "plausibleOnlyHistoricalLabels": [
+        "二号门",
+        "八教"
+      ],
+      "unmatchedHistoricalLabels": [
+        "六号门"
+      ],
+      "matches": [
+        {
+          "historicalLabel": "经管院",
+          "normalizedKey": "经管院",
+          "historicalOccurrenceIndices": [
+            0
+          ],
+          "candidates": [
+            {
+              "currentLabel": "经管院",
+              "sourceIndex": 0,
+              "geometryVisitIndices": [
+                0
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "六号门",
+          "normalizedKey": "6号门",
+          "historicalOccurrenceIndices": [
+            1
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "二号门",
+          "normalizedKey": "2号门",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": [
+            {
+              "currentLabel": "共青花园2号门",
+              "sourceIndex": 3,
+              "geometryVisitIndices": [
+                3
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "八教",
+          "normalizedKey": "8教",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": [
+            {
+              "currentLabel": "8教李园",
+              "sourceIndex": 9,
+              "geometryVisitIndices": [
+                9
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "田家炳",
+          "normalizedKey": "田家炳",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": [
+            {
+              "currentLabel": "田家炳",
+              "sourceIndex": 11,
+              "geometryVisitIndices": [
+                11
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "西师街",
+          "normalizedKey": "西师街",
+          "historicalOccurrenceIndices": [
+            5
+          ],
+          "candidates": [
+            {
+              "currentLabel": "西师街",
+              "sourceIndex": 13,
+              "geometryVisitIndices": [
+                13
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "五号门",
+          "normalizedKey": "5号门",
+          "historicalOccurrenceIndices": [
+            6
+          ],
+          "candidates": [
+            {
+              "currentLabel": "5号门",
+              "sourceIndex": 14,
+              "geometryVisitIndices": [
+                14
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        }
+      ],
+      "order": {
+        "confirmed": {
+          "matchedHistoricalLabels": [
+            "经管院",
+            "田家炳",
+            "西师街",
+            "五号门"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 4,
+              "denominator": 4,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 4,
+              "percent": 25
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 4,
+              "denominator": 4,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 4,
+              "percent": 25
+            }
+          }
+        },
+        "includingPlausible": {
+          "matchedHistoricalLabels": [
+            "经管院",
+            "二号门",
+            "八教",
+            "田家炳",
+            "西师街",
+            "五号门"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 6,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 6,
+              "percent": 16.67
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 6,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 6,
+              "percent": 16.67
+            }
+          }
+        }
+      }
+    },
+    {
+      "historicalRouteNumber": 3,
+      "currentRouteId": "route_3",
+      "status": "compared_semantic_landmarks_only",
+      "historicalRowLabels": [
+        "竹园",
+        "二号门",
+        "五教",
+        "梅园",
+        "橘园",
+        "五号门"
+      ],
+      "historicalRawLabelCount": 6,
+      "historicalUniqueLabelCount": 6,
+      "currentSourceStationNames": [
+        "后山竹园",
+        "32教",
+        "共青花园2号门",
+        "2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "地科院",
+        "心理学部",
+        "外国语学院",
+        "药学院",
+        "梅园",
+        "梅园食堂",
+        "橘园",
+        "田家炳文学院",
+        "桃园",
+        "荟文楼",
+        "圆顶",
+        "外办",
+        "5号门"
+      ],
+      "currentGeometryVisitNames": [
+        "后山竹园",
+        "32教",
+        "共青花园2号门",
+        "2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "地科院",
+        "心理学部",
+        "外国语学院",
+        "药学院",
+        "梅园",
+        "梅园食堂",
+        "橘园",
+        "田家炳文学院",
+        "桃园",
+        "荟文楼",
+        "圆顶",
+        "外办",
+        "5号门"
+      ],
+      "currentVisitSourceIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "currentGeometryWarnings": [],
+      "confirmedCoverage": {
+        "numerator": 5,
+        "denominator": 6,
+        "percent": 83.33
+      },
+      "plausibleCoverageUpperBound": {
+        "numerator": 6,
+        "denominator": 6,
+        "percent": 100
+      },
+      "plausibleOnlyHistoricalLabels": [
+        "竹园"
+      ],
+      "unmatchedHistoricalLabels": [],
+      "matches": [
+        {
+          "historicalLabel": "竹园",
+          "normalizedKey": "竹园",
+          "historicalOccurrenceIndices": [
+            0
+          ],
+          "candidates": [
+            {
+              "currentLabel": "后山竹园",
+              "sourceIndex": 0,
+              "geometryVisitIndices": [
+                0
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "二号门",
+          "normalizedKey": "2号门",
+          "historicalOccurrenceIndices": [
+            1
+          ],
+          "candidates": [
+            {
+              "currentLabel": "共青花园2号门",
+              "sourceIndex": 2,
+              "geometryVisitIndices": [
+                2
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            },
+            {
+              "currentLabel": "2号门",
+              "sourceIndex": 3,
+              "geometryVisitIndices": [
+                3
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "五教",
+          "normalizedKey": "外语学院",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": [
+            {
+              "currentLabel": "外国语学院",
+              "sourceIndex": 11,
+              "geometryVisitIndices": [
+                11
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "2024 overview building #5 = 外国语学院; semantic building alias only, not identical stop coordinates"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "梅园",
+          "normalizedKey": "梅园",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": [
+            {
+              "currentLabel": "梅园",
+              "sourceIndex": 13,
+              "geometryVisitIndices": [
+                13
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            },
+            {
+              "currentLabel": "梅园食堂",
+              "sourceIndex": 14,
+              "geometryVisitIndices": [
+                14
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "橘园",
+          "normalizedKey": "橘园",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": [
+            {
+              "currentLabel": "橘园",
+              "sourceIndex": 15,
+              "geometryVisitIndices": [
+                15
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "五号门",
+          "normalizedKey": "5号门",
+          "historicalOccurrenceIndices": [
+            5
+          ],
+          "candidates": [
+            {
+              "currentLabel": "5号门",
+              "sourceIndex": 21,
+              "geometryVisitIndices": [
+                21
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        }
+      ],
+      "order": {
+        "confirmed": {
+          "matchedHistoricalLabels": [
+            "二号门",
+            "五教",
+            "梅园",
+            "橘园",
+            "五号门"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          }
+        },
+        "includingPlausible": {
+          "matchedHistoricalLabels": [
+            "竹园",
+            "二号门",
+            "五教",
+            "梅园",
+            "橘园",
+            "五号门"
+          ],
+          "ambiguousHistoricalLabels": [
+            "二号门",
+            "梅园"
+          ],
+          "geometry": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 6,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 6,
+              "percent": 16.67
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 6,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 6,
+              "percent": 16.67
+            }
+          }
+        }
+      }
+    },
+    {
+      "historicalRouteNumber": 4,
+      "currentRouteId": "route_4",
+      "status": "compared_semantic_landmarks_only",
+      "historicalRowLabels": [
+        "二号门",
+        "二食堂",
+        "地科院",
+        "外语学院",
+        "二十六教",
+        "梅园",
+        "橘园"
+      ],
+      "historicalRawLabelCount": 7,
+      "historicalUniqueLabelCount": 7,
+      "currentSourceStationNames": [
+        "2号门",
+        "共青花园2号门",
+        "楠园",
+        "大礼堂",
+        "校史馆",
+        "研究生院",
+        "中心图书馆地科院",
+        "地科院",
+        "心理学部",
+        "外国语学院",
+        "药学院",
+        "梅园",
+        "梅园食堂",
+        "橘11",
+        "橘园"
+      ],
+      "currentGeometryVisitNames": [
+        "2号门",
+        "共青花园2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "地科院",
+        "心理学部",
+        "外国语学院",
+        "药学院",
+        "梅园",
+        "梅园食堂",
+        "橘11",
+        "橘园"
+      ],
+      "currentVisitSourceIndices": [
+        0,
+        1,
+        2,
+        4,
+        3,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "currentGeometryWarnings": [],
+      "confirmedCoverage": {
+        "numerator": 5,
+        "denominator": 7,
+        "percent": 71.43
+      },
+      "plausibleCoverageUpperBound": {
+        "numerator": 5,
+        "denominator": 7,
+        "percent": 71.43
+      },
+      "plausibleOnlyHistoricalLabels": [],
+      "unmatchedHistoricalLabels": [
+        "二食堂",
+        "二十六教"
+      ],
+      "matches": [
+        {
+          "historicalLabel": "二号门",
+          "normalizedKey": "2号门",
+          "historicalOccurrenceIndices": [
+            0
+          ],
+          "candidates": [
+            {
+              "currentLabel": "2号门",
+              "sourceIndex": 0,
+              "geometryVisitIndices": [
+                0
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            },
+            {
+              "currentLabel": "共青花园2号门",
+              "sourceIndex": 1,
+              "geometryVisitIndices": [
+                1
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "二食堂",
+          "normalizedKey": "二食堂",
+          "historicalOccurrenceIndices": [
+            1
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "地科院",
+          "normalizedKey": "地科院",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": [
+            {
+              "currentLabel": "中心图书馆地科院",
+              "sourceIndex": 6,
+              "geometryVisitIndices": [
+                6
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            },
+            {
+              "currentLabel": "地科院",
+              "sourceIndex": 7,
+              "geometryVisitIndices": [
+                7
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "外语学院",
+          "normalizedKey": "外语学院",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": [
+            {
+              "currentLabel": "外国语学院",
+              "sourceIndex": 9,
+              "geometryVisitIndices": [
+                9
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "二十六教",
+          "normalizedKey": "26教",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "梅园",
+          "normalizedKey": "梅园",
+          "historicalOccurrenceIndices": [
+            5
+          ],
+          "candidates": [
+            {
+              "currentLabel": "梅园",
+              "sourceIndex": 11,
+              "geometryVisitIndices": [
+                11
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            },
+            {
+              "currentLabel": "梅园食堂",
+              "sourceIndex": 12,
+              "geometryVisitIndices": [
+                12
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "橘园",
+          "normalizedKey": "橘园",
+          "historicalOccurrenceIndices": [
+            6
+          ],
+          "candidates": [
+            {
+              "currentLabel": "橘11",
+              "sourceIndex": 13,
+              "geometryVisitIndices": [
+                13
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            },
+            {
+              "currentLabel": "橘园",
+              "sourceIndex": 14,
+              "geometryVisitIndices": [
+                14
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        }
+      ],
+      "order": {
+        "confirmed": {
+          "matchedHistoricalLabels": [
+            "二号门",
+            "地科院",
+            "外语学院",
+            "梅园",
+            "橘园"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          }
+        },
+        "includingPlausible": {
+          "matchedHistoricalLabels": [
+            "二号门",
+            "地科院",
+            "外语学院",
+            "梅园",
+            "橘园"
+          ],
+          "ambiguousHistoricalLabels": [
+            "二号门",
+            "地科院",
+            "梅园",
+            "橘园"
+          ],
+          "geometry": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          }
+        }
+      }
+    },
+    {
+      "historicalRouteNumber": 5,
+      "currentRouteId": "route_5",
+      "status": "compared_semantic_landmarks_only",
+      "historicalRowLabels": [
+        "二号门",
+        "八教",
+        "田家炳",
+        "圆顶",
+        "五号门"
+      ],
+      "historicalRawLabelCount": 5,
+      "historicalUniqueLabelCount": 5,
+      "currentSourceStationNames": [
+        "2号门",
+        "共青团花园2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "8教李园",
+        "行署楼1号门",
+        "田家炳",
+        "圆顶",
+        "外办",
+        "5号门"
+      ],
+      "currentGeometryVisitNames": [
+        "2号门",
+        "共青团花园2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆地科院",
+        "8教李园",
+        "行署楼1号门",
+        "田家炳",
+        "圆顶",
+        "外办",
+        "5号门"
+      ],
+      "currentVisitSourceIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "currentGeometryWarnings": [],
+      "confirmedCoverage": {
+        "numerator": 4,
+        "denominator": 5,
+        "percent": 80
+      },
+      "plausibleCoverageUpperBound": {
+        "numerator": 5,
+        "denominator": 5,
+        "percent": 100
+      },
+      "plausibleOnlyHistoricalLabels": [
+        "八教"
+      ],
+      "unmatchedHistoricalLabels": [],
+      "matches": [
+        {
+          "historicalLabel": "二号门",
+          "normalizedKey": "2号门",
+          "historicalOccurrenceIndices": [
+            0
+          ],
+          "candidates": [
+            {
+              "currentLabel": "2号门",
+              "sourceIndex": 0,
+              "geometryVisitIndices": [
+                0
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            },
+            {
+              "currentLabel": "共青团花园2号门",
+              "sourceIndex": 1,
+              "geometryVisitIndices": [
+                1
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "八教",
+          "normalizedKey": "8教",
+          "historicalOccurrenceIndices": [
+            1
+          ],
+          "candidates": [
+            {
+              "currentLabel": "8教李园",
+              "sourceIndex": 7,
+              "geometryVisitIndices": [
+                7
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "田家炳",
+          "normalizedKey": "田家炳",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": [
+            {
+              "currentLabel": "田家炳",
+              "sourceIndex": 9,
+              "geometryVisitIndices": [
+                9
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "圆顶",
+          "normalizedKey": "圆顶",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": [
+            {
+              "currentLabel": "圆顶",
+              "sourceIndex": 10,
+              "geometryVisitIndices": [
+                10
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "五号门",
+          "normalizedKey": "5号门",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": [
+            {
+              "currentLabel": "5号门",
+              "sourceIndex": 12,
+              "geometryVisitIndices": [
+                12
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        }
+      ],
+      "order": {
+        "confirmed": {
+          "matchedHistoricalLabels": [
+            "二号门",
+            "田家炳",
+            "圆顶",
+            "五号门"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 4,
+              "denominator": 4,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 4,
+              "percent": 25
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 4,
+              "denominator": 4,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 4,
+              "percent": 25
+            }
+          }
+        },
+        "includingPlausible": {
+          "matchedHistoricalLabels": [
+            "二号门",
+            "八教",
+            "田家炳",
+            "圆顶",
+            "五号门"
+          ],
+          "ambiguousHistoricalLabels": [
+            "二号门"
+          ],
+          "geometry": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          }
+        }
+      }
+    },
+    {
+      "historicalRouteNumber": 6,
+      "currentRouteId": "route_6",
+      "status": "compared_semantic_landmarks_only",
+      "historicalRowLabels": [
+        "竹园",
+        "二号门",
+        "梅园",
+        "橘园",
+        "田家炳",
+        "八教",
+        "二号门",
+        "竹园"
+      ],
+      "historicalRawLabelCount": 8,
+      "historicalUniqueLabelCount": 6,
+      "currentSourceStationNames": [
+        "竹园",
+        "32教",
+        "2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆",
+        "地科院",
+        "心理学部",
+        "外语学院",
+        "26教",
+        "梅园1舍",
+        "橘园12舍",
+        "橘园10舍",
+        "橘园",
+        "桃园",
+        "文学院",
+        "田家炳",
+        "行署楼",
+        "八教",
+        "共青团花园"
+      ],
+      "currentGeometryVisitNames": [
+        "竹园",
+        "32教",
+        "共青团花园",
+        "2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆",
+        "八教",
+        "行署楼",
+        "田家炳",
+        "文学院",
+        "桃园",
+        "橘园",
+        "橘园10舍",
+        "橘园12舍",
+        "梅园1舍",
+        "26教",
+        "外语学院",
+        "心理学部",
+        "地科院"
+      ],
+      "currentVisitSourceIndices": [
+        0,
+        1,
+        21,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        20,
+        19,
+        18,
+        17,
+        16,
+        15,
+        14,
+        13,
+        12,
+        11,
+        10,
+        9,
+        8
+      ],
+      "currentGeometryWarnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ],
+      "confirmedCoverage": {
+        "numerator": 5,
+        "denominator": 6,
+        "percent": 83.33
+      },
+      "plausibleCoverageUpperBound": {
+        "numerator": 6,
+        "denominator": 6,
+        "percent": 100
+      },
+      "plausibleOnlyHistoricalLabels": [
+        "梅园"
+      ],
+      "unmatchedHistoricalLabels": [],
+      "matches": [
+        {
+          "historicalLabel": "竹园",
+          "normalizedKey": "竹园",
+          "historicalOccurrenceIndices": [
+            0,
+            7
+          ],
+          "candidates": [
+            {
+              "currentLabel": "竹园",
+              "sourceIndex": 0,
+              "geometryVisitIndices": [
+                0
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "二号门",
+          "normalizedKey": "2号门",
+          "historicalOccurrenceIndices": [
+            1,
+            6
+          ],
+          "candidates": [
+            {
+              "currentLabel": "2号门",
+              "sourceIndex": 2,
+              "geometryVisitIndices": [
+                3
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "梅园",
+          "normalizedKey": "梅园",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": [
+            {
+              "currentLabel": "梅园1舍",
+              "sourceIndex": 12,
+              "geometryVisitIndices": [
+                17
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "橘园",
+          "normalizedKey": "橘园",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": [
+            {
+              "currentLabel": "橘园12舍",
+              "sourceIndex": 13,
+              "geometryVisitIndices": [
+                16
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            },
+            {
+              "currentLabel": "橘园10舍",
+              "sourceIndex": 14,
+              "geometryVisitIndices": [
+                15
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            },
+            {
+              "currentLabel": "橘园",
+              "sourceIndex": 15,
+              "geometryVisitIndices": [
+                14
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "田家炳",
+          "normalizedKey": "田家炳",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": [
+            {
+              "currentLabel": "田家炳",
+              "sourceIndex": 18,
+              "geometryVisitIndices": [
+                11
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "八教",
+          "normalizedKey": "8教",
+          "historicalOccurrenceIndices": [
+            5
+          ],
+          "candidates": [
+            {
+              "currentLabel": "八教",
+              "sourceIndex": 20,
+              "geometryVisitIndices": [
+                9
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        }
+      ],
+      "order": {
+        "confirmed": {
+          "matchedHistoricalLabels": [
+            "竹园",
+            "二号门",
+            "橘园",
+            "田家炳",
+            "八教"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 3,
+              "denominator": 5,
+              "percent": 60
+            },
+            "reverse": {
+              "numerator": 3,
+              "denominator": 5,
+              "percent": 60
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          }
+        },
+        "includingPlausible": {
+          "matchedHistoricalLabels": [
+            "竹园",
+            "二号门",
+            "梅园",
+            "橘园",
+            "田家炳",
+            "八教"
+          ],
+          "ambiguousHistoricalLabels": [
+            "橘园"
+          ],
+          "geometry": {
+            "forward": {
+              "numerator": 3,
+              "denominator": 6,
+              "percent": 50
+            },
+            "reverse": {
+              "numerator": 4,
+              "denominator": 6,
+              "percent": 66.67
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 6,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 6,
+              "percent": 16.67
+            }
+          }
+        }
+      }
+    },
+    {
+      "historicalRouteNumber": 7,
+      "currentRouteId": "route_7",
+      "status": "compared_semantic_landmarks_only",
+      "historicalRowLabels": [
+        "二号门",
+        "地科院",
+        "五教",
+        "26教",
+        "梅园",
+        "橘园",
+        "田家炳",
+        "李园",
+        "大礼堂",
+        "二号门"
+      ],
+      "historicalRawLabelCount": 10,
+      "historicalUniqueLabelCount": 9,
+      "currentSourceStationNames": [
+        "2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆",
+        "地科院",
+        "心理学部",
+        "外语学院",
+        "26教",
+        "梅园1舍",
+        "橘园12舍",
+        "橘园10舍",
+        "橘园",
+        "桃园",
+        "荟文楼",
+        "文学院",
+        "田家炳",
+        "行署楼",
+        "八教"
+      ],
+      "currentGeometryVisitNames": [
+        "2号门",
+        "楠园",
+        "校史馆",
+        "大礼堂",
+        "研究生院",
+        "中心图书馆",
+        "地科院",
+        "心理学部",
+        "外语学院",
+        "26教",
+        "梅园1舍",
+        "橘园12舍",
+        "橘园10舍",
+        "橘园",
+        "桃园",
+        "荟文楼",
+        "文学院",
+        "田家炳",
+        "行署楼",
+        "八教"
+      ],
+      "currentVisitSourceIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "currentGeometryWarnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ],
+      "confirmedCoverage": {
+        "numerator": 7,
+        "denominator": 9,
+        "percent": 77.78
+      },
+      "plausibleCoverageUpperBound": {
+        "numerator": 8,
+        "denominator": 9,
+        "percent": 88.89
+      },
+      "plausibleOnlyHistoricalLabels": [
+        "梅园"
+      ],
+      "unmatchedHistoricalLabels": [
+        "李园"
+      ],
+      "matches": [
+        {
+          "historicalLabel": "二号门",
+          "normalizedKey": "2号门",
+          "historicalOccurrenceIndices": [
+            0,
+            9
+          ],
+          "candidates": [
+            {
+              "currentLabel": "2号门",
+              "sourceIndex": 0,
+              "geometryVisitIndices": [
+                0
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "reviewed numeric/building-name synonym"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "地科院",
+          "normalizedKey": "地科院",
+          "historicalOccurrenceIndices": [
+            1
+          ],
+          "candidates": [
+            {
+              "currentLabel": "地科院",
+              "sourceIndex": 6,
+              "geometryVisitIndices": [
+                6
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "五教",
+          "normalizedKey": "外语学院",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": [
+            {
+              "currentLabel": "外语学院",
+              "sourceIndex": 8,
+              "geometryVisitIndices": [
+                8
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "2024 overview building #5 = 外国语学院; semantic building alias only, not identical stop coordinates"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "26教",
+          "normalizedKey": "26教",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": [
+            {
+              "currentLabel": "26教",
+              "sourceIndex": 9,
+              "geometryVisitIndices": [
+                9
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "梅园",
+          "normalizedKey": "梅园",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": [
+            {
+              "currentLabel": "梅园1舍",
+              "sourceIndex": 10,
+              "geometryVisitIndices": [
+                10
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "橘园",
+          "normalizedKey": "橘园",
+          "historicalOccurrenceIndices": [
+            5
+          ],
+          "candidates": [
+            {
+              "currentLabel": "橘园12舍",
+              "sourceIndex": 11,
+              "geometryVisitIndices": [
+                11
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            },
+            {
+              "currentLabel": "橘园10舍",
+              "sourceIndex": 12,
+              "geometryVisitIndices": [
+                12
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            },
+            {
+              "currentLabel": "橘园",
+              "sourceIndex": 13,
+              "geometryVisitIndices": [
+                13
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "田家炳",
+          "normalizedKey": "田家炳",
+          "historicalOccurrenceIndices": [
+            6
+          ],
+          "candidates": [
+            {
+              "currentLabel": "田家炳",
+              "sourceIndex": 17,
+              "geometryVisitIndices": [
+                17
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "李园",
+          "normalizedKey": "李园",
+          "historicalOccurrenceIndices": [
+            7
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "大礼堂",
+          "normalizedKey": "大礼堂",
+          "historicalOccurrenceIndices": [
+            8
+          ],
+          "candidates": [
+            {
+              "currentLabel": "大礼堂",
+              "sourceIndex": 3,
+              "geometryVisitIndices": [
+                3
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        }
+      ],
+      "order": {
+        "confirmed": {
+          "matchedHistoricalLabels": [
+            "二号门",
+            "地科院",
+            "五教",
+            "26教",
+            "橘园",
+            "田家炳",
+            "大礼堂"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 7,
+              "percent": 85.71
+            },
+            "reverse": {
+              "numerator": 2,
+              "denominator": 7,
+              "percent": 28.57
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 7,
+              "percent": 85.71
+            },
+            "reverse": {
+              "numerator": 2,
+              "denominator": 7,
+              "percent": 28.57
+            }
+          }
+        },
+        "includingPlausible": {
+          "matchedHistoricalLabels": [
+            "二号门",
+            "地科院",
+            "五教",
+            "26教",
+            "梅园",
+            "橘园",
+            "田家炳",
+            "大礼堂"
+          ],
+          "ambiguousHistoricalLabels": [
+            "橘园"
+          ],
+          "geometry": {
+            "forward": {
+              "numerator": 7,
+              "denominator": 8,
+              "percent": 87.5
+            },
+            "reverse": {
+              "numerator": 2,
+              "denominator": 8,
+              "percent": 25
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 7,
+              "denominator": 8,
+              "percent": 87.5
+            },
+            "reverse": {
+              "numerator": 2,
+              "denominator": 8,
+              "percent": 25
+            }
+          }
+        }
+      }
+    },
+    {
+      "historicalRouteNumber": 8,
+      "currentRouteId": "route_8",
+      "status": "compared_semantic_landmarks_only",
+      "historicalRowLabels": [
+        "音乐学院",
+        "八教",
+        "田家炳",
+        "橘园",
+        "梅园",
+        "外语学院",
+        "音乐学院"
+      ],
+      "historicalRawLabelCount": 7,
+      "historicalUniqueLabelCount": 6,
+      "currentSourceStationNames": [
+        "音乐学院",
+        "八教",
+        "行署楼",
+        "田家炳",
+        "文学院",
+        "荟文楼",
+        "桃园",
+        "橘园",
+        "橘园10舍",
+        "橘园12舍",
+        "梅园1舍",
+        "26教",
+        "外语学院",
+        "心理学部",
+        "地科院"
+      ],
+      "currentGeometryVisitNames": [
+        "音乐学院",
+        "行署楼",
+        "田家炳",
+        "文学院",
+        "荟文楼",
+        "桃园",
+        "橘园",
+        "橘园10舍",
+        "橘园12舍",
+        "梅园1舍",
+        "26教",
+        "外语学院",
+        "心理学部",
+        "地科院",
+        "八教"
+      ],
+      "currentVisitSourceIndices": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        1
+      ],
+      "currentGeometryWarnings": [
+        "发布轨迹末点在2米以内接近早期中段（中段近回接），呈引入段+近闭环图形；循环运营未确认，不补边。"
+      ],
+      "confirmedCoverage": {
+        "numerator": 5,
+        "denominator": 6,
+        "percent": 83.33
+      },
+      "plausibleCoverageUpperBound": {
+        "numerator": 6,
+        "denominator": 6,
+        "percent": 100
+      },
+      "plausibleOnlyHistoricalLabels": [
+        "梅园"
+      ],
+      "unmatchedHistoricalLabels": [],
+      "matches": [
+        {
+          "historicalLabel": "音乐学院",
+          "normalizedKey": "音乐学院",
+          "historicalOccurrenceIndices": [
+            0,
+            6
+          ],
+          "candidates": [
+            {
+              "currentLabel": "音乐学院",
+              "sourceIndex": 0,
+              "geometryVisitIndices": [
+                0
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "八教",
+          "normalizedKey": "8教",
+          "historicalOccurrenceIndices": [
+            1
+          ],
+          "candidates": [
+            {
+              "currentLabel": "八教",
+              "sourceIndex": 1,
+              "geometryVisitIndices": [
+                14
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "田家炳",
+          "normalizedKey": "田家炳",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": [
+            {
+              "currentLabel": "田家炳",
+              "sourceIndex": 3,
+              "geometryVisitIndices": [
+                2
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "橘园",
+          "normalizedKey": "橘园",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": [
+            {
+              "currentLabel": "橘园",
+              "sourceIndex": 7,
+              "geometryVisitIndices": [
+                6
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            },
+            {
+              "currentLabel": "橘园10舍",
+              "sourceIndex": 8,
+              "geometryVisitIndices": [
+                7
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            },
+            {
+              "currentLabel": "橘园12舍",
+              "sourceIndex": 9,
+              "geometryVisitIndices": [
+                8
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "梅园",
+          "normalizedKey": "梅园",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": [
+            {
+              "currentLabel": "梅园1舍",
+              "sourceIndex": 10,
+              "geometryVisitIndices": [
+                9
+              ],
+              "kind": "composite_or_area",
+              "reason": "explicit compound component or broader area candidate; stop equivalence unconfirmed"
+            }
+          ]
+        },
+        {
+          "historicalLabel": "外语学院",
+          "normalizedKey": "外语学院",
+          "historicalOccurrenceIndices": [
+            5
+          ],
+          "candidates": [
+            {
+              "currentLabel": "外语学院",
+              "sourceIndex": 12,
+              "geometryVisitIndices": [
+                11
+              ],
+              "kind": "confirmed_semantic",
+              "reason": "same full label"
+            }
+          ]
+        }
+      ],
+      "order": {
+        "confirmed": {
+          "matchedHistoricalLabels": [
+            "音乐学院",
+            "八教",
+            "田家炳",
+            "橘园",
+            "外语学院"
+          ],
+          "ambiguousHistoricalLabels": [],
+          "geometry": {
+            "forward": {
+              "numerator": 4,
+              "denominator": 5,
+              "percent": 80
+            },
+            "reverse": {
+              "numerator": 2,
+              "denominator": 5,
+              "percent": 40
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 5,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 5,
+              "percent": 20
+            }
+          }
+        },
+        "includingPlausible": {
+          "matchedHistoricalLabels": [
+            "音乐学院",
+            "八教",
+            "田家炳",
+            "橘园",
+            "梅园",
+            "外语学院"
+          ],
+          "ambiguousHistoricalLabels": [
+            "橘园"
+          ],
+          "geometry": {
+            "forward": {
+              "numerator": 5,
+              "denominator": 6,
+              "percent": 83.33
+            },
+            "reverse": {
+              "numerator": 2,
+              "denominator": 6,
+              "percent": 33.33
+            }
+          },
+          "sourceArray": {
+            "forward": {
+              "numerator": 6,
+              "denominator": 6,
+              "percent": 100
+            },
+            "reverse": {
+              "numerator": 1,
+              "denominator": 6,
+              "percent": 16.67
+            }
+          }
+        }
+      }
+    },
+    {
+      "historicalRouteNumber": 9,
+      "currentRouteId": null,
+      "status": "no_current_catalog_counterpart",
+      "historicalRowLabels": [
+        "竹园",
+        "二号门",
+        "八教",
+        "田家炳",
+        "圆顶",
+        "五号门",
+        "橘园",
+        "梅园",
+        "中图",
+        "二号门",
+        "竹园"
+      ],
+      "historicalRawLabelCount": 11,
+      "historicalUniqueLabelCount": 9,
+      "currentSourceStationNames": [],
+      "currentGeometryVisitNames": [],
+      "currentVisitSourceIndices": [],
+      "currentGeometryWarnings": [],
+      "confirmedCoverage": null,
+      "plausibleCoverageUpperBound": null,
+      "plausibleOnlyHistoricalLabels": [],
+      "unmatchedHistoricalLabels": [],
+      "matches": [
+        {
+          "historicalLabel": "竹园",
+          "normalizedKey": "竹园",
+          "historicalOccurrenceIndices": [
+            0,
+            10
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "二号门",
+          "normalizedKey": "2号门",
+          "historicalOccurrenceIndices": [
+            1,
+            9
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "八教",
+          "normalizedKey": "8教",
+          "historicalOccurrenceIndices": [
+            2
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "田家炳",
+          "normalizedKey": "田家炳",
+          "historicalOccurrenceIndices": [
+            3
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "圆顶",
+          "normalizedKey": "圆顶",
+          "historicalOccurrenceIndices": [
+            4
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "五号门",
+          "normalizedKey": "5号门",
+          "historicalOccurrenceIndices": [
+            5
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "橘园",
+          "normalizedKey": "橘园",
+          "historicalOccurrenceIndices": [
+            6
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "梅园",
+          "normalizedKey": "梅园",
+          "historicalOccurrenceIndices": [
+            7
+          ],
+          "candidates": []
+        },
+        {
+          "historicalLabel": "中图",
+          "normalizedKey": "中图",
+          "historicalOccurrenceIndices": [
+            8
+          ],
+          "candidates": []
+        }
+      ],
+      "order": null
+    }
+  ]
+}

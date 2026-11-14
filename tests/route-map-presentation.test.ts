@@ -32,6 +32,11 @@ function fixture(
       isLoop: stopIds.length > 0,
       stopIds,
       ...(stopIds.length > 0 ? { allowedRepeatedStopIds: ['b'] } : {}),
+    }, {
+      name: '逆序',
+      isLoop: stopIds.length > 0,
+      stopIds: [...stopIds].reverse(),
+      ...(stopIds.length > 0 ? { allowedRepeatedStopIds: ['b'] } : {}),
     }],
   }])
   return createRouteMapPresentationService(createRouteNavigationService(
@@ -104,4 +109,17 @@ test('an incomplete flexible route reports missing reference stops instead of cl
 test('unknown route and direction errors remain explicit for the page', () => {
   assert.throws(() => routeMapPresentationService.getRoutePresentation('route_missing'), /未找到线路/)
   assert.throws(() => routeMapPresentationService.getRoutePresentation('route_1', '不存在方向'), /不存在方向/)
+})
+
+test('a physical stop keeps its marker identity across directions and repeated visits', () => {
+  const service = fixture('verified', ['a', 'b', 'b', 'c', 'a'])
+  const forward = service.getRoutePresentation('route_6')
+  const reverse = service.getRoutePresentation('route_6', '逆序')
+  const identities = (view: typeof forward) => Object.fromEntries(
+    view.busStopMarkers.map((marker) => [(marker as typeof marker & { stopId?: string }).stopId, marker.id]),
+  )
+  assert.deepEqual(Object.keys(identities(forward)).sort(), ['a', 'b'])
+  assert.deepEqual(identities(forward), identities(reverse))
+  assert.equal(new Set(forward.busStopMarkers.map(({ id }) => id)).size, 2)
+  assert.equal(forward.routeStops.filter(({ id }) => id === 'a').length, 2)
 })

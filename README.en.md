@@ -5,7 +5,7 @@
 
 [简体中文](README.md) | English
 
-**Campus bus navigation for Southwest University's Beibei campus: find routes, choose directions, and view reference stop sequences.**
+**Campus bus navigation for Southwest University's Beibei campus: choose stops, compare direct and one-transfer rides, and view the segment to ride.**
 
 <sub>WeChat Mini Program · TypeScript · Unofficial open-source project · MIT</sub>
 
@@ -20,17 +20,19 @@ SWU Go is an unofficial, open-source WeChat Mini Program for campus bus navigati
 <a id="status"></a>
 ## Current status
 
-**Phase 15: end-to-end validation of real Route 1 demo data** is complete. Both directions, stop references, geometry status, missing-coordinate preflight, manual review, and production display gates are connected. The seven relevant Route 1 stops still lack field-verified coordinates, so real geometry remains `missing`. The page safely falls back to direction, stop order, and flexible-stopping guidance, without drawing or requesting guessed geometry.
+The default entry combines the **campus map and trip planner** on one full-screen map with floating search and a three-position bottom sheet. It uses ten routes, 162 stop visits, 103 source stop identities and 682 track points published by the operator on 2026-11-13. Direct and one-transfer planning works locally without live vehicle data. Access and egress distances are straight-line estimates, not walking directions or arrival predictions. See [offline navigation and data boundaries](docs/offline-transit-2026-11-13.md).
 
-A colored network experimental preview and one-transfer search are available. The production map follows these review gates at startup. Selecting a route number shows only offline Tencent reference segments for that route's current direction and fits the view. Reference dashed lines are separate from official data and do not confirm actual bus paths; turn off “腾讯参考” (Tencent reference) to hide them.
+The map displays those 103 source records as 53 station-area entries. Tapping an entry shows serving routes and boarding/alighting choices. All 162 visits, original coordinates and route-specific review restrictions remain intact. Grouping is for presentation and does not establish that nearby records are one physical platform. See [unified stations](docs/unified-stations-2026-11-14.md).
 
-The first dataset comes from the route table at the upper left of the *Southwest University Beibei Campus Map (2025)*, supporting only route numbers, illustrated stop names, order, and loop structure. Actual 2026 directions, stop-sign names, and stopping behavior still require official notices, on-site signs, and actual rides.
+The current dataset is labeled `operator_published`, separately from the field/manual verification gates used by legacy data. Stops are ordered by projection along the published track while preserving source indices; actual operating directions remain unconfirmed. Routes 6/7/8 have an approach segment and a near-loop shape; this does not justify adding a closing edge or assuming continuous loop operation. The approximately 83-meter offset at Route 3B's Gate 2 stays at its source coordinate and is excluded from automatic boarding, alighting and transfers on that line; Route 3's valid visit remains usable. This is not evidence that service has stopped. See [direction and closure review](docs/direction-closure-check-2026-11-13.md). Private source material stays local; published navigation data excludes credentials, internal source IDs, personal records and local machine paths while retaining necessary public campus coordinates.
 
-There are 22 deduplicated stops; 20 are referenced by Routes 1–9. Gate 1 and the library are unverified stops retained from the previous dataset. All stop coordinates are `null`; GPS is never inferred from image pixels. Stops without field-calibrated GCJ-02 coordinates display no markers.
+The planner supports fuzzy campus search, map selection, optional location and automatic boarding/alighting recommendations. The origin defaults to the current location; location is requested after confirming a destination, and no route is preselected. A failed location request does not silently select the first stop. The glass-style sheet supports peek, half and full positions and dragging, with results on the same map. Old index links redirect to this entry. See [the unified home and map legend](docs/unified-home-2026-11-13.md). Campus search combines OpenStreetMap places with user-supplied building aliases and service descriptions, recommends nearby stops, and offers WeChat's native Tencent location picker. See [campus address search and source boundaries](docs/campus-place-search-2026-11-13.md).
 
-Location handling distinguishes permission denial, timeout, invalid results, and system location failure. Results with horizontal error over 100 meters are retained with a low-accuracy warning.
+### Historical data and services
 
-The map initially uses the existing campus center to show the SWU area. The first location fix updates position/status only, preserving the campus view. Toolbar controls select “校园全览” (campus overview), “北碚城区” (Beibei urban area), or “我的位置” (my location). `setBoundary` and zoom limits restrict browsing to Beibei; out-of-range locations fall back to the campus view. This rectangular viewport is UI configuration, not an exact administrative/campus boundary or a source of stop coordinates.
+The 2025 campus illustration, old Routes 1–9, review gates, experimental Tencent segments and historical navigation services remain in the data/service layers for provenance and research. They are not a second current planner in the user interface. The early 2026 operator name catalog remains in `operator-routes.json`; the current entry uses independent `current-transit` data and does not connect roads from historical stop order. Route 9 being absent from that catalog does not establish a service withdrawal. See [operator observations](docs/operator-route-observations-2026-11-13.md) and the maintenance documentation below.
+
+Location is requested only after a user action. The map's location control updates the map position without changing trip endpoints. Initial entry preserves the campus view, and stale location callbacks cannot override a newer route or overview selection. No live vehicles or arrival predictions are currently provided.
 
 <a id="quick-start"></a>
 ## Running the project
@@ -41,7 +43,7 @@ The map initially uses the existing campus center to show the SWU area. The firs
 4. Run `npm install` to install development dependencies.
 5. Run `npm run typecheck`, `npm run validate:data`, and `npm test` for TypeScript checks, static-data validation, and all tests.
 
-Before real-device location testing, declare location usage in the Mini Program User Privacy Protection Guidelines on the WeChat public platform. DevTools simulations do not replace real-device GPS and permission-denial tests.
+Before real-device testing, declare location and selected-location usage in the Mini Program User Privacy Protection Guidelines and enable the required location-picker interface in the WeChat public platform. The Mini Program requests consent before protected APIs. DevTools simulations do not establish backend approval or replace real-device GPS and permission-denial tests.
 
 The basic `map` component needs no Tencent Location Service key. For Tencent geocoding/walking routes, copy `miniprogram/config/config.example.ts` to Git-ignored `config.local.ts`, supply your WebService key, and configure the Mini Program request source and `https://apis.map.qq.com` allowed domain in Tencent's console. Never commit real keys.
 
@@ -75,6 +77,8 @@ miniprogram/
 Directories are created when needed rather than generating empty files up front. Pages do not implement routing or data access, easing a later switch from static Data Adapters to CloudBase.
 
 ## Core data models
+
+The sections below describe retained legacy services and maintenance workflows. Current published-data models are in `miniprogram/models/current-transit.ts`; see the current navigation documents linked above for their separate data and quality boundaries.
 
 Defined in `miniprogram/models/index.ts`:
 

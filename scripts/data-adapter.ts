@@ -7,6 +7,7 @@ export const dataAdapters = [
   { file: 'pois', type: 'CampusPOI', name: 'pois' },
   { file: 'coordinate-reviews', type: 'CoordinateReview', name: 'coordinateReviews' },
   { file: 'route-geometries', type: 'RouteGeometry', name: 'routeGeometries' },
+  { file: 'operator-routes', type: 'OperatorRouteObservation', name: 'operatorRoutes' },
 ] as const
 
 export type DataAdapter = (typeof dataAdapters)[number]
