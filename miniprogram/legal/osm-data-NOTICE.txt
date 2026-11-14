@@ -1,0 +1,23 @@
+Campus address data © OpenStreetMap contributors
+https://www.openstreetmap.org/copyright
+
+The OpenStreetMap-derived campus place source and generated address index are
+provided under the Open Database License (ODbL) 1.0:
+https://opendatacommons.org/licenses/odbl/1-0/
+
+Original WGS84 coordinates, OSM object IDs, versions, timestamps, approximate
+GCJ-02 generated coordinates, and campus-guide annotations are distributed in:
+miniprogram/data/campus-map-places-source.json
+miniprogram/data/campus-map-places.ts
+Public source: https://github.com/Maximora-byte/swu-busmini
+
+OSM mapping is a community map reference, not a field survey or verified
+building entrance. Geometry bounds centers may not be entrances. Campus-guide
+aliases and service descriptions were supplied by the user from Southwest
+University campus forum materials; original photographs, QR codes, contact
+information and private evidence are not redistributed here.
+
+The OSM-derived address database remains separate from operator-published bus
+routes and transient Tencent native-map selections. Tencent POI data is not
+bulk downloaded or copied into this address database. No OSM tile service or
+public geocoding service is contacted by autocomplete at runtime.

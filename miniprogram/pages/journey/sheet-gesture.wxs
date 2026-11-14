@@ -1,0 +1,84 @@
+var state = { active: false }
+function clamp(value, min, max) { return Math.max(min, Math.min(max, value)) }
+function style(owner, selector, value) {
+  var component = owner.selectComponent(selector)
+  if (component) component.setStyle(value)
+}
+function render(owner, y, animated) {
+  var g = state.geometry
+  if (!g) return
+  var height = Math.max(0, g.windowHeight - g.footerGap - y)
+  style(owner, '.glass-sheet', {
+    transform: 'translate3d(0,' + y + 'px,0)', height: height + 'px',
+    transition: animated ? 'transform 260ms cubic-bezier(.22,1,.36,1)' : 'none'
+  })
+  style(owner, '.sheet-scroll', { height: Math.max(0, height - g.headerHeight - (g.keyboardHeight || 0)) + 'px' })
+  style(owner, '.map-tools', {
+    transform: 'translate3d(0,' + Math.max(108, y - 160) + 'px,0)',
+    opacity: '' + clamp((y - g.expanded) / Math.max(1, g.half - g.expanded), 0, 1)
+  })
+}
+function point(event) {
+  if (event.touches && event.touches.length > 1) return null
+  var touch = (event.touches && event.touches[0]) || (event.changedTouches && event.changedTouches[0])
+  if (!touch) return null
+  var value = typeof touch.clientY === 'number' ? touch.clientY : touch.pageY
+  return typeof value === 'number' && value === value ? value : null
+}
+function sync(next, old, owner) {
+  if (!next) return
+  state.geometry = next
+  state.active = false
+  render(owner, next.y, true)
+}
+function start(event, owner) {
+  if (state.active) cancel(event, owner)
+  var y = point(event)
+  var g = state.geometry
+  state.active = false
+  if (y === null || !g) return
+  if (g.keyboardHeight > 0) { owner.callMethod('handleDismissKeyboard', {}); return; }
+  state.active = true
+  state.start = y
+  state.y = g.y
+  state.time = event.timeStamp || 0
+  state.epoch = g.epoch
+  state.moved = false
+}
+function move(event, owner) {
+  if (!state.active) return
+  var y = point(event)
+  if (y === null) { cancel(event, owner); return; }
+  var g = state.geometry
+  state.y = clamp(g.y + y - state.start, g.expanded, g.peek)
+  if (Math.abs(y - state.start) > 5) state.moved = true
+  render(owner, state.y, false)
+  return false
+}
+function end(event, owner) {
+  if (!state.active) return
+  state.active = false
+  if (!state.moved) { render(owner, state.geometry.y, true); return; }
+  var g = state.geometry
+  var values = [g.expanded, g.half, g.peek]
+  var target = values[0]
+  for (var i = 1; i < 3; i++) if (Math.abs(values[i] - state.y) < Math.abs(target - state.y)) target = values[i]
+  var distance = state.y - g.y
+  var duration = (event.timeStamp || 0) - state.time
+  if (duration > 0 && duration < 250 && Math.abs(distance) > 20) {
+    if (distance < 0 && target === g.y) target = g.y === g.peek ? g.half : g.expanded
+    if (distance > 0 && target === g.y) target = g.y === g.expanded ? g.half : g.peek
+  }
+  render(owner, target, true)
+  owner.callMethod('handleSheetGestureEnd', {
+    snap: target === g.expanded ? 'full' : target === g.half ? 'half' : 'peek', epoch: state.epoch
+  })
+  return false
+}
+function cancel(event, owner) {
+  if (!state.active) return
+  state.active = false
+  render(owner, state.geometry.y, true)
+  return false
+}
+module.exports = { sync: sync, start: start, move: move, end: end, cancel: cancel }

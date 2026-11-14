@@ -1,0 +1,15 @@
+<view wx:if="{{visible}}" class="privacy-mask" catchtap="handleRefuse" catchtouchmove="preventClose">
+  <view class="privacy-dialog" role="dialog" aria-modal="true" aria-label="位置使用与隐私保护" catchtap="preventClose">
+    <view class="privacy-heading"><text>位置使用与隐私保护</text><button class="privacy-close" aria-label="关闭并暂不同意" bindtap="handleRefuse">×</button></view>
+    <scroll-view class="privacy-body" scroll-y="{{true}}">
+      <text class="privacy-copy">为推荐附近校车站和规划乘车方案，我们需要使用你主动获取的当前位置，或你在腾讯地图中选中的位置。</text>
+      <text class="privacy-copy">请先阅读并决定是否同意隐私保护指引。暂不同意也可继续浏览线路、搜索本地校园地点和指定站点。</text>
+      <button class="privacy-contract" bindtap="handleOpenContract">阅读{{contractName}}</button>
+      <text wx:if="{{contractError}}" class="privacy-error">{{contractError}}</text>
+    </scroll-view>
+    <view class="privacy-actions">
+      <button class="privacy-refuse" bindtap="handleRefuse">暂不同意</button>
+      <button id="privacy-agree" class="privacy-agree" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="handleAgree">同意并继续</button>
+    </view>
+  </view>
+</view>
