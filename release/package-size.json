@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "source": "wechat-devtools-preview-info-output",
+  "capturedAt": "2026-11-14T14:36:44.219Z",
+  "toolVersion": "2.02.2609231",
+  "buildVersion": "0.1.9",
+  "inputSha256": "fb9faabb01dd29b2f3c5186975d853c6b22665eaed7000369e793bf5319fd2aa",
+  "profile": {
+    "kind": "single-main",
+    "compileType": "miniprogram",
+    "libVersion": "3.7.12",
+    "configSha256": "07c64e54b9b171fb5f04fde8f3b41e70270e9c88d476977a26fd82205d2e9fa6"
+  },
+  "size": {
+    "total": 273473,
+    "packages": [
+      {
+        "name": "TOTAL",
+        "size": 273473
+      }
+    ]
+  }
+}

@@ -44,6 +44,10 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      # Credential-free verification of captured official-build evidence, not an independent WeChat compilation.
+      - name: Verify captured package evidence and internal budget
+        run: npm run check:package-size
+
       - name: Test
         run: npm run test:coverage
       - name: Upload existing test coverage

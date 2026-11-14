@@ -1279,6 +1279,47 @@ test('swapping confirmed endpoints replans the opposite source geometry without 
   assert.equal(page.data.journeys[0].legs[0].points.length, 61)
 })
 
+test('swapping during an origin GPS request keeps the swapped stops when the old fix arrives', async () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  const locating = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.handleSwapEndpoints()
+  runtime.resolveLocation(runtime.dataset().stops[0].coordinate)
+  await locating
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originIndex, 28)
+  assert.equal(page.data.destinationMode, 'stop')
+  assert.equal(page.data.destinationIndex, 0)
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(page.data.destinationCoordinate, null)
+  assert.equal(page.data.locating, false)
+})
+
+test('swapping invalidates an outstanding native place response and keeps the new origin as GPS fallback', async () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  const choosing = page.handleChooseTencentPlace({ currentTarget: { dataset: { field: 'destination' } } })
+  page.handleSwapEndpoints()
+  runtime.resolvePlace(runtime.dataset().stops[0].coordinate, '旧选点')
+  await choosing
+  assert.equal(page.data.destinationMode, 'stop')
+  assert.equal(page.data.destinationIndex, 0)
+  assert.equal(page.data.destinationCoordinate, null)
+  assert.equal(page.data.nativePlacePicking, false)
+  const locating = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  runtime.rejectLocation()
+  await locating
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.originIndex, 28)
+  assert.equal(page.data.locationMessage.length > 0, true)
+})
+
 test('keyboard space shrinks only the visible sheet scroll area and stale keyboard events cannot reopen it', () => {
   const runtime = createRuntime()
   const page = runtime.page()

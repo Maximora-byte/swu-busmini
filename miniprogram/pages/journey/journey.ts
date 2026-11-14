@@ -11,6 +11,7 @@ import { getCurrentMapPresentation, type CurrentRouteStopView } from '../../serv
 import { createSheetLayout, getSheetGeometry, getOverlayMapPadding, type SheetSnap } from '../../services/map/map-sheet-layout'
 import { getUnifiedTransitStops, type UnifiedTransitStop } from '../../services/map/unified-transit-stops'
 import { createNearestCampusStationService, type NearbyCampusStation } from '../../services/navigation/nearest-campus-station.service'
+import { endpointView, readEndpoint, swapEndpoints, transitionEndpoint, type EndpointField, type EndpointMode, type EndpointSelection } from '../../services/navigation/journey-endpoint-state'
 
 const INITIAL_SHEET = createSheetLayout()
 
@@ -27,7 +28,6 @@ interface JourneyView extends TransitJourney {
   isRecommended: boolean
   legs: JourneyLegView[]
 }
-type EndpointField = 'origin' | 'destination'
 interface ReferenceCircle extends Coordinate { color: string; fillColor: string; radius: number; strokeWidth: number }
 function nearbyStopViews(stops: CampusSearchSuggestion['nearbyStops']) {
   return stops.map((stop) => ({ ...stop, distanceMeters: Math.round(stop.distanceMeters) }))
@@ -90,8 +90,8 @@ Page({
     sourceText: '', directionStatusText: '实际运营方向尚未独立确认，请现场核对。',
     routeOptions: [] as { id: string; name: string; color: string }[], selectedRouteId: '', routeName: '',
     stopOptions: [] as { id: string; label: string }[], stopNames: [] as string[], stopPickerNames: [] as string[],
-    originIndex: 0, destinationIndex: 0, originMode: 'location', originCoordinate: null as Coordinate | null,
-    destinationMode: 'search', destinationCoordinate: null as Coordinate | null,
+    originIndex: 0, destinationIndex: 0, originMode: 'location' as EndpointMode, originCoordinate: null as Coordinate | null,
+    destinationMode: 'search' as EndpointMode, destinationCoordinate: null as Coordinate | null,
     originQuery: '当前位置', destinationQuery: '', activeSearchField: '', searchVersion: 0,
     searchResults: [] as CampusSearchSuggestion[], searchMessage: '',
     nativePlacePicking: false, placeSelectionMessage: '', placeMessageField: '',
@@ -234,20 +234,11 @@ Page({
   handleFitCurrentMap() { this.handleDismissKeyboard(); this.setSheetSnap('peek', false); this.fitMap() },
   handleSwapEndpoints() {
     this.handleDismissKeyboard()
-    const d = this.data
-    const originIndex = d.destinationIndex, destinationIndex = d.originIndex
-    const originMode = d.destinationMode, destinationMode = d.originMode === 'coordinate' ? 'map' : d.originMode === 'location' ? 'search' : d.originMode
-    const originCoordinate = d.destinationCoordinate ? { ...d.destinationCoordinate } : null
-    const destinationCoordinate = d.originCoordinate ? { ...d.originCoordinate } : null
-    const originQuery = originMode === 'map' ? '地图所选起点' : d.destinationQuery
-    const destinationQuery = d.originMode === 'location' ? '' : d.originMode === 'coordinate' ? '原定位位置' : destinationMode === 'map' ? '地图所选终点' : d.originQuery
+    const endpoints = swapEndpoints(readEndpoint(this.data, 'origin'), readEndpoint(this.data, 'destination'))
     this.clearJourneys()
-    this.confirmedOriginStopId = ['stop', 'place'].includes(originMode) ? this.data.stopOptions[originIndex]?.id ?? '' : ''
-    this.setData({ viewMode: 'journey', originIndex, destinationIndex, originMode, destinationMode, originCoordinate, destinationCoordinate,
-      originAllowedVisits: d.destinationAllowedVisits, destinationAllowedVisits: d.originAllowedVisits,
-      originQuery, destinationQuery, locationMessage: '',
-      originPlaceDetails: d.destinationPlaceDetails, destinationPlaceDetails: d.originPlaceDetails,
-      originNearbyStops: d.destinationNearbyStops, destinationNearbyStops: d.originNearbyStops })
+    this.confirmedOriginStopId = ['stop', 'place'].includes(endpoints.origin.mode) ? this.data.stopOptions[endpoints.origin.index]?.id ?? '' : ''
+    this.setData({ viewMode: 'journey', locationMessage: '',
+      ...endpointView('origin', endpoints.origin), ...endpointView('destination', endpoints.destination) })
     this.replanIfReady()
   },
   handleBrowseRoutes() {
@@ -432,25 +423,20 @@ Page({
     })
     if (redraw) this.showRoute(this.data.selectedRouteId, false)
   },
-  handleOriginChange(event: WechatMiniprogram.PickerChange) {
-    const index = Number(event.detail.value)
-    if (!Number.isInteger(index) || !this.data.stopOptions[index]) return
+  commitEndpoint(field: EndpointField, selection: EndpointSelection) {
+    const endpoint = transitionEndpoint(readEndpoint(this.data, field), selection)
     this.clearJourneys()
-    this.confirmedOriginStopId = this.data.stopOptions[index].id
-    this.setData({ originIndex: index, originMode: 'stop', originCoordinate: null, locationMessage: '',
-      originAllowedVisits: null,
-      originPlaceDetails: '', originNearbyStops: [],
-      originQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
+    if (field === 'origin') this.confirmedOriginStopId = ['stop', 'place'].includes(endpoint.mode) ? this.data.stopOptions[endpoint.index]?.id ?? '' : ''
+    this.setData({ ...endpointView(field, endpoint), ...(field === 'origin' ? { locationMessage: '' } : {}) })
   },
-  handleDestinationChange(event: WechatMiniprogram.PickerChange) {
-    const index = Number(event.detail.value)
+  selectExactEndpoint(field: EndpointField, value: string) {
+    const index = Number(value)
     if (!Number.isInteger(index) || !this.data.stopOptions[index]) return
-    this.clearJourneys()
-    this.setData({ destinationIndex: index, destinationMode: 'stop', destinationCoordinate: null,
-      destinationAllowedVisits: null,
-      destinationPlaceDetails: '', destinationNearbyStops: [],
-      destinationQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
+    this.commitEndpoint(field, { mode: 'stop', index,
+      query: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
   },
+  handleOriginChange(event: WechatMiniprogram.PickerChange) { this.selectExactEndpoint('origin', String(event.detail.value)) },
+  handleDestinationChange(event: WechatMiniprogram.PickerChange) { this.selectExactEndpoint('destination', String(event.detail.value)) },
   handleExactStopChange(event: WechatMiniprogram.PickerChange) {
     const index = Number(event.detail.value) - 1
     if (!Number.isInteger(index) || index < 0 || !this.data.stopOptions[index]) return
@@ -464,8 +450,7 @@ Page({
     const field = endpointField(event.currentTarget.dataset.field)
     if (!field || !this.pageVisible) return
     if (field === 'origin' && this.data.originMode === 'location') {
-      this.clearJourneys()
-      this.setData({ originMode: 'search', originQuery: '', locationMessage: '', originPlaceDetails: '', originNearbyStops: [] })
+      this.commitEndpoint(field, { mode: 'search', query: '' })
     }
     this.setData({ viewMode: 'journey' })
     this.setData({ focusedSearchField: field, sheetScrollTarget: `${field}-field`, dataNotesExpanded: false })
@@ -486,10 +471,7 @@ Page({
     if (!field || typeof event.detail.value !== 'string' || !this.pageVisible) return
     const query = event.detail.value.slice(0, 64)
     this.setData({ viewMode: 'journey' })
-    this.clearJourneys()
-    if (field === 'origin') this.confirmedOriginStopId = ''
-    this.setData(field === 'origin' ? { originAllowedVisits: null, originQuery: query, originMode: 'search', originCoordinate: null, locationMessage: '', originPlaceDetails: '', originNearbyStops: [] } :
-      { destinationAllowedVisits: null, destinationQuery: query, destinationMode: 'search', destinationCoordinate: null, destinationPlaceDetails: '', destinationNearbyStops: [] })
+    this.commitEndpoint(field, { mode: 'search', query })
     this.setData({ focusedSearchField: field, sheetScrollTarget: `${field}-field`, dataNotesExpanded: false })
     if (this.data.sheetSnap !== 'full') this.setSheetSnap('full', false)
     this.showSearchResults(field)
@@ -503,12 +485,8 @@ Page({
     if (!suggestion.coordinate) {
       wx.hideKeyboard()
       this.setData({ focusedSearchField: '', keyboardHeight: 0 })
-      this.clearJourneys()
-      if (field === 'origin') this.confirmedOriginStopId = ''
-      this.setData({ placeMessageField: field, placeSelectionMessage: `${suggestion.name}：名称和用途已收录，请用腾讯地图或地图选点确认具体位置后推荐站点。`,
-        ...(field === 'origin' ? { originQuery: suggestion.name, originMode: 'search', originCoordinate: null, originIndex: -1,
-          originPlaceDetails: suggestion.details ?? '', originNearbyStops: [], locationMessage: '' } : { destinationQuery: suggestion.name, destinationMode: 'search', destinationCoordinate: null,
-          destinationIndex: -1, destinationPlaceDetails: suggestion.details ?? '', destinationNearbyStops: [] }) })
+      this.commitEndpoint(field, { mode: 'search', query: suggestion.name, index: -1, placeDetails: suggestion.details ?? '' })
+      this.setData({ placeMessageField: field, placeSelectionMessage: `${suggestion.name}：名称和用途已收录，请用腾讯地图或地图选点确认具体位置后推荐站点。` })
       this.setSheetSnap('full', false)
       return
     }
@@ -520,13 +498,8 @@ Page({
     const nearbyStops = nearbyStopViews(this.placeSearch?.nearby(point) ?? [])
     wx.hideKeyboard()
     this.setData({ focusedSearchField: '', keyboardHeight: 0 })
-    if (field === 'origin') this.confirmedOriginStopId = stopId ?? ''
-    this.clearJourneys()
-    this.setData(field === 'origin' ? {
-      originAllowedVisits: allowedVisits?.map((rule) => ({ ...rule })) ?? null,
-      originQuery: name, originMode: 'place', originCoordinate: { ...point }, originIndex: index, locationMessage: '', originPlaceDetails: details, originNearbyStops: nearbyStops,
-    } : { destinationAllowedVisits: allowedVisits?.map((rule) => ({ ...rule })) ?? null,
-      destinationQuery: name, destinationMode: 'place', destinationCoordinate: { ...point }, destinationIndex: index, destinationPlaceDetails: details, destinationNearbyStops: nearbyStops })
+    this.commitEndpoint(field, { mode: 'place', query: name, coordinate: point, index, placeDetails: details,
+      nearbyStops, allowedVisits: allowedVisits ? [...allowedVisits] : null })
     this.replanIfReady()
   },
   async handleChooseTencentPlace(event: WechatMiniprogram.TouchEvent) {
@@ -587,11 +560,9 @@ Page({
     }
     const coordinate = { latitude, longitude }
     if (!field) { this.showNearbyStations(coordinate); return }
-    this.clearJourneys()
-    if (field === 'origin') this.confirmedOriginStopId = ''
     const nearbyStops = nearbyStopViews(this.placeSearch?.nearby(coordinate) ?? [])
-    this.setData(field === 'origin' ? { originAllowedVisits: null, originMode: 'map', originCoordinate: coordinate, originQuery: '地图所选起点', locationMessage: '', originPlaceDetails: '手动地图参考点。', originNearbyStops: nearbyStops } :
-      { destinationAllowedVisits: null, destinationMode: 'map', destinationCoordinate: coordinate, destinationQuery: '地图所选终点', destinationPlaceDetails: '手动地图参考点。', destinationNearbyStops: nearbyStops })
+    this.commitEndpoint(field, { mode: 'map', coordinate, query: field === 'origin' ? '地图所选起点' : '地图所选终点',
+      placeDetails: '手动地图参考点。', nearbyStops })
     this.replanIfReady()
   },
   showNearbyStations(point: Coordinate) {

@@ -1,0 +1,6 @@
+<view class="recovery">
+  <text class="recovery-title">暂时无法打开页面</text>
+  <text class="recovery-message">{{message}}</text>
+  <button bindtap="handleRetry" loading="{{retrying}}" disabled="{{retrying}}">重新打开首页</button>
+  <text wx:if="{{retryError}}" class="recovery-error">{{retryError}}</text>
+</view>
