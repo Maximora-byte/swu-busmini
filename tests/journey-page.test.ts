@@ -11,8 +11,10 @@ import type { TransitJourney } from '../miniprogram/services/navigation/transit-
 import type { CampusSearchSuggestion } from '../miniprogram/services/navigation/campus-place-search.service'
 import type { CurrentRouteStopView } from '../miniprogram/services/map/current-transit-map.service'
 import type { SheetGeometry, SheetSnap } from '../miniprogram/services/map/map-sheet-layout'
+import type { UnifiedTransitStop } from '../miniprogram/services/map/unified-transit-stops'
 
 interface PageData {
+  selectedStation: UnifiedTransitStop | null
   sheetSnap: SheetSnap
   sheetGeometry: SheetGeometry
   focusedSearchField: string
@@ -61,16 +63,22 @@ interface PageData {
   locationMessage: string
   locating: boolean
   mapPolylines: { points: Coordinate[] }[]
-  mapMarkers: { stopId: string; latitude: number; longitude: number; callout: { content: string } }[]
+  mapMarkers: { id: number; stationId?: string; stopIds?: string[]; stopId: string; latitude: number; longitude: number; callout: { content: string } }[]
 }
 interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; suggestionId?: string; stopId?: string; searchVersion?: number; view?: string; order?: string; visitKey?: string } } }
 interface JourneyPage {
+  handleMarkerTap(event: { detail: { markerId: number } }): void
+  handleCloseStation(): void
+  handleUseStation(event: Event): void
+  handleUseStationVisit(event: Event): void
   data: PageData
+  selectComponent?(selector: string): { hasPendingPrivacy?(): boolean } | null
   setData(update: Partial<PageData>, callback?: () => void): void
   onLoad(query?: { routeId?: string }): void
   onReady(): void
   onHide(): void
   onShow(): void
+  onUnload(): void
   handleRouteChange(event: Event): void
   handleOriginChange(event: { detail: { value: string } }): void
   handleDestinationChange(event: { detail: { value: string } }): void
@@ -388,6 +396,65 @@ test('a hidden page discards a pending location instead of resurrecting old orig
   assert.equal(page.data.originCoordinate, null)
 })
 
+test('reading the privacy contract preserves pending origin GPS until return and explicit agreement', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  let privacyPending = true
+  page.selectComponent = selector => selector === '#privacy-consent' ? { hasPendingPrivacy: () => privacyPending } : null
+  const locating = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.onHide()
+  assert.equal(page.data.locating, true)
+  assert.equal(page.data.originCoordinate, null)
+  page.onShow()
+  privacyPending = false
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await locating
+  assert.equal(page.data.originMode, 'coordinate')
+  assert.equal((page.data.originCoordinate as Coordinate | null)?.latitude, 29.82)
+  assert.equal(page.data.locating, false)
+})
+
+test('reading the privacy contract preserves pending map GPS without changing planner origin', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  let privacyPending = true
+  page.selectComponent = () => ({ hasPendingPrivacy: () => privacyPending })
+  const locating = page.handleMapLocate()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.onHide()
+  assert.equal(page.data.mapLocating, true)
+  assert.equal(page.data.mapLocation, null)
+  page.onShow()
+  privacyPending = false
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await locating
+  assert.equal((page.data.mapLocation as Coordinate | null)?.latitude, 29.82)
+  assert.equal(page.data.mapLocating, false)
+  assert.equal(page.data.originCoordinate, null)
+  assert.equal(runtime.cameraMoves.length, 1)
+  assert.equal(runtime.cameraMoves[0].latitude, 29.82)
+  assert.equal(runtime.cameraMoves[0].longitude, 106.42)
+})
+
+test('unloading still invalidates an origin fix while privacy agreement is pending', async () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.selectComponent = () => ({ hasPendingPrivacy: () => true })
+  const locating = page.handleUseLocation()
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  page.onUnload()
+  page.onShow()
+  runtime.resolveLocation({ latitude: 29.82, longitude: 106.42 })
+  await locating
+  assert.equal(page.data.originMode, 'location')
+  assert.equal(page.data.originCoordinate, null)
+})
+
 test('a failed location refresh cannot silently reuse a previous successful GPS fix', async () => {
   const runtime = createRuntime()
   const page = runtime.page()
@@ -452,6 +519,64 @@ test('an off-route source point stays visible for review without advertising tha
   assert.doesNotMatch(option.label, /3路B线/)
   assert.match(option.label, /3号线/)
   assert.match(page.data.directionStatusText, /运营方向.*未.*确认/)
+})
+
+test('network markers open a unified station with all published lines and can return to browsing', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  assert.ok(page.data.mapMarkers.length < runtime.dataset().stops.length)
+  const marker = page.data.mapMarkers.find((item) => (item.stopIds?.length ?? 0) > 1)!
+  assert.ok(marker)
+  page.handleMarkerTap({ detail: { markerId: marker.id } })
+  assert.ok(page.data.selectedStation)
+  assert.ok(page.data.selectedStation!.routes.length > 1)
+  assert.equal(page.data.sheetSnap, 'half')
+  const focusedPoints = runtime.fitPoints[runtime.fitPoints.length - 1]
+  assert.equal(focusedPoints.length, 2)
+  assert.ok(Math.abs((focusedPoints[0].latitude + focusedPoints[1].latitude) / 2 - marker.latitude) < 1e-8)
+  page.handleUseStation({ currentTarget: { dataset: { field: 'destination' } } })
+  assert.equal(page.data.destinationMode, 'place')
+  assert.equal(page.data.selectedStation, null)
+  assert.equal(page.data.viewMode, 'journey')
+  page.handleMarkerTap({ detail: { markerId: marker.id } })
+  page.handleCloseStation()
+  assert.equal(page.data.selectedStation, null)
+})
+
+test('unified station keeps quarantined line actions disabled and uses exact eligible source records', () => {
+  const runtime = createRuntime()
+  const page = runtime.page()
+  page.onLoad({ routeId: 'route_3b' })
+  const stop = page.data.routeStops.find((item) => !item.canBoard)!
+  const marker = page.data.mapMarkers.find((item) => item.stopIds?.includes(stop.stopId))!
+  assert.ok(marker)
+  page.handleMarkerTap({ detail: { markerId: marker.id } })
+  const blocked = page.data.selectedStation!.routes.find((route) => route.routeId === 'route_3b')!.visits.find((visit) => !visit.canBoard)!
+  page.handleUseStationVisit({ currentTarget: { dataset: { field: 'origin', visitKey: blocked.key } } })
+  assert.equal(page.data.originMode, 'location')
+  const eligible = page.data.selectedStation!.routes.find((route) => route.routeId === 'route_3')!.visits.find((visit) => visit.canBoard)!
+  page.handleUseStationVisit({ currentTarget: { dataset: { field: 'origin', visitKey: eligible.key } } })
+  assert.equal(page.data.originMode, 'stop')
+  assert.equal(page.data.stopOptions[page.data.originIndex].id, eligible.stopId)
+  assert.equal(page.data.selectedStation, null)
+})
+
+test('station focus retains visible map space in compact supported windows', () => {
+  for (const height of [559, 480]) {
+    const runtime = createRuntime()
+    const page = runtime.page()
+    page.onLoad()
+    page.onReady()
+    page.onResize({ size: { windowWidth: 375, windowHeight: height } })
+    const count = runtime.fitPoints.length
+    page.handleMarkerTap({ detail: { markerId: page.data.mapMarkers[0].id } })
+    assert.ok(runtime.fitPoints.length > count, `station focus must still fit at ${height}px`)
+    assert.equal(runtime.fitPoints[runtime.fitPoints.length - 1].length, 2)
+    const padding = runtime.fitPadding[runtime.fitPadding.length - 1]
+    assert.ok(padding[0] + padding[2] < 294, 'the focused station must retain a visible map area')
+  }
 })
 
 test('a valid B-line ride passes the source geometry without presenting the offset point as a boarding stop', () => {

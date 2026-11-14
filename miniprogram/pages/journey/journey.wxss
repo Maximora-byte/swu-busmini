@@ -144,3 +144,28 @@ button::after { border: 0; }
 .selected-nearby { margin-top: 8px; padding: 8px 10px; background: #eef6f0; border-radius: 12px; }
 .nearby-caption { color: #5e7264; font-size: 20rpx; }
 .nearby-stop-row { display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; color: #345642; font-size: 23rpx; }
+
+.station-overview { display: flex; align-items: center; gap: 12px; padding: 3px 0 16px; }
+.station-symbol { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; flex: none; border: 1px solid rgba(255,255,255,.9); border-radius: 17px; background: linear-gradient(140deg,#e4f3eb,#f8fbf9); box-shadow: inset 0 1px 0 #fff,0 3px 8px rgba(34,76,52,.06); }
+.station-symbol image { width: 24px; height: 32px; }
+.station-overview-copy { min-width: 0; }
+.station-category { display: block; color: #254c39; font-size: 28rpx; font-weight: 600; }
+.station-meta { display: block; margin-top: 4px; color: #637568; font-size: 21rpx; line-height: 1.5; }
+.station-primary-actions { display: flex; gap: 10px; margin-bottom: 22px; }
+.station-primary-actions button { flex: 1; min-width: 0; margin: 0; padding: 12px 8px; border-radius: 16px; font-size: 25rpx; }
+.station-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; color: #244934; font-size: 29rpx; font-weight: 600; }
+.station-section-heading .station-meta { font-weight: 400; }
+.station-route { padding: 17px 0 13px; border-bottom: 1px solid rgba(51,91,65,.1); }
+.station-line-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0; margin: 0 0 13px; width: 100%; background: transparent; text-align: left; line-height: 1.4; }
+.station-line-badge { display: block; padding: 5px 13px; border: 1.5px solid; border-radius: 24px; font-size: 27rpx; font-weight: 600; }
+.station-view-line { display: flex; align-items: center; gap: 3px; flex: none; color: #637568; font-size: 21rpx; }
+.station-visit { padding: 7px 0 10px; }
+.station-visit-copy { display: flex; align-items: flex-start; gap: 10px; }
+.station-visit-dot { flex: none; margin-top: 7px; width: 7px; height: 7px; border-radius: 50%; }
+.station-reference { display: block; color: #345543; font-size: 24rpx; line-height: 1.6; }
+.station-status { display: block; margin-top: 3px; color: #637568; font-size: 20rpx; line-height: 1.5; }
+.station-status--review { color: #956324; }
+.station-visit-actions { display: flex; gap: 8px; margin: 9px 0 0 17px; }
+.station-visit-actions button { margin: 0; padding: 7px 11px; font-size: 21rpx; }
+.station-content button[disabled] { color: #8b948f; background: #eef1ef; box-shadow: none; }
+.station-footnote { display: block; margin: 18px 0 8px; color: #637568; font-size: 20rpx; line-height: 1.8; }
