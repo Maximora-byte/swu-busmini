@@ -19,8 +19,8 @@
   <view class="glass-sheet" style="transform: translate3d(0,{{sheetGeometry.y}}px,0); height: {{sheetGeometry.height}}px">
     <view class="sheet-header" geometry="{{sheetGeometry}}" change:geometry="{{sheetGesture.sync}}" bindtouchstart="{{sheetGesture.start}}" catchtouchmove="{{sheetGesture.move}}" bindtouchend="{{sheetGesture.end}}" bindtouchcancel="{{sheetGesture.cancel}}" bindtap="handleToggleSheet">
       <view class="sheet-grip"></view>
-      <view class="sheet-heading"><view class="sheet-heading-copy"><text class="sheet-title">{{dataNotesExpanded ? '数据与使用说明' : viewMode === 'map' ? '校园出行' : journeyPreview ? '推荐 · ' + journeyPreview.title : '设置起终点'}}</text><text wx:if="{{stopMessage || mapLocationMessage}}" class="sheet-subtitle">{{stopMessage || mapLocationMessage}}</text><view wx:elif="{{!dataNotesExpanded && (viewMode === 'journey' ? !!journeyPreview : !showAllRoutes)}}" class="header-route-legend"><block wx:for="{{mapLegend}}" wx:key="routeId"><view wx:if="{{index < 2}}" class="legend-item"><view class="legend-line" style="background: {{item.color}}"></view><text>{{item.name}}</text></view></block></view><text wx:else class="sheet-subtitle">{{showAllRoutes ? (viewMode === 'journey' ? '确认目的地，自动比较全部线路' : '十条发布线路，未预选线路') : '选好位置，自动推荐上下车点'}}</text></view>
-        <button wx:if="{{viewMode === 'journey' && !dataNotesExpanded}}" class="tiny-text-button" catchtap="handleBrowseRoutes">线路</button><button wx:elif="{{journeys.length && !dataNotesExpanded}}" class="tiny-text-button" catchtap="handleRestorePlan">方案</button>
+      <view class="sheet-heading"><view class="sheet-heading-copy"><text class="sheet-title">{{dataNotesExpanded ? '数据与使用说明' : selectedStation ? selectedStation.label : viewMode === 'map' ? '校园出行' : journeyPreview ? '推荐 · ' + journeyPreview.title : '设置起终点'}}</text><text wx:if="{{stopMessage || mapLocationMessage}}" class="sheet-subtitle">{{stopMessage || mapLocationMessage}}</text><view wx:elif="{{!dataNotesExpanded && (viewMode === 'journey' ? !!journeyPreview : !showAllRoutes)}}" class="header-route-legend"><block wx:for="{{mapLegend}}" wx:key="routeId"><view wx:if="{{index < 2}}" class="legend-item"><view class="legend-line" style="background: {{item.color}}"></view><text>{{item.name}}</text></view></block></view><text wx:else class="sheet-subtitle">{{showAllRoutes ? (viewMode === 'journey' ? '确认目的地，自动比较全部线路' : '十条发布线路，未预选线路') : '选好位置，自动推荐上下车点'}}</text></view>
+        <button wx:if="{{selectedStation && !dataNotesExpanded}}" class="header-icon-button" catchtap="handleCloseStation" aria-label="关闭站点详情"><image class="small-icon" src="/assets/icons/ui-close.svg" /></button><button wx:elif="{{viewMode === 'journey' && !dataNotesExpanded}}" class="tiny-text-button" catchtap="handleBrowseRoutes">线路</button><button wx:elif="{{journeys.length && !dataNotesExpanded}}" class="tiny-text-button" catchtap="handleRestorePlan">方案</button>
         <button class="header-icon-button" catchtap="toggleDataNotes" aria-label="查看资料说明"><image class="small-icon" src="/assets/icons/ui-info.svg" /></button>
         <button class="header-icon-button" catchtap="handleToggleSheet" aria-label="{{sheetSnap === 'peek' ? '展开浮层' : '收起浮层'}}"><image class="small-icon {{sheetSnap !== 'peek' ? 'chevron-up' : ''}}" src="/assets/icons/ui-chevron.svg" /></button>
       </view>
@@ -32,6 +32,21 @@
         <text>校车轨迹以线路图例实线为准。蓝／紫参考圈分别表示出发和到达位置，图钉表示实际乘降参考点；底图其他线条不表示校车路线。</text>
         <text>6／7／8的近闭环不证明可连续循环运营，当前不补闭合边。偏移待核对点保留原位置，暂停该线路的自动乘降，不代表停站。</text>
         <text>接驳为直线估计，未绘制步行道路；当前不提供实时车辆、等待或到站预测。</text><text wx:for="{{routeWarnings}}" wx:key="*this" class="data-warning">{{item}}</text>
+      </view>
+
+      <view wx:elif="{{selectedStation}}" class="sheet-content station-content">
+        <view class="station-overview"><view class="station-symbol"><image src="/assets/icons/bus-stop-marker.png" /></view><view class="station-overview-copy"><text class="station-category">校园校车站</text><text class="station-meta">{{selectedStation.routes.length}}条途经线路 · {{selectedStation.stopIds.length}}个发布参考记录</text></view></view>
+        <view class="station-primary-actions"><button class="subtle-button" disabled="{{!selectedStation.canBoard}}" data-field="origin" bindtap="handleUseStation">从此站出发</button><button class="compact-primary" disabled="{{!selectedStation.canBoard}}" data-field="destination" bindtap="handleUseStation">到此站去<image class="tiny-icon" src="/assets/icons/ui-forward-light.svg" /></button></view>
+        <view class="station-section-heading"><text>途经线路</text><text class="station-meta">按发布资料展示</text></view>
+        <text class="quiet-note">相邻站为几何参考站序，实际运营方向请现场核对。</text>
+        <view wx:for="{{selectedStation.routes}}" wx:key="routeId" wx:for-item="line" class="station-route">
+          <button class="station-line-heading" style="color: {{line.color}}" data-route-id="{{line.routeId}}" bindtap="handleRouteChange"><text class="station-line-badge" style="border-color: {{line.color}}">{{line.name}}</text><view class="station-view-line"><text>查看线路</text><image class="tiny-icon" src="/assets/icons/ui-forward.svg" /></view></button>
+          <view wx:for="{{line.visits}}" wx:key="key" wx:for-item="visit" class="station-visit">
+            <view class="station-visit-copy"><view class="station-visit-dot" style="background: {{line.color}}"></view><view><text class="station-reference">{{visit.referenceText}}</text><text class="station-status {{!visit.canBoard ? 'station-status--review' : ''}}">{{visit.canBoard ? '发布候车参考点' : '位置待核对，暂不推荐乘降'}}</text></view></view>
+            <view class="station-visit-actions"><button class="subtle-button" disabled="{{!visit.canBoard}}" data-visit-key="{{visit.key}}" data-field="origin" bindtap="handleUseStationVisit">在此上车</button><button class="subtle-button" disabled="{{!visit.canBoard}}" data-visit-key="{{visit.key}}" data-field="destination" bindtap="handleUseStationVisit">在此下车</button></view>
+          </view>
+        </view>
+        <text class="station-footnote">同名近邻仅作展示归拢，实际乘降坐标保留在线路记录中。当前不提供实时车辆或到站预测。</text>
       </view>
 
       <view wx:elif="{{viewMode === 'map'}}" class="sheet-content browse-content">
