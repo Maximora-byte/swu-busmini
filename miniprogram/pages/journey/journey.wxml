@@ -4,7 +4,7 @@
 
   <button class="floating-search glass-surface" hover-class="button-press" bindtap="handleOpenPlanner" aria-label="搜索地点并规划出行">
     <view class="search-symbol"><image class="icon" src="/assets/icons/ui-search.svg" /></view>
-    <view class="search-copy"><text class="search-title">{{destinationQuery || '想去哪里？'}}</text><text class="search-subtitle">北碚校区 · 自动匹配线路</text></view>
+    <view class="search-copy"><text class="search-title">{{destinationQuery || '想去哪里？'}}</text><text class="search-subtitle">点地图找车站 · 搜索规划出行</text></view>
     <view class="search-route-cue">路线<image class="tiny-icon" src="/assets/icons/ui-forward.svg" /></view>
   </button>
 
@@ -19,8 +19,8 @@
   <view class="glass-sheet" style="transform: translate3d(0,{{sheetGeometry.y}}px,0); height: {{sheetGeometry.height}}px">
     <view class="sheet-header" geometry="{{sheetGeometry}}" change:geometry="{{sheetGesture.sync}}" bindtouchstart="{{sheetGesture.start}}" catchtouchmove="{{sheetGesture.move}}" bindtouchend="{{sheetGesture.end}}" bindtouchcancel="{{sheetGesture.cancel}}" bindtap="handleToggleSheet">
       <view class="sheet-grip"></view>
-      <view class="sheet-heading"><view class="sheet-heading-copy"><text class="sheet-title">{{dataNotesExpanded ? '数据与使用说明' : selectedStation ? selectedStation.label : viewMode === 'map' ? '校园出行' : journeyPreview ? '推荐 · ' + journeyPreview.title : '设置起终点'}}</text><text wx:if="{{stopMessage || mapLocationMessage}}" class="sheet-subtitle">{{stopMessage || mapLocationMessage}}</text><view wx:elif="{{!dataNotesExpanded && (viewMode === 'journey' ? !!journeyPreview : !showAllRoutes)}}" class="header-route-legend"><block wx:for="{{mapLegend}}" wx:key="routeId"><view wx:if="{{index < 2}}" class="legend-item"><view class="legend-line" style="background: {{item.color}}"></view><text>{{item.name}}</text></view></block></view><text wx:else class="sheet-subtitle">{{showAllRoutes ? (viewMode === 'journey' ? '确认目的地，自动比较全部线路' : '十条发布线路，未预选线路') : '选好位置，自动推荐上下车点'}}</text></view>
-        <button wx:if="{{selectedStation && !dataNotesExpanded}}" class="header-icon-button" catchtap="handleCloseStation" aria-label="关闭站点详情"><image class="small-icon" src="/assets/icons/ui-close.svg" /></button><button wx:elif="{{viewMode === 'journey' && !dataNotesExpanded}}" class="tiny-text-button" catchtap="handleBrowseRoutes">线路</button><button wx:elif="{{journeys.length && !dataNotesExpanded}}" class="tiny-text-button" catchtap="handleRestorePlan">方案</button>
+      <view class="sheet-heading"><view class="sheet-heading-copy"><text class="sheet-title">{{dataNotesExpanded ? '数据与使用说明' : selectedStation ? selectedStation.label : nearbyStationPoint ? '附近校车站' : viewMode === 'map' ? '校园出行' : journeyPreview ? '推荐 · ' + journeyPreview.title : '设置起终点'}}</text><text wx:if="{{nearbyStationPoint && !selectedStation && !dataNotesExpanded}}" class="sheet-subtitle">按所选点找站 · 从手机当前位置导航</text><text wx:elif="{{stopMessage || mapLocationMessage}}" class="sheet-subtitle">{{stopMessage || mapLocationMessage}}</text><view wx:elif="{{!dataNotesExpanded && (viewMode === 'journey' ? !!journeyPreview : !showAllRoutes)}}" class="header-route-legend"><block wx:for="{{mapLegend}}" wx:key="routeId"><view wx:if="{{index < 2}}" class="legend-item"><view class="legend-line" style="background: {{item.color}}"></view><text>{{item.name}}</text></view></block></view><text wx:else class="sheet-subtitle">{{showAllRoutes ? (viewMode === 'journey' ? '确认目的地，自动比较全部线路' : '十条发布线路，未预选线路') : '选好位置，自动推荐上下车点'}}</text></view>
+        <button wx:if="{{selectedStation && !dataNotesExpanded}}" class="header-icon-button" catchtap="handleCloseStation" aria-label="关闭站点详情"><image class="small-icon" src="/assets/icons/ui-close.svg" /></button><button wx:elif="{{nearbyStationPoint && !dataNotesExpanded}}" class="header-icon-button" catchtap="handleCloseNearbyStations" aria-label="关闭附近车站"><image class="small-icon" src="/assets/icons/ui-close.svg" /></button><button wx:elif="{{viewMode === 'journey' && !dataNotesExpanded}}" class="tiny-text-button" catchtap="handleBrowseRoutes">线路</button><button wx:elif="{{journeys.length && !dataNotesExpanded}}" class="tiny-text-button" catchtap="handleRestorePlan">方案</button>
         <button class="header-icon-button" catchtap="toggleDataNotes" aria-label="查看资料说明"><image class="small-icon" src="/assets/icons/ui-info.svg" /></button>
         <button class="header-icon-button" catchtap="handleToggleSheet" aria-label="{{sheetSnap === 'peek' ? '展开浮层' : '收起浮层'}}"><image class="small-icon {{sheetSnap !== 'peek' ? 'chevron-up' : ''}}" src="/assets/icons/ui-chevron.svg" /></button>
       </view>
@@ -45,6 +45,17 @@
         </view>
         <text wx:if="{{!selectedStation.directions.length}}" class="quiet-note">暂无法区分参考方向，可用上方入口自动规划。</text>
         <text class="station-footnote">参考方向依据发布轨迹，并非已确认的道路两侧站位。分岔线路可点击查看，或由上方入口自动选方向；当前无实时到站信息。</text>
+      </view>
+
+      <view wx:elif="{{nearbyStationPoint}}" class="sheet-content nearest-stations-content">
+        <view class="nearest-point-note"><view class="nearest-point-dot"></view><text>已在地图选好位置，可继续点图更换</text></view>
+        <text class="quiet-note">{{nearbyStationMessage}}</text>
+        <view wx:for="{{nearbyStations}}" wx:key="stationId" class="nearest-station-card {{index === 0 ? 'nearest-station-card--first' : ''}}">
+          <view class="nearest-station-heading"><view class="nearest-station-title"><text wx:if="{{index === 0}}" class="nearest-badge">最近</text><text>{{item.name}}</text></view><text class="nearest-station-distance">直线约{{item.distanceMeters}}米</text></view>
+          <text class="nearest-station-routes">{{item.routeText}}</text>
+          <view class="nearest-station-actions"><button class="subtle-button" data-stop-id="{{item.stopId}}" bindtap="handleNearbyStationDetails">站点与方向</button><button class="nearest-navigate" disabled="{{!!nearbyOpeningStopId}}" data-stop-id="{{item.stopId}}" bindtap="handleNavigateNearbyStation">{{nearbyOpeningStopId === item.stopId ? '正在打开…' : '导航去车站'}}<image class="tiny-icon" src="/assets/icons/ui-forward-light.svg" /></button></view>
+        </view>
+        <text class="nearest-navigation-note">导航从手机当前位置出发；请在打开的地图中选择步行。距离是所选点到站的直线参考，步行路线以地图为准。</text>
       </view>
 
       <view wx:elif="{{viewMode === 'map'}}" class="sheet-content browse-content">

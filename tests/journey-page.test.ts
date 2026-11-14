@@ -12,8 +12,13 @@ import type { CampusSearchSuggestion } from '../miniprogram/services/navigation/
 import type { CurrentRouteStopView } from '../miniprogram/services/map/current-transit-map.service'
 import type { SheetGeometry, SheetSnap } from '../miniprogram/services/map/map-sheet-layout'
 import type { UnifiedTransitStop } from '../miniprogram/services/map/unified-transit-stops'
+import type { NearbyCampusStation } from '../miniprogram/services/navigation/nearest-campus-station.service'
 
 interface PageData {
+  nearbyStationPoint: Coordinate | null
+  nearbyStations: NearbyCampusStation[]
+  nearbyStationMessage: string
+  nearbyOpeningStopId: string
   originAllowedVisits: TransitVisitDirection[] | null
   destinationAllowedVisits: TransitVisitDirection[] | null
   selectedStation: UnifiedTransitStop | null
@@ -69,6 +74,9 @@ interface PageData {
 }
 interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; suggestionId?: string; stopId?: string; searchVersion?: number; view?: string; order?: string; visitKey?: string; directionId?: string } } }
 interface JourneyPage {
+  handleCloseNearbyStations(): void
+  handleNavigateNearbyStation(event: Event): void
+  handleNearbyStationDetails(event: Event): void
   handleMarkerTap(event: { detail: { markerId: number } }): void
   handleCloseStation(): void
   handleUseStation(event: Event): void
@@ -116,7 +124,7 @@ interface JourneyPage {
   handleKeyboardHeightChange(event: { detail: { height: number }; currentTarget: { dataset: { field: string } } }): void
 }
 
-function createRuntime(deferRendering = false, deferMapMeasurement = false) {
+function createRuntime(deferRendering = false, deferMapMeasurement = false, deferNativeMap = false) {
   const root = fileURLToPath(new URL('../miniprogram/', import.meta.url))
   const modules = new Map<string, { exports: unknown }>()
   const pendingRendering: (() => void)[] = []
@@ -127,6 +135,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
   const fitPadding: number[][] = []
   const pendingMapMeasurement: ((rect: { width: number; height: number }) => void)[] = []
   const openedStops: Coordinate[] = []
+  const pendingNativeMaps: { fail?(result: { errMsg: string }): void; complete?(): void }[] = []
   let mapPayloadWrites = 0
   let page: JourneyPage | undefined
   const wx = {
@@ -153,7 +162,11 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
     },
     getLocation(options: (typeof pendingLocation)[number]) { pendingLocation.push(options) },
     chooseLocation(options: (typeof pendingPlace)[number]) { pendingPlace.push(options) },
-    openLocation(options: Coordinate) { openedStops.push({ latitude: options.latitude, longitude: options.longitude }) },
+    openLocation(options: Coordinate & { fail?(result: { errMsg: string }): void; complete?(): void }) {
+      openedStops.push({ latitude: options.latitude, longitude: options.longitude })
+      if (deferNativeMap) pendingNativeMaps.push(options)
+      else options.complete?.()
+    },
     navigateTo() {},
     hideKeyboard() {},
   }
@@ -188,6 +201,7 @@ function createRuntime(deferRendering = false, deferMapMeasurement = false) {
     return module.exports
   }
   return {
+    rejectNativeMap() { const pending = pendingNativeMaps.shift()!; pending.fail?.({ errMsg: 'openLocation:fail unavailable' }); pending.complete?.() },
     fitPoints, fitPadding, openedStops, cameraMoves, mapPayloadWrites: () => mapPayloadWrites,
     pendingLocationCount: () => pendingLocation.length,
     resolvePlace(coordinate: Coordinate, name = '腾讯地图选择位置') { assert.ok(pendingPlace.length); pendingPlace.shift()!.success({ ...coordinate, name, address: '校园参考地址' }) },
@@ -818,7 +832,7 @@ test('typing while GPS is pending cancels that request and preserves the search 
   assert.equal(page.data.locating, false)
 })
 
-test('map selection requires an explicit field, validates coordinates and supports cancellation', () => {
+test('map endpoint selection requires an explicit field while ordinary taps find nearby stations', () => {
   const runtime = createRuntime()
   const page = runtime.page()
   page.onLoad()
@@ -846,6 +860,101 @@ test('map selection requires an explicit field, validates coordinates and suppor
   page.onShow()
   page.handleMapTap({ detail: point })
   assert.equal(page.data.destinationCoordinate, null, 'leaving the page cancels the map selection session')
+})
+
+test('a map tap recommends unique nearby station areas without changing endpoints or collecting GPS', () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  const before = [page.data.originMode, page.data.originQuery, page.data.destinationMode, page.data.destinationQuery]
+  page.handleMapTap({ detail: runtime.dataset().stops[0].coordinate })
+  assert.ok(page.data.nearbyStations.length)
+  assert.ok(page.data.nearbyStations.length <= 3)
+  assert.equal(new Set(page.data.nearbyStations.map((s) => s.stationId)).size, page.data.nearbyStations.length)
+  assert.deepEqual([page.data.originMode, page.data.originQuery, page.data.destinationMode, page.data.destinationQuery], before)
+  assert.equal(runtime.pendingLocationCount(), 0)
+  const station = page.data.nearbyStations[0]
+  page.handleNavigateNearbyStation({ currentTarget: { dataset: { stopId: station.stopId } } })
+  assert.deepEqual(runtime.openedStops[0], JSON.parse(JSON.stringify(station.coordinate)))
+  assert.equal(page.data.nearbyOpeningStopId, '')
+  page.handleNavigateNearbyStation({ currentTarget: { dataset: { stopId: 'not-recommended' } } })
+  assert.equal(runtime.openedStops.length, 1)
+})
+
+test('closing nearby station search restores the selected ride and station details return to nearby results', () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  page.handlePlanJourney()
+  const id = page.data.selectedJourneyId, before = JSON.stringify(page.data.mapPolylines)
+  page.handleMapTap({ detail: runtime.dataset().stops[0].coordinate })
+  const station = page.data.nearbyStations[0]
+  page.handleNearbyStationDetails({ currentTarget: { dataset: { stopId: station.stopId } } })
+  assert.ok(page.data.selectedStation)
+  page.handleCloseStation()
+  assert.ok(page.data.nearbyStationPoint)
+  page.handleCloseNearbyStations()
+  assert.equal(page.data.nearbyStationPoint, null)
+  assert.equal(page.data.selectedJourneyId, id)
+  assert.equal(JSON.stringify(page.data.mapPolylines), before)
+})
+
+test('nearby navigation handles duplicate taps, failure and late callbacks after a new selection', () => {
+  const runtime = createRuntime(false, false, true), page = runtime.page()
+  page.onLoad()
+  page.handleMapTap({ detail: runtime.dataset().stops[0].coordinate })
+  const event = { currentTarget: { dataset: { stopId: page.data.nearbyStations[0].stopId } } }
+  page.handleNavigateNearbyStation(event)
+  page.handleNavigateNearbyStation(event)
+  assert.equal(runtime.openedStops.length, 1)
+  runtime.rejectNativeMap()
+  assert.equal(page.data.nearbyOpeningStopId, '')
+  assert.match(page.data.nearbyStationMessage, /打开|导航/)
+  page.handleNavigateNearbyStation(event)
+  page.handleMapTap({ detail: runtime.dataset().stops[28].coordinate })
+  const message = page.data.nearbyStationMessage
+  runtime.rejectNativeMap()
+  assert.equal(page.data.nearbyStationMessage, message)
+  page.handleMapTap({ detail: { latitude: 29.9, longitude: 106.5 } })
+  assert.equal(page.data.nearbyStations.length, 0)
+  assert.match(page.data.nearbyStationMessage, /800/)
+})
+
+test('hidden pages discard native-map callbacks and planner actions clear the nearby overlay', () => {
+  const runtime = createRuntime(false, false, true), page = runtime.page()
+  page.onLoad()
+  const point = runtime.dataset().stops[0].coordinate
+  page.handleMapTap({ detail: point })
+  page.handleNavigateNearbyStation({ currentTarget: { dataset: { stopId: page.data.nearbyStations[0].stopId } } })
+  page.onHide()
+  const message = page.data.nearbyStationMessage
+  runtime.rejectNativeMap()
+  page.onShow()
+  assert.equal(page.data.nearbyOpeningStopId, '')
+  assert.equal(page.data.nearbyStationMessage, message)
+  page.handleOpenPlanner()
+  assert.equal(page.data.nearbyStationPoint, null)
+  page.handleMapTap({ detail: point })
+  page.handleRouteChange({ currentTarget: { dataset: { routeId: 'route_4' } } })
+  assert.equal(page.data.nearbyStationPoint, null)
+})
+
+test('closing nearby results fits the restored journey after asynchronous rendering', () => {
+  const runtime = createRuntime(true), page = runtime.page()
+  page.onLoad()
+  page.onReady()
+  page.handleOriginChange({ detail: { value: '0' } })
+  page.handleDestinationChange({ detail: { value: '28' } })
+  page.handlePlanJourney()
+  runtime.flushRendering()
+  page.handleMapTap({ detail: runtime.dataset().stops[50].coordinate })
+  runtime.flushRendering()
+  const count = runtime.fitPoints.length
+  page.handleCloseNearbyStations()
+  runtime.flushRendering()
+  assert.ok(runtime.fitPoints.length > count, 'restored ride must receive a current camera fit')
+  assert.equal(JSON.stringify(runtime.fitPoints[runtime.fitPoints.length - 1]), JSON.stringify(page.data.mapFitPoints))
 })
 
 test('map points on both ends auto-plan and a far point keeps its reference without an old journey', () => {

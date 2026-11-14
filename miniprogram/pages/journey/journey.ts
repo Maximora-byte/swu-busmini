@@ -10,6 +10,7 @@ import { BEIBEI_VIEWPORT, CAMPUS_VIEWPORT, getLocationViewport } from '../../ser
 import { getCurrentMapPresentation, type CurrentRouteStopView } from '../../services/map/current-transit-map.service'
 import { createSheetLayout, getSheetGeometry, getOverlayMapPadding, type SheetSnap } from '../../services/map/map-sheet-layout'
 import { getUnifiedTransitStops, type UnifiedTransitStop } from '../../services/map/unified-transit-stops'
+import { createNearestCampusStationService, type NearbyCampusStation } from '../../services/navigation/nearest-campus-station.service'
 
 const INITIAL_SHEET = createSheetLayout()
 
@@ -66,10 +67,15 @@ Page({
   confirmedOriginStopId: '',
   placeSearch: null as ReturnType<typeof createCampusPlaceSearchService> | null,
   nativePlaceRequestVersion: 0,
+  nearbyNavigationVersion: 0,
+  nearestStationService: null as ReturnType<typeof createNearestCampusStationService> | null,
   pendingTencentPlace: null as { field: EndpointField; point: Coordinate; name: string; details: string; version: number } | null,
   sheetLayout: INITIAL_SHEET,
   sheetTapSuppressedUntil: 0,
   data: {
+    nearbyStationPoint: null as Coordinate | null,
+    nearbyStations: [] as (NearbyCampusStation & { routeText: string })[],
+    nearbyStationMessage: '', nearbyOpeningStopId: '',
     originAllowedVisits: null as TransitVisitDirection[] | null,
     destinationAllowedVisits: null as TransitVisitDirection[] | null,
     selectedStation: null as UnifiedTransitStop | null,
@@ -106,6 +112,7 @@ Page({
     this.dataset = currentTransitRepository.getDataset()
     const dataset = this.dataset
     this.stations = getUnifiedTransitStops(dataset)
+    this.nearestStationService = createNearestCampusStationService(dataset)
     this.placeSearch = createCampusPlaceSearchService(dataset, campusMapPlaces)
     const initialRouteId = dataset.routes.some(({ id }) => id === query.routeId) ? query.routeId! : ''
     const eligibleStopIds = new Set(dataset.routes.flatMap((route) => route.visits.filter(isAutomaticBoardingVisit).map(({ stopId }) => stopId)))
@@ -144,6 +151,8 @@ Page({
   onUnload() { this.cancelPendingActions(false); this.mapReady = false },
   cancelPendingActions(updateView = true) {
     this.pageVisible = false
+    this.nearbyNavigationVersion += 1
+    if (updateView) this.setData({ nearbyOpeningStopId: '' })
     // Reading the privacy contract can hide the page while a location API is
     // awaiting the user's decision. Keep that request alive until return.
     if (updateView && this.selectComponent?.('#privacy-consent')?.hasPendingPrivacy?.()) return
@@ -214,6 +223,7 @@ Page({
     this.setSheetSnap(this.data.sheetSnap, false)
   },
   handleOpenPlanner() {
+    if (this.data.nearbyStationPoint) this.handleCloseNearbyStations()
     this.setData({ selectedStation: null })
     this.switchView('journey')
     const field = this.data.originMode === 'search' && this.data.destinationMode !== 'search' ? 'origin' : 'destination'
@@ -275,12 +285,14 @@ Page({
     const dataset = this.dataset
     if (!dataset || (!dataset.routes.some(({ id }) => id === routeId) && !(routeId === '' && this.data.showAllRoutes))) return
     const version = ++this.cameraRequestVersion
+    this.nearbyNavigationVersion += 1
     const view = getCurrentMapPresentation(dataset, routeId, {
       network: this.data.showAllRoutes, reverse: this.data.referenceReverse,
     })
     const ids = new Set(view.stopIds)
     const eligibleIds = new Set(view.eligibleStopIds)
     this.setData({
+      nearbyStationPoint: null, nearbyStations: [], nearbyStationMessage: '', nearbyOpeningStopId: '',
       selectedStation: null,
       selectedRouteId: view.routeId, routeName: view.name, routeColor: view.color, selectedJourneyId: '', stopMessage: '', selectedVisitKey: '',
       routeStops: view.stops, routeSummary: view.summary, mapLegend: view.legend,
@@ -408,7 +420,7 @@ Page({
   },
 
   clearJourneys() {
-    const redraw = !!this.data.selectedJourneyId || this.data.mapCircles.length > 0 || this.data.journeys.length > 0
+    const redraw = !!this.data.selectedJourneyId || this.data.mapCircles.length > 0 || this.data.journeys.length > 0 || !!this.data.nearbyStationPoint
     this.rememberedJourneyId = ''
     this.endpointRequestVersion += 1
     this.cameraRequestVersion += 1
@@ -567,18 +579,73 @@ Page({
   handleCancelMapSelection() { this.setData({ mapSelectionField: '', mapSelectionMessage: '' }); this.setSheetSnap('half') },
   handleMapTap(event: WechatMiniprogram.MapTap) {
     const field = endpointField(this.data.mapSelectionField)
-    if (!field || !this.pageVisible) return
+    if (!this.pageVisible) return
     const { latitude, longitude } = event.detail
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
-      this.setData({ mapSelectionMessage: '未取得有效地图位置，请重新点选。' }); return
+      this.setData(field ? { mapSelectionMessage: '未取得有效地图位置，请重新点选。' } :
+        { nearbyStationMessage: '未取得有效地图位置，请重新点选。' }); return
     }
     const coordinate = { latitude, longitude }
+    if (!field) { this.showNearbyStations(coordinate); return }
     this.clearJourneys()
     if (field === 'origin') this.confirmedOriginStopId = ''
     const nearbyStops = nearbyStopViews(this.placeSearch?.nearby(coordinate) ?? [])
     this.setData(field === 'origin' ? { originAllowedVisits: null, originMode: 'map', originCoordinate: coordinate, originQuery: '地图所选起点', locationMessage: '', originPlaceDetails: '手动地图参考点。', originNearbyStops: nearbyStops } :
       { destinationAllowedVisits: null, destinationMode: 'map', destinationCoordinate: coordinate, destinationQuery: '地图所选终点', destinationPlaceDetails: '手动地图参考点。', destinationNearbyStops: nearbyStops })
     this.replanIfReady()
+  },
+  showNearbyStations(point: Coordinate) {
+    if (!this.dataset || !this.nearestStationService || !this.pageVisible) return
+    const result = this.nearestStationService.nearby(point)
+    this.handleDismissKeyboard()
+    this.endpointRequestVersion += 1
+    this.mapLocationRequestVersion += 1
+    this.nearbyNavigationVersion += 1
+    const inArea = getLocationViewport(point).isWithinArea
+    const fitPoints = [point, ...result.stations.map((station) => station.coordinate)].map((p) => ({ ...p }))
+    this.setData({ nearbyStationPoint: { ...point }, nearbyStations: result.stations.map((station) => ({ ...station,
+      distanceMeters: Math.round(station.distanceMeters), routeText: station.routeNames.join(' / ') })),
+      nearbyStationMessage: result.message, nearbyOpeningStopId: '', selectedStation: null,
+      dataNotesExpanded: false, focusedSearchField: '', activeSearchField: '', searchResults: [],
+      locating: false, mapLocating: false, mapLocationMessage: '', stopMessage: '',
+      ...(this.data.locating ? { locationMessage: '本次定位已取消，可重新定位。' } : {}),
+      mapMarkers: result.stations.map((station, index) => {
+        const stop = this.dataset!.stops.find((item) => item.id === station.stopId)!
+        const item = marker(this.dataset!, stop, index === 0 ? '最近 · ' : '')
+        return { ...item, stationId: station.stationId, title: station.name }
+      }),
+      mapCircles: inArea ? [{ ...point, color: '#2869d8', fillColor: '#2869d844', radius: 18, strokeWidth: 3 }] : [],
+      mapFitPoints: inArea ? fitPoints : [],
+    })
+    this.setSheetSnap('half', false, () => { if (inArea && fitPoints.length >= 2) this.fitMap(fitPoints) })
+  },
+  handleCloseNearbyStations() {
+    this.nearbyNavigationVersion += 1
+    const journey = this.data.journeys.find((item) => item.id === this.data.selectedJourneyId)
+    if (journey) { this.showJourney(journey); return }
+    else if (this.data.viewMode === 'journey') this.showPlanningOverview(false)
+    else this.showRoute(this.data.selectedRouteId, false)
+    this.setSheetSnap('peek')
+  },
+  handleNearbyStationDetails(event: WechatMiniprogram.TouchEvent) {
+    const stop = this.data.nearbyStations.find((item) => item.stopId === event.currentTarget.dataset.stopId)
+    const item = stop && this.data.mapMarkers.find((m) => m.stopId === stop.stopId)
+    if (item) this.handleMarkerTap({ detail: { markerId: item.id } } as WechatMiniprogram.MarkerTap)
+  },
+  handleNavigateNearbyStation(event: WechatMiniprogram.TouchEvent) {
+    if (!this.pageVisible || this.data.nearbyOpeningStopId) return
+    const stop = this.data.nearbyStations.find((item) => item.stopId === event.currentTarget.dataset.stopId)
+    if (!stop) return
+    const version = ++this.nearbyNavigationVersion
+    this.setData({ nearbyOpeningStopId: stop.stopId })
+    const fail = () => {
+      if (version === this.nearbyNavigationVersion && this.pageVisible) this.setData({ nearbyStationMessage: '暂时无法打开地图导航，请稍后重试或查看站点位置。' })
+    }
+    const complete = () => { if (version === this.nearbyNavigationVersion) this.setData({ nearbyOpeningStopId: '' }) }
+    try {
+      wx.openLocation({ ...stop.coordinate, name: stop.name, scale: 18,
+        address: '校园校车发布参考点；从手机当前位置前往，请在地图中选择步行并现场核对站位。', fail, complete })
+    } catch { fail(); complete() }
   },
   replanIfReady() {
     if (this.data.originMode !== 'search' && this.data.destinationMode !== 'search' && !this.data.locating) this.handlePlanJourney()
@@ -680,6 +747,7 @@ Page({
     if (journey) this.showJourney(journey)
   },
   showJourney(journey: JourneyView) {
+    this.nearbyNavigationVersion += 1
     const dataset = this.dataset!
     const markers = new Map<string, JourneyMarker>()
     journey.legs.forEach((leg, index) => {
@@ -698,6 +766,7 @@ Page({
     const mapCircles = this.referenceCircles()
     this.rememberedJourneyId = journey.id
     this.setData({
+      nearbyStationPoint: null, nearbyStations: [], nearbyStationMessage: '', nearbyOpeningStopId: '',
       focusedSearchField: '', keyboardHeight: 0,
       journeyPreview: { title: journey.title, boardingName: journey.legs[0].boardingName,
         alightingName: journey.legs[journey.legs.length - 1].alightingName, routeText: journey.legs.map(({ routeName }) => routeName).join(' → '),
@@ -737,7 +806,7 @@ Page({
   },
   handleCloseStation() {
     this.setData({ selectedStation: null, stopMessage: '' })
-    this.setSheetSnap('peek', false)
+    this.setSheetSnap(this.data.nearbyStationPoint ? 'half' : 'peek', !!this.data.nearbyStationPoint)
   },
   handleUseStation(event: WechatMiniprogram.TouchEvent) {
     const field = endpointField(event.currentTarget.dataset.field)
