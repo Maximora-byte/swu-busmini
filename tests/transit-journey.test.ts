@@ -26,6 +26,53 @@ function assertPoints(actual: Coordinate[], expected: Coordinate[]): void {
   })
 }
 
+test('reference direction constraints apply to both ends of direct and transfer rides', () => {
+  const data = dataset([stop('a', p(106.420)), stop('x', p(106.421)), stop('d', p(106.422))], [
+    route('first', [p(106.420), p(106.421)], [visit('a', 0, 0, 0), visit('x', 0, 1, 100)]),
+    route('second', [p(106.421), p(106.422)], [visit('x', 0, 0, 0), visit('d', 0, 1, 100)]),
+  ])
+  const service = createTransitJourneyService(data)
+  const a = { ...endpoint('a'), allowedVisits: [{ routeId: 'first', visitIndex: 0, directionId: 'forward' as const }] }
+  const d = { ...endpoint('d'), allowedVisits: [{ routeId: 'second', visitIndex: 1, directionId: 'forward' as const }] }
+  assert.equal(service.plan(a, d).journeys.length, 1)
+  assert.equal(service.plan({ ...a, allowedVisits: [{ ...a.allowedVisits[0], directionId: 'reverse' }] }, d).journeys.length, 0)
+  assert.equal(service.plan(a, { ...d, allowedVisits: [{ ...d.allowedVisits[0], directionId: 'reverse' }] }).journeys.length, 0)
+  assert.equal(service.plan({ ...a, allowedVisits: [] }, d).journeys.length, 0)
+  assert.equal(service.plan(a, endpoint('x')).journeys.length, 1)
+  assert.equal(service.plan(endpoint('x'), d).journeys.length, 1)
+})
+
+test('direction candidates are filtered before the nearest-six limit and preserve source occurrence', () => {
+  const stops = Array.from({ length: 8 }, (_, i) => stop(`s${i}`, p(106.420 + i * .00001)))
+  stops.push(stop('z', p(106.43)))
+  const routes = stops.slice(0, 8).map((s, i) => route(`r${i}`, [s.coordinate, stops[8].coordinate], [visit(s.id, 0, 0, 0), visit('z', 0, 1, 1000)]))
+  const service = createTransitJourneyService(dataset(stops, routes))
+  const from = { kind: 'coordinate' as const, coordinate: p(106.42), allowedVisits: [{ routeId: 'r7', visitIndex: 0, directionId: 'forward' as const }] }
+  assert.equal(service.plan(from, endpoint('z')).journeys[0]?.legs[0].boardingStopId, 's7')
+  assert.equal(service.plan({ ...from, allowedVisits: [{ routeId: 'missing', visitIndex: 0, directionId: 'forward' }] }, endpoint('z')).journeys.length, 0)
+})
+
+test('reference constraints retain the selected occurrence of a repeated source stop', () => {
+  const data = dataset([stop('a', p(106.42)), stop('b', p(106.421)), stop('c', p(106.423))], [
+    route('r', [p(106.42), p(106.421), p(106.42), p(106.423)], [
+      visit('a', 0, 0, 0), visit('b', 1, 0, 100), visit('a', 2, 0, 200), visit('c', 2, 1, 500),
+    ]),
+  ])
+  const service = createTransitJourneyService(data)
+  const a = { ...endpoint('a'), allowedVisits: [{ routeId: 'r', visitIndex: 0, directionId: 'forward' as const }] }
+  assert.equal(service.plan(a, endpoint('c')).journeys[0].legs[0].boardingVisitIndex, 0)
+  assert.equal(service.plan({ ...a, allowedVisits: [{ routeId: 'r', visitIndex: 0, directionId: 'reverse' }] }, endpoint('b')).journeys.length, 0)
+  const later = { ...a, allowedVisits: [{ routeId: 'r', visitIndex: 2, directionId: 'reverse' as const }] }
+  assert.equal(service.plan(later, endpoint('b')).journeys[0].legs[0].boardingVisitIndex, 2)
+})
+
+test('explicit direction rules cannot re-enable the quarantined 3B visit through a shared stop ID', () => {
+  const route = currentTransitDataset.routes.find((r) => r.id === 'route_3b')!
+  const index = route.visits.findIndex((v) => v.offsetMeters > 35)
+  const from = { ...endpoint(route.visits[index].stopId), allowedVisits: [{ routeId: route.id, visitIndex: index, directionId: 'forward' as const }] }
+  assert.equal(transitJourneyService.plan(from, endpoint(route.visits[0].stopId)).journeys.length, 0)
+})
+
 test('automatic boarding admits the inclusive 35-meter boundary and rejects nonfinite or negative offsets', () => {
   for (const [offsetMeters, eligible] of [[0, true], [35, true], [35.000001, false], [55, false], [-1, false], [NaN, false], [Infinity, false], [-Infinity, false]] as const) {
     assert.equal(isAutomaticBoardingVisit({ offsetMeters }), eligible, `offset ${offsetMeters}`)

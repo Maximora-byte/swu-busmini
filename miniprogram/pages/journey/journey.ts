@@ -1,5 +1,5 @@
 import type { Coordinate } from '../../models/index'
-import type { TransitDataset, TransitStop } from '../../models/current-transit'
+import type { TransitDataset, TransitStop, TransitVisitDirection } from '../../models/current-transit'
 import { currentTransitRepository } from '../../services/repository/current-transit.repository'
 import { transitJourneyService, type TransitJourney, type TransitJourneyLeg } from '../../services/navigation/transit-journey.service'
 import { isAutomaticBoardingVisit } from '../../services/navigation/transit-visit-policy'
@@ -70,6 +70,8 @@ Page({
   sheetLayout: INITIAL_SHEET,
   sheetTapSuppressedUntil: 0,
   data: {
+    originAllowedVisits: null as TransitVisitDirection[] | null,
+    destinationAllowedVisits: null as TransitVisitDirection[] | null,
     selectedStation: null as UnifiedTransitStop | null,
     sheetSnap: 'peek' as SheetSnap, sheetGeometry: getSheetGeometry(INITIAL_SHEET, 'peek', 0),
     focusedSearchField: '', keyboardHeight: 0, sheetScrollTarget: '', planMessageVisible: false,
@@ -121,6 +123,7 @@ Page({
       stopOptions, stopNames: stopOptions.map(({ label }) => label), destinationIndex: stopOptions.length > 1 ? 1 : 0,
       stopPickerNames: ['请选择候车参考站', ...stopOptions.map(({ label }) => label)],
       originMode: 'location', originQuery: '当前位置', destinationQuery: '', showAllRoutes: !initialRouteId,
+      originAllowedVisits: null, destinationAllowedVisits: null,
       sheetSnap, sheetGeometry: getSheetGeometry(this.sheetLayout, sheetSnap, 1),
     })
     this.showRoute(initialRouteId)
@@ -231,6 +234,7 @@ Page({
     this.clearJourneys()
     this.confirmedOriginStopId = ['stop', 'place'].includes(originMode) ? this.data.stopOptions[originIndex]?.id ?? '' : ''
     this.setData({ viewMode: 'journey', originIndex, destinationIndex, originMode, destinationMode, originCoordinate, destinationCoordinate,
+      originAllowedVisits: d.destinationAllowedVisits, destinationAllowedVisits: d.originAllowedVisits,
       originQuery, destinationQuery, locationMessage: '',
       originPlaceDetails: d.destinationPlaceDetails, destinationPlaceDetails: d.originPlaceDetails,
       originNearbyStops: d.destinationNearbyStops, destinationNearbyStops: d.originNearbyStops })
@@ -422,6 +426,7 @@ Page({
     this.clearJourneys()
     this.confirmedOriginStopId = this.data.stopOptions[index].id
     this.setData({ originIndex: index, originMode: 'stop', originCoordinate: null, locationMessage: '',
+      originAllowedVisits: null,
       originPlaceDetails: '', originNearbyStops: [],
       originQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
   },
@@ -430,6 +435,7 @@ Page({
     if (!Number.isInteger(index) || !this.data.stopOptions[index]) return
     this.clearJourneys()
     this.setData({ destinationIndex: index, destinationMode: 'stop', destinationCoordinate: null,
+      destinationAllowedVisits: null,
       destinationPlaceDetails: '', destinationNearbyStops: [],
       destinationQuery: this.dataset?.stops.find(({ id }) => id === this.data.stopOptions[index].id)?.name ?? '' })
   },
@@ -470,8 +476,8 @@ Page({
     this.setData({ viewMode: 'journey' })
     this.clearJourneys()
     if (field === 'origin') this.confirmedOriginStopId = ''
-    this.setData(field === 'origin' ? { originQuery: query, originMode: 'search', originCoordinate: null, locationMessage: '', originPlaceDetails: '', originNearbyStops: [] } :
-      { destinationQuery: query, destinationMode: 'search', destinationCoordinate: null, destinationPlaceDetails: '', destinationNearbyStops: [] })
+    this.setData(field === 'origin' ? { originAllowedVisits: null, originQuery: query, originMode: 'search', originCoordinate: null, locationMessage: '', originPlaceDetails: '', originNearbyStops: [] } :
+      { destinationAllowedVisits: null, destinationQuery: query, destinationMode: 'search', destinationCoordinate: null, destinationPlaceDetails: '', destinationNearbyStops: [] })
     this.setData({ focusedSearchField: field, sheetScrollTarget: `${field}-field`, dataNotesExpanded: false })
     if (this.data.sheetSnap !== 'full') this.setSheetSnap('full', false)
     this.showSearchResults(field)
@@ -497,7 +503,7 @@ Page({
     this.commitCampusPlace(field, suggestion.coordinate, suggestion.name,
       `${suggestion.sourceLabel}。${suggestion.details ?? ''}`, suggestion.kind === 'stop' ? suggestion.stopId : undefined)
   },
-  commitCampusPlace(field: EndpointField, point: Coordinate, name: string, details: string, stopId?: string) {
+  commitCampusPlace(field: EndpointField, point: Coordinate, name: string, details: string, stopId?: string, allowedVisits?: readonly TransitVisitDirection[]) {
     const index = stopId ? this.data.stopOptions.findIndex((item) => item.id === stopId) : -1
     const nearbyStops = nearbyStopViews(this.placeSearch?.nearby(point) ?? [])
     wx.hideKeyboard()
@@ -505,8 +511,10 @@ Page({
     if (field === 'origin') this.confirmedOriginStopId = stopId ?? ''
     this.clearJourneys()
     this.setData(field === 'origin' ? {
+      originAllowedVisits: allowedVisits?.map((rule) => ({ ...rule })) ?? null,
       originQuery: name, originMode: 'place', originCoordinate: { ...point }, originIndex: index, locationMessage: '', originPlaceDetails: details, originNearbyStops: nearbyStops,
-    } : { destinationQuery: name, destinationMode: 'place', destinationCoordinate: { ...point }, destinationIndex: index, destinationPlaceDetails: details, destinationNearbyStops: nearbyStops })
+    } : { destinationAllowedVisits: allowedVisits?.map((rule) => ({ ...rule })) ?? null,
+      destinationQuery: name, destinationMode: 'place', destinationCoordinate: { ...point }, destinationIndex: index, destinationPlaceDetails: details, destinationNearbyStops: nearbyStops })
     this.replanIfReady()
   },
   async handleChooseTencentPlace(event: WechatMiniprogram.TouchEvent) {
@@ -568,8 +576,8 @@ Page({
     this.clearJourneys()
     if (field === 'origin') this.confirmedOriginStopId = ''
     const nearbyStops = nearbyStopViews(this.placeSearch?.nearby(coordinate) ?? [])
-    this.setData(field === 'origin' ? { originMode: 'map', originCoordinate: coordinate, originQuery: '地图所选起点', locationMessage: '', originPlaceDetails: '手动地图参考点。', originNearbyStops: nearbyStops } :
-      { destinationMode: 'map', destinationCoordinate: coordinate, destinationQuery: '地图所选终点', destinationPlaceDetails: '手动地图参考点。', destinationNearbyStops: nearbyStops })
+    this.setData(field === 'origin' ? { originAllowedVisits: null, originMode: 'map', originCoordinate: coordinate, originQuery: '地图所选起点', locationMessage: '', originPlaceDetails: '手动地图参考点。', originNearbyStops: nearbyStops } :
+      { destinationAllowedVisits: null, destinationMode: 'map', destinationCoordinate: coordinate, destinationQuery: '地图所选终点', destinationPlaceDetails: '手动地图参考点。', destinationNearbyStops: nearbyStops })
     this.replanIfReady()
   },
   replanIfReady() {
@@ -605,7 +613,7 @@ Page({
     this.clearJourneys()
     const version = this.endpointRequestVersion
     const fallback = this.data.stopOptions.findIndex(({ id }) => id === this.confirmedOriginStopId)
-    this.setData({ locating: true, originMode: fallback >= 0 ? 'stop' : 'location', originCoordinate: null, locationMessage: '正在定位…', originPlaceDetails: '', originNearbyStops: [],
+    this.setData({ originAllowedVisits: null, locating: true, originMode: fallback >= 0 ? 'stop' : 'location', originCoordinate: null, locationMessage: '正在定位…', originPlaceDetails: '', originNearbyStops: [],
       originQuery: fallback >= 0 ? this.dataset?.stops.find(({ id }) => id === this.confirmedOriginStopId)?.name ?? '' : '当前位置' })
     try {
       const location = await locationService.getCurrentLocation()
@@ -642,7 +650,9 @@ Page({
       const destination = this.data.destinationMode !== 'stop' && this.data.destinationCoordinate
         ? { kind: 'coordinate' as const, coordinate: this.data.destinationCoordinate }
         : { kind: 'stop' as const, stopId: this.data.stopOptions[this.data.destinationIndex]?.id }
-      const result = transitJourneyService.plan(origin, destination)
+      const result = transitJourneyService.plan(
+        { ...origin, ...(this.data.originAllowedVisits !== null ? { allowedVisits: this.data.originAllowedVisits } : {}) },
+        { ...destination, ...(this.data.destinationAllowedVisits !== null ? { allowedVisits: this.data.destinationAllowedVisits } : {}) })
       const dataset = this.dataset!
       const name = (id: string) => dataset.stops.find((stop) => stop.id === id)?.name ?? '未知站点'
       const journeys: JourneyView[] = result.journeys.map((journey, index) => ({
@@ -736,6 +746,16 @@ Page({
     this.setData({ selectedStation: null, viewMode: 'journey' })
     this.setSheetSnap('full', false)
     this.commitCampusPlace(field, station.coordinate, station.label, '统一站区参考位置，自动比较附近线路；实际乘降点以方案为准。')
+  },
+  handleUseStationDirection(event: WechatMiniprogram.TouchEvent) {
+    const field = endpointField(event.currentTarget.dataset.field)
+    const station = this.data.selectedStation
+    const direction = station?.directions.find((item) => item.id === event.currentTarget.dataset.directionId)
+    if (!field || !station || !direction || !(field === 'origin' ? direction.canDepart : direction.canArrive)) return
+    this.setData({ selectedStation: null, viewMode: 'journey' })
+    this.setSheetSnap('full', false)
+    this.commitCampusPlace(field, station.coordinate, `${station.label} · ${direction.label}`,
+      `${direction.hint}。仅限制发布轨迹参考顺序，实际站位与运营方向请现场核对。`, undefined, direction.allowedVisits)
   },
   handleUseStationVisit(event: WechatMiniprogram.TouchEvent) {
     const field = endpointField(event.currentTarget.dataset.field)

@@ -6,7 +6,7 @@ import { runInNewContext } from 'node:vm'
 import test from 'node:test'
 import ts from 'typescript'
 import type { Coordinate } from '../miniprogram/models/index'
-import type { TransitDataset } from '../miniprogram/models/current-transit'
+import type { TransitDataset, TransitVisitDirection } from '../miniprogram/models/current-transit'
 import type { TransitJourney } from '../miniprogram/services/navigation/transit-journey.service'
 import type { CampusSearchSuggestion } from '../miniprogram/services/navigation/campus-place-search.service'
 import type { CurrentRouteStopView } from '../miniprogram/services/map/current-transit-map.service'
@@ -14,6 +14,8 @@ import type { SheetGeometry, SheetSnap } from '../miniprogram/services/map/map-s
 import type { UnifiedTransitStop } from '../miniprogram/services/map/unified-transit-stops'
 
 interface PageData {
+  originAllowedVisits: TransitVisitDirection[] | null
+  destinationAllowedVisits: TransitVisitDirection[] | null
   selectedStation: UnifiedTransitStop | null
   sheetSnap: SheetSnap
   sheetGeometry: SheetGeometry
@@ -65,12 +67,13 @@ interface PageData {
   mapPolylines: { points: Coordinate[] }[]
   mapMarkers: { id: number; stationId?: string; stopIds?: string[]; stopId: string; latitude: number; longitude: number; callout: { content: string } }[]
 }
-interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; suggestionId?: string; stopId?: string; searchVersion?: number; view?: string; order?: string; visitKey?: string } } }
+interface Event { currentTarget: { dataset: { routeId?: string; journeyId?: string; legIndex?: number; pointKind?: string; field?: string; suggestionId?: string; stopId?: string; searchVersion?: number; view?: string; order?: string; visitKey?: string; directionId?: string } } }
 interface JourneyPage {
   handleMarkerTap(event: { detail: { markerId: number } }): void
   handleCloseStation(): void
   handleUseStation(event: Event): void
   handleUseStationVisit(event: Event): void
+  handleUseStationDirection(event: Event): void
   data: PageData
   selectComponent?(selector: string): { hasPendingPrivacy?(): boolean } | null
   setData(update: Partial<PageData>, callback?: () => void): void
@@ -577,6 +580,31 @@ test('station focus retains visible map space in compact supported windows', () 
     const padding = runtime.fitPadding[runtime.fitPadding.length - 1]
     assert.ok(padding[0] + padding[2] < 294, 'the focused station must retain a visible map area')
   }
+})
+
+test('station reference choice reaches the planner and editing only resets the changed endpoint', () => {
+  const runtime = createRuntime(), page = runtime.page()
+  page.onLoad()
+  const marker = page.data.mapMarkers.find((m) => m.stopIds!.some((id) => runtime.dataset().stops.find((s) => s.id === id)?.name === '经管院'))!
+  page.handleMarkerTap({ detail: { markerId: marker.id } })
+  const direction = page.data.selectedStation!.directions.find((d) => d.canDepart)!
+  page.handleUseStationDirection({ currentTarget: { dataset: { field: 'origin', directionId: direction.id } } })
+  assert.equal(page.data.originMode, 'place')
+  assert.deepEqual(JSON.parse(JSON.stringify(page.data.originAllowedVisits)), JSON.parse(JSON.stringify(direction.allowedVisits)))
+  const saved = JSON.stringify(page.data.originAllowedVisits)
+  const destinationIndex = page.data.stopOptions.findIndex((s) => runtime.dataset().stops.find((stop) => stop.id === s.id)?.name === '5号门')
+  page.handleDestinationChange({ detail: { value: String(destinationIndex) } })
+  assert.equal(JSON.stringify(page.data.originAllowedVisits), saved)
+  page.handlePlanJourney()
+  for (const journey of page.data.journeys) {
+    const leg = journey.legs[0]
+    assert.ok(direction.allowedVisits.some((rule) => rule.routeId === leg.routeId && rule.visitIndex === leg.boardingVisitIndex && rule.directionId === leg.directionId))
+  }
+  page.handleSwapEndpoints()
+  assert.equal(page.data.originAllowedVisits, null)
+  assert.equal(JSON.stringify(page.data.destinationAllowedVisits), saved)
+  page.handleSearchInput({ currentTarget: { dataset: { field: 'destination' } }, detail: { value: '田家炳' } })
+  assert.equal(page.data.destinationAllowedVisits, null)
 })
 
 test('a valid B-line ride passes the source geometry without presenting the offset point as a boarding stop', () => {

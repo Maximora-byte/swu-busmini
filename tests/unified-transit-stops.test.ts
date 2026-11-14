@@ -18,7 +18,7 @@ test('unified stations preserve every source stop and visit without changing the
 test('same-name grouping uses complete distance bounds, separates other names and distant platforms', () => {
   const data = structuredClone(currentTransitDataset)
   data.routes = []
-  data.stops = [0, 0.0001, 0.0002, 0.001].map((delta, i) => ({ id: `s${i}`, name: '同站', coordinate: { latitude: 29.82 + delta, longitude: 106.42 } }))
+  data.stops = [0, 0.0005, 0.001, 0.002].map((delta, i) => ({ id: `s${i}`, name: '同站', coordinate: { latitude: 29.82 + delta, longitude: 106.42 } }))
   data.stops.push({ ...data.stops[0], id: 'other', name: '另一站' })
   const groups = getUnifiedTransitStops(data)
   assert.equal(groups.length, 4)
